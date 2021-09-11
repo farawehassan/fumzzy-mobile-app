@@ -25,12 +25,6 @@ class _BouncingContainerState extends State<BouncingContainer> with TickerProvid
     });
     controller.repeat(reverse: true);
   }
-  // @override
-  // void didUpdateWidget( oldWidget) {
-  //   super.didUpdateWidget(oldWidget);
-  //   controller.duration = Duration(milliseconds: 1000);
-  // }
-
 
   @override
   void dispose() {
@@ -70,7 +64,6 @@ class _BouncingContainerState extends State<BouncingContainer> with TickerProvid
 }
 
 class LoadingScreen extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -90,13 +83,37 @@ class LoadingScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              child: Center(
-                child: BouncingContainer(),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Center(
+                    child: BouncingContainer(),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => Dashboard()));
+                    },
+                    child: Container(
+                      margin: EdgeInsets.only(top: 13.0),
+                      child: Icon(
+                        Icons.arrow_right_alt_rounded,
+                        color: Colors.black,
+                        size: 30,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            )
+            ),
         ),
       ),
     );
   }
 }
-
+// startTime () async  {
+//   var duration = new Duration(seconds: 5);
+//   return new Timer(duration, route);
+// }
+// route () {
+//   Navigator.push(context, MaterialPageRoute(builder: (context) => Dashboard()));
+// }

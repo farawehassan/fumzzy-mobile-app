@@ -49,10 +49,8 @@ class _MyAppState extends State<MyApp> {
                         ),
                       ),
                     ),
-                    SizedBox(
-                      width: constraints.maxWidth*0.076,
-                    ),
                     Container(
+                      margin: EdgeInsets.only(left: constraints.maxWidth*0.076,),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -129,7 +127,7 @@ class _MyAppState extends State<MyApp> {
                         ),
                         pinTheme: PinTheme(
                           shape: PinCodeFieldShape.box,
-                          fieldHeight: constraints.maxHeight*0.075,
+                          fieldHeight: constraints.maxHeight*.075,
                           fieldWidth: constraints.maxWidth*0.139,
                           activeColor: Color(0xFF000428).withOpacity(0.7,),
                           selectedColor: Colors.blue,
