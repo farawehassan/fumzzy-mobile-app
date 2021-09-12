@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:fumzy/screens/settings/settings.dart';
+import 'package:fumzy/screens/creditors/creditors.dart';
+import 'package:fumzy/screens/staff/staff.dart';
 
 class RefactoredDrawer extends StatefulWidget {
 
@@ -201,7 +203,8 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                       ),
                     ),
                     onTap: () {
-                      print("clicked dashboard");
+                      Navigator.pop(context);
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => Creditors(),));
                     },
                   ),//Creditors
                   ListTile(
@@ -255,7 +258,8 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                       ),
                     ),
                     onTap: () {
-                      print("clicked dashboard");
+                      Navigator.pop(context);
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => Staff(),));
                     },
                   ),//Staffs
                   ListTile(

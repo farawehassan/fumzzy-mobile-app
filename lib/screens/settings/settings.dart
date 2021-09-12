@@ -44,7 +44,7 @@ class _SettingsState extends State<Settings> {
                                 ),//account and security name
                                 Container(
                                   margin: EdgeInsets.only(top: constraints.maxHeight*0.04, bottom: constraints.maxHeight*0.025),
-                                  color: Colors.blue,
+                                  color: Color(0xFF004E92),
                                   height: 3,
                                   width: 79,
                                 ),//blue divider
