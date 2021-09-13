@@ -125,7 +125,7 @@ class _CreditorsState extends State<Creditors> {
                                             style: TextStyle(
                                               color: Color(0xFF75759E),
                                               fontWeight: FontWeight.w500,
-                                              fontSize: 15,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),

@@ -75,9 +75,14 @@ class _StaffState extends State<Staff> {
                                                     fontSize: 14,
                                                   ),
                                                 ),
-                                                Icon(
-                                                  IconlyBold.closeSquare,
-                                                  color: Colors.black.withOpacity(0.7),
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    Navigator.pop(context)
+                                                  },
+                                                  child: Icon(
+                                                    IconlyBold.closeSquare,
+                                                    color: Colors.black.withOpacity(0.7),
+                                                  ),
                                                 ),
                                               ],
                                             ),
@@ -151,7 +156,7 @@ class _StaffState extends State<Staff> {
                                             ),
                                           ),
                                           Container(
-                                            //margin: EdgeInsets.only(bottom: constraints.maxHeight*0.075,),
+                                            margin: EdgeInsets.only(bottom: constraints.maxHeight*0.075,),
                                             padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth*0.07),
                                             child: Column(
                                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -196,9 +201,8 @@ class _StaffState extends State<Staff> {
                                             ),
                                           ),
                                           Container(
-                                            margin: EdgeInsets.only(left: constraints.maxHeight*0.044),
-                                            height: constraints.maxHeight*0.163,
-                                            width: constraints.maxWidth*0.156,
+                                            height: constraints.maxHeight*0.063,
+                                            width: constraints.maxWidth*0.476,
                                             decoration: BoxDecoration(
                                               borderRadius: BorderRadius.circular(6.0),
                                               color: Color(0xFF00509A),
@@ -209,7 +213,7 @@ class _StaffState extends State<Staff> {
                                                 style: TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.w500,
-                                                  fontSize: 13,
+                                                  fontSize: 15,
                                                 ),
                                               ),
                                             ),
@@ -270,7 +274,7 @@ class _StaffState extends State<Staff> {
                                 ),
                                 style: TextStyle(
                                     fontWeight: FontWeight.w400,
-                                    fontSize: 17.0,
+                                    fontSize: 15.0,
                                     color: Colors.black
                                 ),
                               ),
@@ -299,7 +303,7 @@ class _StaffState extends State<Staff> {
                                             style: TextStyle(
                                               color: Color(0xFF75759E),
                                               fontWeight: FontWeight.w500,
-                                              fontSize: 15,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -351,7 +355,7 @@ class _StaffState extends State<Staff> {
                       ),//search, export and filter
                       Container(
                         margin: EdgeInsets.only(top: constraints.maxHeight*0.028),
-                        width: constraints.maxWidth*0.69,
+                        width: constraints.maxWidth*0.75,
                         height: constraints.maxHeight*1.8,
                         decoration: BoxDecoration(
                           color: Colors.white,
