@@ -17,6 +17,9 @@ class _DashboardState extends State<Dashboard> {
       home: SafeArea(
         child: LayoutBuilder(builder: (context, constraints) => Scaffold(
           appBar: AppBar(
+            iconTheme: IconThemeData(
+              color: Color(0xFF004E92),
+            ),
             backgroundColor: Colors.white,
             title: Text(
               'Dashboard',
@@ -28,8 +31,8 @@ class _DashboardState extends State<Dashboard> {
             ),
             actions: [
               Container(
-                padding: EdgeInsets.only(top: constraints.maxWidth*0.03, bottom: constraints.maxWidth*0.03,),
-                margin: EdgeInsets.only(top: constraints.maxWidth*0.006, bottom: constraints.maxWidth*0.006, right: constraints.maxWidth*0.045),
+                padding: EdgeInsets.only(left: constraints.maxWidth*0.019),
+                margin: EdgeInsets.only(top: constraints.maxWidth*0.009, bottom: constraints.maxWidth*0.009, right: constraints.maxWidth*0.045),
                 width: constraints.maxWidth*0.25,
                 decoration: BoxDecoration(
                   color: Color(0xFFE6E9EE),
@@ -49,7 +52,7 @@ class _DashboardState extends State<Dashboard> {
                   ),
                   style: TextStyle(
                       fontWeight: FontWeight.w400,
-                      fontSize: 15.0,
+                      fontSize: 16.0,
                       color: Colors.black
                   ),
                 ),

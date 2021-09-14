@@ -13,9 +13,7 @@ class _SettingsState extends State<Settings> {
     return MaterialApp(
       home: SafeArea(
         child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.white,
-          ),
+          appBar: AppBar(),//ReusableAppBar.getsAppBar('Staffs'),
           drawer: RefactoredDrawer(),
           body: LayoutBuilder(builder: (context, constraints) => ListView(
             children: [
