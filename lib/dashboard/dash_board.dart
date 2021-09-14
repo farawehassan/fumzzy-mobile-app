@@ -28,13 +28,35 @@ class _DashboardState extends State<Dashboard> {
             ),
             actions: [
               Container(
-                margin: EdgeInsets.only(right: constraints.maxWidth*0.067),
-                color: Colors.blue,
-                width: 40,
+                padding: EdgeInsets.only(top: constraints.maxWidth*0.03, bottom: constraints.maxWidth*0.03,),
+                margin: EdgeInsets.only(top: constraints.maxWidth*0.006, bottom: constraints.maxWidth*0.006, right: constraints.maxWidth*0.045),
+                width: constraints.maxWidth*0.25,
+                decoration: BoxDecoration(
+                  color: Color(0xFFE6E9EE),
+                  borderRadius: BorderRadius.circular(27.5),
+                ),
+                child: TextField(
+                  textAlign: TextAlign.start,
+                  decoration: InputDecoration(
+                    suffixIcon: Icon(
+                      IconlyLight.search,
+                      color: Colors.black,
+                      size: 17,
+                    ),
+                    hintText: 'Search',
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                  ),
+                  style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                      fontSize: 15.0,
+                      color: Colors.black
+                  ),
+                ),
               ),//searchbox
               Container(
                 margin: EdgeInsets.only(right: constraints.maxWidth*0.04),
-                width: constraints.maxWidth*0.092,
+                width: constraints.maxWidth*0.082,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -63,7 +85,8 @@ class _DashboardState extends State<Dashboard> {
                       Text(
                         'Admin',
                         style: TextStyle(
-                          fontWeight: FontWeight.w400,
+                          textBaseline: TextBaseline.ideographic,
+                          fontWeight: FontWeight.w500,
                           fontSize: 14,
                           color: Colors.black,
                         ),
