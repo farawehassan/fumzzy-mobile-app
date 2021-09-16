@@ -32,6 +32,7 @@ class _StaffState extends State<Staff> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  //all staff, add staff button
                   Container(
                     margin: EdgeInsets.only(bottom: constraints.maxHeight * 0.1),
                     child: Row(
@@ -47,266 +48,7 @@ class _StaffState extends State<Staff> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            showDialog(
-                              context: context,
-                              barrierColor: Color(0xFF000428).withOpacity(0.86),
-                              builder: (context) => Center(
-                                child: Container(
-                                  //margin: EdgeInsets.symmetric(vertical: 70.0),
-                                  height: constraints.maxHeight,
-                                  width: 400,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(15.0),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Container(
-                                        margin: EdgeInsets.only(bottom: constraints.maxHeight * 0.042),
-                                        padding: EdgeInsets.symmetric(horizontal: 20),
-                                        width: constraints.maxWidth,
-                                        height: constraints.maxWidth * 0.18,
-                                        decoration: BoxDecoration(
-                                          color: Color(0xFFF5F8FF),
-                                          borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(15.0),
-                                            topRight: Radius.circular(15.0),
-                                          ),
-                                        ),
-                                        child: Row(
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              'NEW STAFF',
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                            GestureDetector(
-                                              onTap: () {
-                                                Navigator.pop(context);
-                                              },
-                                              child: Icon(
-                                                IconlyBold.closeSquare,
-                                                color: Colors.black.withOpacity(0.7),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),//newstaff header with cancel icon
-                                      Padding(
-                                        padding:  EdgeInsets.only(bottom: constraints.maxHeight * 0.025),
-                                        child: Text(
-                                          'Add New Staff',
-                                          style: TextStyle(
-                                            color: Color(0xFF00509A),
-                                            fontSize: 19,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 15.0),
-                                        child: Text(
-                                          'To add a new staff enter a username and set a solid 4-digit pin for the new staff.',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            color: Color(0xFF000428).withOpacity(0.6),
-                                            fontWeight: FontWeight.w400,
-                                            fontSize: 15.0,
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        margin: EdgeInsets.only(top: constraints.maxHeight * 0.019,),
-                                        padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth * 0.07),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Username',
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                            Material(
-                                              color: Colors.transparent,
-                                              child: Container(
-                                                margin: EdgeInsets.only(top: constraints.maxHeight * 0.02, bottom: constraints.maxHeight * 0.02),
-                                                height: constraints.maxHeight * 0.07,
-                                                width: constraints.maxWidth,
-                                                padding: EdgeInsets.only(top: 14.0, bottom: 10.0, left: 12.0),
-                                                decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.circular(4.0),
-                                                  color: Colors.white,
-                                                  border: Border.all(
-                                                    width: 1,
-                                                    color: Color(0xFF7BBBE5),
-                                                  ),
-                                                ),
-                                                child: TextField(
-                                                  textAlign: TextAlign.start,
-                                                  decoration: InputDecoration(
-                                                    hintText: 'Enter staff username',
-                                                    hintStyle: TextStyle(
-                                                      color: Color(0xFF818181),
-                                                    ),
-                                                    enabledBorder: InputBorder.none,
-                                                    focusedBorder: InputBorder.none,
-                                                  ),
-                                                  style: TextStyle(
-                                                      fontWeight: FontWeight.w400,
-                                                      fontSize: 17.0,
-                                                      color: Colors.black
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),//username
-                                      Container(
-                                        //margin: EdgeInsets.only(bottom: constraints.maxHeight * 0.0,),
-                                        padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth * 0.07),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'PIN',
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                            Material(
-                                              color: Colors.transparent,
-                                              child: Container(
-                                                margin: EdgeInsets.only(top: constraints.maxHeight * 0.02, bottom: constraints.maxHeight * 0.02),
-                                                child: PinCodeTextField(
-                                                    appContext: context,
-                                                    length: 4,
-                                                    animationType: AnimationType.fade,
-                                                    enablePinAutofill: false,
-                                                    textStyle: TextStyle(
-                                                      fontSize: 20,
-                                                      color: Color(0xFF004E92),
-                                                      fontWeight: FontWeight.w500,
-                                                    ),
-                                                    pinTheme: PinTheme(
-                                                      shape: PinCodeFieldShape.box,
-                                                      fieldHeight: constraints.maxHeight * .075,
-                                                      fieldWidth: constraints.maxWidth * 0.139,
-                                                      activeColor: Color(0xFF000428).withOpacity(0.7,),
-                                                      selectedColor: Colors.blue,
-                                                    ),
-                                                    onChanged: (value) {
-                                                      print("value");
-                                                    }
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),//enter pin
-                                      Container(
-                                        margin: EdgeInsets.only(bottom: constraints.maxHeight * 0.035,),
-                                        padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth * 0.07),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Confirm PIN',
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                            Material(
-                                              color: Colors.transparent,
-                                              child: Container(
-                                                margin: EdgeInsets.only(top: constraints.maxHeight * 0.02, bottom: constraints.maxHeight * 0.02),
-                                                child: PinCodeTextField(
-                                                    appContext: context,
-                                                    length: 4,
-                                                    animationType: AnimationType.fade,
-                                                    enablePinAutofill: false,
-                                                    textStyle: TextStyle(
-                                                      fontSize: 20,
-                                                      color: Color(0xFF004E92),
-                                                      fontWeight: FontWeight.w500,
-                                                    ),
-                                                    pinTheme: PinTheme(
-                                                      shape: PinCodeFieldShape.box,
-                                                      fieldHeight: constraints.maxHeight * .075,
-                                                      fieldWidth: constraints.maxWidth * 0.139,
-                                                      activeColor: Color(0xFF000428).withOpacity(0.7,),
-                                                      selectedColor: Colors.blue,
-                                                    ),
-                                                    onChanged: (value) {
-                                                      print("value");
-                                                    }
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),//re-enter pin
-                                      GestureDetector(
-                                        onTap: () {
-                                          print("re-add staff");
-                                        },
-                                        child: Container(
-                                          margin: EdgeInsets.only(bottom: constraints.maxHeight * 0.045),
-                                          height: constraints.maxHeight * 0.063,
-                                          width: constraints.maxWidth * 0.476,
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(6.0),
-                                            color: Color(0xFF00509A),
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              'Add Staff',
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 15,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.pop(context);
-                                        },
-                                        child: Center(
-                                          child: Text(
-                                            'No, Cancel',
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                              decoration: TextDecoration.underline,
-                                            ),
-                                          ),
-                                        ),
-                                      ),//No, cancel
-                                      //add staff
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
+                            _addStaffDialog(constraints);
                           },
                           child: Container(
                             margin: EdgeInsets.only(left: constraints.maxHeight * 0.044),
@@ -330,7 +72,7 @@ class _StaffState extends State<Staff> {
                         ),
                       ],
                     ),
-                  ),//all staff, add staff button
+                  ),
                   Container(
                     margin: EdgeInsets.only(bottom: constraints.maxHeight * 0.1),
                     child: Row(
@@ -463,5 +205,266 @@ class _StaffState extends State<Staff> {
       ),
     );
   }
-  
+
+  Future<void> _addStaffDialog(BoxConstraints constraints){
+    return showDialog(
+      context: context,
+      barrierColor: Color(0xFF000428).withOpacity(0.86),
+      builder: (context) => Container(
+        color: Color(0xFFFFFFFF),
+        margin: EdgeInsets.all(50),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              //newstaff header with cancel icon
+              Container(
+                padding: EdgeInsets.fromLTRB(34, 30, 34, 27),
+                decoration: BoxDecoration(
+                  color: Color(0xFFF5F8FF),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(15.0),
+                    topRight: Radius.circular(15.0),
+                  ),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'NEW STAFF',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Icon(
+                        IconlyBold.closeSquare,
+                        color: Colors.black.withOpacity(0.7),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 42),
+                child: Text(
+                  'Add New Staff',
+                  style: TextStyle(
+                    color: Color(0xFF00509A),
+                    fontSize: 19,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 15.0),
+                child: Text(
+                  'To add a new staff enter a username and set a solid 4-digit pin for the new staff.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Color(0xFF000428).withOpacity(0.6),
+                    fontWeight: FontWeight.w400,
+                    fontSize: 15.0,
+                  ),
+                ),
+              ),
+              //username
+              Container(
+                margin: EdgeInsets.only(top: constraints.maxHeight * 0.019,),
+                padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth * 0.07),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Username',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Material(
+                      color: Colors.transparent,
+                      child: Container(
+                        margin: EdgeInsets.only(top: constraints.maxHeight * 0.02, bottom: constraints.maxHeight * 0.02),
+                        height: constraints.maxHeight * 0.07,
+                        width: constraints.maxWidth,
+                        padding: EdgeInsets.only(top: 14.0, bottom: 10.0, left: 12.0),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(4.0),
+                          color: Colors.white,
+                          border: Border.all(
+                            width: 1,
+                            color: Color(0xFF7BBBE5),
+                          ),
+                        ),
+                        child: TextField(
+                          textAlign: TextAlign.start,
+                          decoration: InputDecoration(
+                            hintText: 'Enter staff username',
+                            hintStyle: TextStyle(
+                              color: Color(0xFF818181),
+                            ),
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                          ),
+                          style: TextStyle(
+                              fontWeight: FontWeight.w400,
+                              fontSize: 17.0,
+                              color: Colors.black
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              //enter pin
+              Container(
+                //margin: EdgeInsets.only(bottom: constraints.maxHeight * 0.0,),
+                padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth * 0.07),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'PIN',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Material(
+                      color: Colors.transparent,
+                      child: Container(
+                        margin: EdgeInsets.only(top: constraints.maxHeight * 0.02, bottom: constraints.maxHeight * 0.02),
+                        child: PinCodeTextField(
+                            appContext: context,
+                            length: 4,
+                            animationType: AnimationType.fade,
+                            enablePinAutofill: false,
+                            textStyle: TextStyle(
+                              fontSize: 20,
+                              color: Color(0xFF004E92),
+                              fontWeight: FontWeight.w500,
+                            ),
+                            pinTheme: PinTheme(
+                              shape: PinCodeFieldShape.box,
+                              fieldHeight: constraints.maxHeight * .075,
+                              fieldWidth: constraints.maxWidth * 0.139,
+                              activeColor: Color(0xFF000428).withOpacity(0.7,),
+                              selectedColor: Colors.blue,
+                            ),
+                            onChanged: (value) {
+                              print("value");
+                            }
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              //re-enter pin
+              Container(
+                margin: EdgeInsets.only(bottom: constraints.maxHeight * 0.035,),
+                padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth * 0.07),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Confirm PIN',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Material(
+                      color: Colors.transparent,
+                      child: Container(
+                        margin: EdgeInsets.only(top: constraints.maxHeight * 0.02, bottom: constraints.maxHeight * 0.02),
+                        child: PinCodeTextField(
+                            appContext: context,
+                            length: 4,
+                            animationType: AnimationType.fade,
+                            enablePinAutofill: false,
+                            textStyle: TextStyle(
+                              fontSize: 20,
+                              color: Color(0xFF004E92),
+                              fontWeight: FontWeight.w500,
+                            ),
+                            pinTheme: PinTheme(
+                              shape: PinCodeFieldShape.box,
+                              fieldHeight: constraints.maxHeight * .075,
+                              fieldWidth: constraints.maxWidth * 0.139,
+                              activeColor: Color(0xFF000428).withOpacity(0.7,),
+                              selectedColor: Colors.blue,
+                            ),
+                            onChanged: (value) {
+                              print("value");
+                            }
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  print("re-add staff");
+                },
+                child: Container(
+                  margin: EdgeInsets.only(bottom: constraints.maxHeight * 0.045),
+                  height: constraints.maxHeight * 0.063,
+                  width: constraints.maxWidth * 0.476,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(6.0),
+                    color: Color(0xFF00509A),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Add Staff',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: Center(
+                  child: Text(
+                    'No, Cancel',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+              ),//No, cancel
+              //add staff
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
 }
