@@ -233,7 +233,7 @@ class _InventoryState extends State<Inventory> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Container(
-                                        height: constraints.maxHeight,
+                                        height: constraints.maxHeight * 0.76,
                                         width: constraints.maxWidth * 0.48,
                                         decoration: kTableContainer,
                                       ),
@@ -242,7 +242,7 @@ class _InventoryState extends State<Inventory> {
                                           print('save changes');
                                         },
                                         child: Container(
-                                          margin: EdgeInsets.only(top: constraints.maxHeight * 0.02),
+                                          margin: EdgeInsets.only(top: constraints.maxHeight * 0.06),
                                           height: constraints.maxHeight * 0.163,
                                           width: constraints.maxWidth * 0.156,
                                           decoration: BoxDecoration(
@@ -293,7 +293,6 @@ class _InventoryState extends State<Inventory> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              //newstaff header with cancel icon
               Container(
                 padding: EdgeInsets.fromLTRB(34, 30, 34, 27),
                 decoration: BoxDecoration(
@@ -308,11 +307,11 @@ class _InventoryState extends State<Inventory> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'NEW STAFF',
+                      'NEW PRODUCT CATEGORY',
                       style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w500,
-                        fontSize: 14,
+                        fontSize: 15,
                       ),
                     ),
                     GestureDetector(
@@ -326,11 +325,11 @@ class _InventoryState extends State<Inventory> {
                     ),
                   ],
                 ),
-              ),
+              ),//new category header with cancel icon
               Padding(
                 padding: EdgeInsets.only(top: 42),
                 child: Text(
-                  'Add New Staff',
+                  'Add New Category',
                   style: TextStyle(
                     color: Color(0xFF00509A),
                     fontSize: 19,
@@ -341,7 +340,7 @@ class _InventoryState extends State<Inventory> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 15.0),
                 child: Text(
-                  'To add a new staff enter a username and set a solid 4-digit pin for the new staff.',
+                  'You have made a new purchase. Please fill the fields to record your purchase.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Color(0xFF000428).withOpacity(0.6),
@@ -350,15 +349,14 @@ class _InventoryState extends State<Inventory> {
                   ),
                 ),
               ),
-              //username
               Container(
-                margin: EdgeInsets.only(top: constraints.maxHeight * 0.019,),
+                margin: EdgeInsets.only(top: constraints.maxHeight * 0.019, bottom: constraints.maxHeight * 0.045,),
                 padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth * 0.07),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Username',
+                      'Category',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.black,
@@ -372,7 +370,7 @@ class _InventoryState extends State<Inventory> {
                         margin: EdgeInsets.only(top: constraints.maxHeight * 0.02, bottom: constraints.maxHeight * 0.02),
                         height: constraints.maxHeight * 0.07,
                         width: constraints.maxWidth,
-                        padding: EdgeInsets.only(top: 14.0, bottom: 10.0, left: 12.0),
+                        padding: EdgeInsets.only(top: 14.0, bottom: 4.0, left: 12.0),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(4.0),
                           color: Colors.white,
@@ -384,7 +382,7 @@ class _InventoryState extends State<Inventory> {
                         child: TextField(
                           textAlign: TextAlign.start,
                           decoration: InputDecoration(
-                            hintText: 'Enter staff username',
+                            hintText: 'Enter category name',
                             hintStyle: TextStyle(
                               color: Color(0xFF818181),
                             ),
@@ -401,48 +399,10 @@ class _InventoryState extends State<Inventory> {
                     ),
                   ],
                 ),
-              ),
-              //enter pin
-              Container(
-                //margin: EdgeInsets.only(bottom: constraints.maxHeight * 0.0,),
-                padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth * 0.07),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'PIN',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              //re-enter pin
-              Container(
-                margin: EdgeInsets.only(bottom: constraints.maxHeight * 0.035,),
-                padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth * 0.07),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Confirm PIN',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              ),//username
               GestureDetector(
                 onTap: () {
-                  print("re-add staff");
+                  print("add category");
                 },
                 child: Container(
                   margin: EdgeInsets.only(bottom: constraints.maxHeight * 0.045),
@@ -454,7 +414,7 @@ class _InventoryState extends State<Inventory> {
                   ),
                   child: Center(
                     child: Text(
-                      'Add Staff',
+                      'Add Category',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w500,
