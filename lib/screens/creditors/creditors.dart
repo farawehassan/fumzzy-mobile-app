@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fumzy/screens/dashboard/drawer.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:fumzy/screens/ReuseableWidgets.dart';
 
 class Creditors extends StatefulWidget {
 
   static const String id = 'creditors';
-
-  const Creditors({Key? key}) : super(key: key);
 
   @override
   _CreditorsState createState() => _CreditorsState();
@@ -146,14 +145,7 @@ class _CreditorsState extends State<Creditors> {
                                 padding: EdgeInsets.all(15),
                                 height: constraints.maxHeight * 0.163,
                                 width: constraints.maxWidth * 0.131,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(3.0),
-                                  color: Colors.white,
-                                  border: Border.all(
-                                    width: 1,
-                                    color: Color(0xFFE2E2EA),
-                                  ),
-                                ),
+                                decoration: kTableContainer,
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [

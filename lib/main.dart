@@ -1,12 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fumzy/screens/inventory/inventory.dart';
+import 'package:fumzy/screens/invoices/invoices.dart';
 import 'screens/splash-screen.dart';
 import 'screens/creditors/creditors.dart';
 import 'screens/dashboard/dashboard.dart';
 import 'screens/login.dart';
 import 'screens/settings/settings.dart';
 import 'screens/staff/staff.dart';
-
+import 'screens/inventory/inventory.dart';
+import 'screens/invoices/invoices.dart';
 void main() {
   runApp(MyApp());
 }
@@ -27,6 +30,11 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         primaryColor: Color(0xFF00509A),
         backgroundColor: Color(0xFFF7F8F9),
+        tabBarTheme: TabBarTheme(
+          labelPadding: EdgeInsets.only(left: 0.0, right: 0.0),
+          labelColor: Color(0xFF004E92),
+          indicatorSize: TabBarIndicatorSize.label,
+        ),
         appBarTheme: AppBarTheme(
           backgroundColor: Color(0xFFFFFFFF),
           centerTitle: false
@@ -44,6 +52,8 @@ class _MyAppState extends State<MyApp> {
         Staff.id: (context) => Staff(),
         Settings.id: (context) => Settings(),
         Creditors.id: (context) => Creditors(),
+        Inventory.id: (context) => Inventory(),
+        Invoices.id: (context) => Invoices(),
       },
     );
   }

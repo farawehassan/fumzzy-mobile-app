@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:fumzy/screens/dashboard/drawer.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:fumzy/screens/ReuseableWidgets.dart';
 
 class Staff extends StatefulWidget {
 
@@ -183,20 +184,13 @@ class _StaffState extends State<Staff> {
                     margin: EdgeInsets.only(top: constraints.maxHeight * 0.028),
                     width: constraints.maxWidth * 0.75,
                     height: constraints.maxHeight * 1.8,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20.0),
-                      border: Border.all(
-                        width: 1,
-                        color: Color(0xFFE2E2EA),
-                      ),
-                    ),
+                    decoration: kTableContainer,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                       ],
                     ),
-                  ),//settings details
+                  ),//staff details
                 ],
               ),
             ),
@@ -211,7 +205,10 @@ class _StaffState extends State<Staff> {
       context: context,
       barrierColor: Color(0xFF000428).withOpacity(0.86),
       builder: (context) => Container(
-        color: Color(0xFFFFFFFF),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: Color(0xFFFFFFFF),
+        ),
         margin: EdgeInsets.all(50),
         child: SingleChildScrollView(
           child: Column(

@@ -73,14 +73,14 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
               child: Container(
                 width: 70,//constraints.maxWidth*0.21,
                 height: 70,//constraints.maxHeight*0.10,
-                color: Color(0xFF006ACC),
+                color: Colors.white,
                 child: Center(
                   child: Transform.rotate(
                     angle: -0.8,
                     child: Text(
                       'FGV',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Color(0xFF006ACC),
                         fontWeight: FontWeight.w600,
                         fontSize: 20,
                       ),

@@ -3,7 +3,8 @@ import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:fumzy/screens/settings/settings.dart';
 import 'package:fumzy/screens/creditors/creditors.dart';
 import 'package:fumzy/screens/staff/staff.dart';
-
+import 'package:fumzy/screens/inventory/inventory.dart';
+import 'package:fumzy/screens/invoices/invoices.dart';
 class RefactoredDrawer extends StatefulWidget {
 
   @override
@@ -154,7 +155,8 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                         ),
                       ),
                       onTap: () {
-                        print("clicked dashboard");
+                        Navigator.pop(context);
+                        Navigator.pushNamed(context, Inventory.id);
                       },
                     ),//Inventory
                     ListTile(
@@ -172,7 +174,8 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                         ),
                       ),
                       onTap: () {
-                        print("clicked dashboard");
+                        Navigator.pop(context);
+                        Navigator.pushNamed(context, Invoices.id);
                       },
                     ),//Invoices
                     ListTile(
@@ -306,7 +309,7 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                           Navigator.pop(context);
                         },
                       ),
-                    ),
+                    ),//collapse
                   ],
                 ),
               ),

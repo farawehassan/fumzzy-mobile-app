@@ -28,7 +28,7 @@ class _LoginState extends State<Login> {
                 Transform.rotate(
                   angle: 0.8,
                   child: Container(
-                    width: constraints.maxWidth * 0.17,
+                    width: constraints.maxWidth * 0.17,//TODO: change the constaints here.
                     height: constraints.maxHeight * 0.08,
                     color: Color(0xFF00509A),
                     child: Center(
