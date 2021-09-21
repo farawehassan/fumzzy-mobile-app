@@ -71,7 +71,7 @@ class _InventoryState extends State<Inventory> {
                               child: Container(
                                 margin: EdgeInsets.only(
                                     left: constraints.maxHeight * 0.044),
-                                height: constraints.maxHeight * 0.163,
+                                height: constraints.maxHeight * 0.133,
                                 width: constraints.maxWidth * 0.156,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(6.0),
@@ -101,7 +101,7 @@ class _InventoryState extends State<Inventory> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
-                          height: constraints.maxHeight * 0.155,
+                          height: constraints.maxHeight * 0.125,
                           width: constraints.maxWidth * 0.34,
                           padding: EdgeInsets.symmetric(horizontal: 15.0),
                           decoration: BoxDecoration(
@@ -167,7 +167,7 @@ class _InventoryState extends State<Inventory> {
                                 margin: EdgeInsets.only(
                                     left: constraints.maxHeight * 0.044),
                                 padding: EdgeInsets.all(15),
-                                height: constraints.maxHeight * 0.163,
+                                height: constraints.maxHeight * 0.133,
                                 width: constraints.maxWidth * 0.131,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(3.0),
