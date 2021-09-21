@@ -5,7 +5,6 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:fumzy/screens/ReuseableWidgets.dart';
 
 class Staff extends StatefulWidget {
-
   static const String id = 'staff';
 
   @override
@@ -13,21 +12,19 @@ class Staff extends StatefulWidget {
 }
 
 class _StaffState extends State<Staff> {
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      drawer: RefactoredDrawer(),
-      body: LayoutBuilder(builder: (context, constraints) => ListView(
-        children: [
+    return LayoutBuilder(
+      builder: (context, constraints) => (Scaffold(
+        appBar: buildAppBar(constraints,'Staffs'),
+        drawer: RefactoredDrawer(),
+        body: ListView(children: [
           Container(
             child: Container(
               padding: EdgeInsets.only(
-                top: constraints.maxHeight  *  0.07,
-                left: constraints.maxWidth  *  0.026,
-                right: constraints.maxWidth  *  0.026
-              ),
+                  top: constraints.maxHeight * 0.07,
+                  left: constraints.maxWidth * 0.026,
+                  right: constraints.maxWidth * 0.026),
               color: Color(0xFFF7F8F9),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -35,7 +32,8 @@ class _StaffState extends State<Staff> {
                 children: [
                   //all staff, add staff button
                   Container(
-                    margin: EdgeInsets.only(bottom: constraints.maxHeight * 0.1),
+                    margin:
+                        EdgeInsets.only(bottom: constraints.maxHeight * 0.1),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -52,7 +50,8 @@ class _StaffState extends State<Staff> {
                             _addStaffDialog(constraints);
                           },
                           child: Container(
-                            margin: EdgeInsets.only(left: constraints.maxHeight * 0.044),
+                            margin: EdgeInsets.only(
+                                left: constraints.maxHeight * 0.044),
                             height: constraints.maxHeight * 0.163,
                             width: constraints.maxWidth * 0.156,
                             decoration: BoxDecoration(
@@ -75,7 +74,8 @@ class _StaffState extends State<Staff> {
                     ),
                   ),
                   Container(
-                    margin: EdgeInsets.only(bottom: constraints.maxHeight * 0.1),
+                    margin:
+                        EdgeInsets.only(bottom: constraints.maxHeight * 0.1),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -102,10 +102,9 @@ class _StaffState extends State<Staff> {
                             style: TextStyle(
                                 fontWeight: FontWeight.w400,
                                 fontSize: 15.0,
-                                color: Colors.black
-                            ),
+                                color: Colors.black),
                           ),
-                        ),//search
+                        ), //search
                         Row(
                           children: [
                             GestureDetector(
@@ -113,7 +112,8 @@ class _StaffState extends State<Staff> {
                                 print("export table");
                               },
                               child: Container(
-                                margin: EdgeInsets.only(left: constraints.maxHeight * 0.044),
+                                margin: EdgeInsets.only(
+                                    left: constraints.maxHeight * 0.044),
                                 padding: EdgeInsets.all(15),
                                 color: Colors.transparent,
                                 child: Row(
@@ -143,7 +143,8 @@ class _StaffState extends State<Staff> {
                                 print("filter");
                               },
                               child: Container(
-                                margin: EdgeInsets.only(left: constraints.maxHeight * 0.044),
+                                margin: EdgeInsets.only(
+                                    left: constraints.maxHeight * 0.044),
                                 padding: EdgeInsets.all(15),
                                 height: constraints.maxHeight * 0.163,
                                 width: constraints.maxWidth * 0.131,
@@ -156,7 +157,8 @@ class _StaffState extends State<Staff> {
                                   ),
                                 ),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       'Filter',
@@ -174,12 +176,12 @@ class _StaffState extends State<Staff> {
                                   ],
                                 ),
                               ),
-                            ),//filter
+                            ), //filter
                           ],
                         ),
                       ],
                     ),
-                  ),//search, export and filter
+                  ), //search, export and filter
                   Container(
                     margin: EdgeInsets.only(top: constraints.maxHeight * 0.028),
                     width: constraints.maxWidth * 0.75,
@@ -187,20 +189,19 @@ class _StaffState extends State<Staff> {
                     decoration: kTableContainer,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                      ],
+                      children: [],
                     ),
-                  ),//staff details
+                  ), //staff details
                 ],
               ),
             ),
           )
         ]),
-      ),
+      )),
     );
   }
 
-  Future<void> _addStaffDialog(BoxConstraints constraints){
+  Future<void> _addStaffDialog(BoxConstraints constraints) {
     return showDialog(
       context: context,
       barrierColor: Color(0xFF000428).withOpacity(0.86),
@@ -261,7 +262,8 @@ class _StaffState extends State<Staff> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 15.0),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 35, vertical: 15.0),
                 child: Text(
                   'To add a new staff enter a username and set a solid 4-digit pin for the new staff.',
                   textAlign: TextAlign.center,
@@ -274,8 +276,11 @@ class _StaffState extends State<Staff> {
               ),
               //username
               Container(
-                margin: EdgeInsets.only(top: constraints.maxHeight * 0.019,),
-                padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth * 0.07),
+                margin: EdgeInsets.only(
+                  top: constraints.maxHeight * 0.019,
+                ),
+                padding: EdgeInsets.symmetric(
+                    horizontal: constraints.maxWidth * 0.07),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -291,10 +296,13 @@ class _StaffState extends State<Staff> {
                     Material(
                       color: Colors.transparent,
                       child: Container(
-                        margin: EdgeInsets.only(top: constraints.maxHeight * 0.02, bottom: constraints.maxHeight * 0.02),
+                        margin: EdgeInsets.only(
+                            top: constraints.maxHeight * 0.02,
+                            bottom: constraints.maxHeight * 0.02),
                         height: constraints.maxHeight * 0.07,
                         width: constraints.maxWidth,
-                        padding: EdgeInsets.only(top: 14.0, bottom: 10.0, left: 12.0),
+                        padding: EdgeInsets.only(
+                            top: 14.0, bottom: 10.0, left: 12.0),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(4.0),
                           color: Colors.white,
@@ -316,8 +324,7 @@ class _StaffState extends State<Staff> {
                           style: TextStyle(
                               fontWeight: FontWeight.w400,
                               fontSize: 17.0,
-                              color: Colors.black
-                          ),
+                              color: Colors.black),
                         ),
                       ),
                     ),
@@ -327,7 +334,8 @@ class _StaffState extends State<Staff> {
               //enter pin
               Container(
                 //margin: EdgeInsets.only(bottom: constraints.maxHeight * 0.0,),
-                padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth * 0.07),
+                padding: EdgeInsets.symmetric(
+                    horizontal: constraints.maxWidth * 0.07),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -343,7 +351,9 @@ class _StaffState extends State<Staff> {
                     Material(
                       color: Colors.transparent,
                       child: Container(
-                        margin: EdgeInsets.only(top: constraints.maxHeight * 0.02, bottom: constraints.maxHeight * 0.02),
+                        margin: EdgeInsets.only(
+                            top: constraints.maxHeight * 0.02,
+                            bottom: constraints.maxHeight * 0.02),
                         child: PinCodeTextField(
                             appContext: context,
                             length: 4,
@@ -358,13 +368,14 @@ class _StaffState extends State<Staff> {
                               shape: PinCodeFieldShape.box,
                               fieldHeight: constraints.maxHeight * .075,
                               fieldWidth: constraints.maxWidth * 0.139,
-                              activeColor: Color(0xFF000428).withOpacity(0.7,),
+                              activeColor: Color(0xFF000428).withOpacity(
+                                0.7,
+                              ),
                               selectedColor: Colors.blue,
                             ),
                             onChanged: (value) {
                               print("value");
-                            }
-                        ),
+                            }),
                       ),
                     ),
                   ],
@@ -372,8 +383,11 @@ class _StaffState extends State<Staff> {
               ),
               //re-enter pin
               Container(
-                margin: EdgeInsets.only(bottom: constraints.maxHeight * 0.035,),
-                padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth * 0.07),
+                margin: EdgeInsets.only(
+                  bottom: constraints.maxHeight * 0.035,
+                ),
+                padding: EdgeInsets.symmetric(
+                    horizontal: constraints.maxWidth * 0.07),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -389,7 +403,9 @@ class _StaffState extends State<Staff> {
                     Material(
                       color: Colors.transparent,
                       child: Container(
-                        margin: EdgeInsets.only(top: constraints.maxHeight * 0.02, bottom: constraints.maxHeight * 0.02),
+                        margin: EdgeInsets.only(
+                            top: constraints.maxHeight * 0.02,
+                            bottom: constraints.maxHeight * 0.02),
                         child: PinCodeTextField(
                             appContext: context,
                             length: 4,
@@ -404,13 +420,14 @@ class _StaffState extends State<Staff> {
                               shape: PinCodeFieldShape.box,
                               fieldHeight: constraints.maxHeight * .075,
                               fieldWidth: constraints.maxWidth * 0.139,
-                              activeColor: Color(0xFF000428).withOpacity(0.7,),
+                              activeColor: Color(0xFF000428).withOpacity(
+                                0.7,
+                              ),
                               selectedColor: Colors.blue,
                             ),
                             onChanged: (value) {
                               print("value");
-                            }
-                        ),
+                            }),
                       ),
                     ),
                   ],
@@ -421,7 +438,8 @@ class _StaffState extends State<Staff> {
                   print("re-add staff");
                 },
                 child: Container(
-                  margin: EdgeInsets.only(bottom: constraints.maxHeight * 0.045),
+                  margin:
+                      EdgeInsets.only(bottom: constraints.maxHeight * 0.045),
                   height: constraints.maxHeight * 0.063,
                   width: constraints.maxWidth * 0.476,
                   decoration: BoxDecoration(
@@ -455,7 +473,7 @@ class _StaffState extends State<Staff> {
                     ),
                   ),
                 ),
-              ),//No, cancel
+              ), //No, cancel
               //add staff
             ],
           ),
@@ -463,5 +481,4 @@ class _StaffState extends State<Staff> {
       ),
     );
   }
-
 }
