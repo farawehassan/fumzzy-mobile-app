@@ -15,7 +15,7 @@ class _CreditorsState extends State<Creditors> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) => (Scaffold(
-        appBar:buildAppBar(constraints,'Creditors'),
+        appBar: buildAppBar(constraints, 'Creditors'),
         drawer: RefactoredDrawer(),
         body: ListView(
           children: [
@@ -195,11 +195,8 @@ class _CreditorsState extends State<Creditors> {
                           color: Color(0xFFE2E2EA),
                         ),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [],
-                      ),
-                    ), //settings details
+                      child: ReusableDataTable(),//table
+                    ),
                   ],
                 ),
               ),
@@ -210,3 +207,104 @@ class _CreditorsState extends State<Creditors> {
     );
   }
 }
+
+class ReusableDataTable extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context) {
+    return DataTable(
+      headingTextStyle: TextStyle(
+        color: Color(0xFF75759E),
+        fontSize: 13,
+        fontWeight: FontWeight.w400,
+      ),
+      dataTextStyle: TextStyle(
+        color: Colors.black,
+        fontSize: 13,
+        //fontWeight: FontWeight.w400,
+      ),
+      columnSpacing: 5.0,
+      dataRowHeight: 65.0,
+      columns: [
+        DataColumn(label: Text(' Name')),
+        DataColumn(label: Text('Total Credits')),
+        DataColumn(label: Text('Last Re-payment Date')),
+        DataColumn(label: Text('')),
+      ],
+      rows: [
+        DataRow(cells: [
+          DataCell(Text('Obi Cubana and Sons Limited')),
+          DataCell(Text('N5,000')),
+          DataCell(Text('-')),
+          DataCell(ReusableTableArrowButton()),
+        ]),
+        DataRow(cells: [
+          DataCell(Text('Obi Cubana and Sons Limited')),
+          DataCell(Text('N20,000')),
+          DataCell(Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('23, May 2021'),
+              Text(
+                '12:30pm',
+                style: TextStyle(fontWeight: FontWeight.w300),
+              ),
+            ],
+          )),
+          DataCell(ReusableTableArrowButton()),
+        ]),
+        DataRow(cells: [
+          DataCell(Text('Obi Cubana and Sons Limited')),
+          DataCell(Text('N200,000')),
+          DataCell(Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('23, May 2021'),
+              Text(
+                '12:30pm',
+                style: TextStyle(fontWeight: FontWeight.w300),
+              ),
+            ],
+          )),
+          DataCell(ReusableTableArrowButton()),
+        ]),
+        DataRow(cells: [
+          DataCell(Text('Obi Cubana and Sons Limited')),
+          DataCell(Text('N180,000')),
+          DataCell(Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('23, May 2021'),
+              Text(
+                '12:30pm',
+                style: TextStyle(fontWeight: FontWeight.w300),
+              ),
+            ],
+          )),
+          DataCell(ReusableTableArrowButton()),
+        ]),
+        DataRow(cells: [
+          DataCell(Text('Obi Cubana and Sons Limited')),
+          DataCell(Text('N180,000')),
+          DataCell(Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('23, May 2021'),
+              Text(
+                '12:30pm',
+                style: TextStyle(fontWeight: FontWeight.w300),
+              ),
+            ],
+          )),
+          DataCell(ReusableTableArrowButton()),
+        ]),
+      ],
+    );
+  }
+}
+
+

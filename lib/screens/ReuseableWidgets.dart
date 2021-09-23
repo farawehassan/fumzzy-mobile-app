@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 
+
 final TextStyle kTabBarTextStyle = TextStyle(
   fontSize: 16,
   fontWeight: FontWeight.w600,
@@ -13,7 +14,7 @@ final BoxDecoration kTableContainer = BoxDecoration(
     width: 1,
     color: Color(0xFFE2E2EA),
   ),
-);//decoration for the container that contains the table
+);//decoration for the white container that contains the table
 
 AppBar buildAppBar(BoxConstraints constraints, String title) {
   return AppBar(
@@ -110,7 +111,20 @@ AppBar buildAppBar(BoxConstraints constraints, String title) {
       ),//admin
     ],
   );
-}
+}//app bar present in all the screens. Any screen calling the app bar passes their name too
 
+class ReusableTableArrowButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: Icon(
+        IconlyBold.arrowRightCircle,
+        size: 14.5,
+        color: Color(0xFF004E92).withOpacity(0.5),
+      ),
+    );
+  }
+}// arrows present in the table
 
 //table decoration will come in here

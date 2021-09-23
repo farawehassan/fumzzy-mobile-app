@@ -12,6 +12,10 @@ class Staff extends StatefulWidget {
 }
 
 class _StaffState extends State<Staff> {
+
+  final Color activeStatusColor = Color(0xFF00AF27);
+  final Color blockedStatusColor = Color(0xFF4B545A);
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -181,17 +185,18 @@ class _StaffState extends State<Staff> {
                         ),
                       ],
                     ),
-                  ), //search, export and filter
+                  ),
+                  //search, export and filter
                   Container(
-                    margin: EdgeInsets.only(top: constraints.maxHeight * 0.028),
-                    width: constraints.maxWidth * 0.75,
-                    height: constraints.maxHeight * 1.8,
-                    decoration: kTableContainer,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [],
-                    ),
-                  ), //staff details
+                      margin:
+                          EdgeInsets.only(top: constraints.maxHeight * 0.028),
+                      width: constraints.maxWidth * 0.79,
+                      height: constraints.maxHeight * 1.8,
+                      decoration: kTableContainer,
+                      child: StaffTableContents(
+                          activeStatusColor: activeStatusColor,
+                          blockedStatusColor: blockedStatusColor)),
+                  //staff details
                 ],
               ),
             ),
@@ -479,6 +484,185 @@ class _StaffState extends State<Staff> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class StaffTableContents extends StatelessWidget {
+  StaffTableContents({
+    required this.activeStatusColor,
+    required this.blockedStatusColor,
+  });
+
+  final Color activeStatusColor;
+  final Color blockedStatusColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return DataTable(
+      headingTextStyle: TextStyle(
+        color: Color(0xFF75759E),
+        fontSize: 13,
+        fontWeight: FontWeight.w400,
+      ),
+      dataTextStyle: TextStyle(
+        color: Colors.black,
+        fontSize: 13,
+        //fontWeight: FontWeight.w400,
+      ),
+      columnSpacing: 3.0,
+      dataRowHeight: 65.0,
+      columns: [
+        DataColumn(label: Text(' Username')),
+        DataColumn(label: Text('Status')),
+        DataColumn(label: Text('Date Created')),
+        DataColumn(label: Text('Actions')),
+      ],
+      rows: [
+        DataRow(cells: [
+          DataCell(Text('Jermey')),
+          DataCell(Text('Active', style: TextStyle(color: activeStatusColor))),
+          DataCell(Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('23, May 2021'),
+              Text(
+                '12:30pm',
+                style: TextStyle(fontWeight: FontWeight.w300),
+              ),
+            ],
+          )),
+          DataCell(ReusablePopMenu()),
+        ]),
+        DataRow(cells: [
+          DataCell(Text('Bisolapere')),
+          DataCell(
+              Text('Blocked', style: TextStyle(color: blockedStatusColor))),
+          DataCell(Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('23, May 2021'),
+              Text(
+                '12:30pm',
+                style: TextStyle(fontWeight: FontWeight.w300),
+              ),
+            ],
+          )),
+          DataCell(ReusablePopMenu()),
+        ]),
+        DataRow(cells: [
+          DataCell(Text('ObiCubana')),
+          DataCell(Text('Active', style: TextStyle(color: activeStatusColor))),
+          DataCell(Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('23, May 2021'),
+              Text(
+                '12:30pm',
+                style: TextStyle(fontWeight: FontWeight.w300),
+              ),
+            ],
+          )),
+          DataCell(ReusablePopMenu()),
+        ]),
+        DataRow(cells: [
+          DataCell(Text('Paulo')),
+          DataCell(Text('Active', style: TextStyle(color: activeStatusColor))),
+          DataCell(Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('23, May 2021'),
+              Text(
+                '12:30pm',
+                style: TextStyle(fontWeight: FontWeight.w300),
+              ),
+            ],
+          )),
+          DataCell(ReusablePopMenu()),
+        ]),
+        DataRow(cells: [
+          DataCell(Text('Korede')),
+          DataCell(
+              Text('Blocked', style: TextStyle(color: blockedStatusColor))),
+          DataCell(Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('23, May 2021'),
+              Text(
+                '12:30pm',
+                style: TextStyle(fontWeight: FontWeight.w300),
+              ),
+            ],
+          )),
+          DataCell(ReusablePopMenu()),
+        ]),
+      ],
+    );
+  }
+}//the table contents of the staff
+
+class ReusablePopMenu extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton(
+      offset: Offset(110, 40),
+      icon: Icon(
+        Icons.more_horiz,
+        color: Color(0xFF00509A),
+      ),
+      onSelected: (value) {
+        switch (value) {
+          case 0:
+            {
+              print('Reset Pin');
+            }
+            break;
+          case 1:
+            {
+              print('Block');
+            }
+            break;
+          case 2:
+            {
+              print('delete permanently');
+            }
+            break;
+        }
+      },
+      itemBuilder: (context) => [
+        PopupMenuItem(
+          child: Container(width: 135, child: Text('Reset Pin')),
+          value: 0,
+        ),
+        PopupMenuItem(
+          child: Text('Block'),
+          value: 1,
+        ),
+        PopupMenuItem(
+          child: Row(
+            children: [
+              Icon(
+                Icons.delete,
+                color: Color(0xFFF64932),
+                size: 14,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 1.5),
+                child: Text(
+                  'Reset Pin',
+                  style: TextStyle(color: Color(0xFFF64932)),
+                ),
+              ),
+            ],
+          ),
+          value: 2,
+        ),
+      ],
     );
   }
 }

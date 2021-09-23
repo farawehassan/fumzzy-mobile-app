@@ -11,11 +11,15 @@ class Inventory extends StatefulWidget {
 }
 
 class _InventoryState extends State<Inventory> {
+  final Color shortStockColor = Color(0xFFF28301);
+  final Color inStockColor = Color(0xFF00AF27);
+  final Color outOfStockColor = Color(0xFFF64932);
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) => (Scaffold(
-        appBar: buildAppBar(constraints,'Inventory'),
+        appBar: buildAppBar(constraints, 'Inventory'),
         drawer: RefactoredDrawer(),
         body: ListView(children: [
           Container(
@@ -236,6 +240,10 @@ class _InventoryState extends State<Inventory> {
                               Container(
                                 width: constraints.maxWidth,
                                 decoration: kTableContainer,
+                                child: ProductsTableDetails(
+                                    inStockColor: inStockColor,
+                                    outOfStockColor: outOfStockColor,
+                                    shortStockColor: shortStockColor),
                               ),
                               //tabView for product details
                               Container(
@@ -246,6 +254,7 @@ class _InventoryState extends State<Inventory> {
                                       height: constraints.maxHeight * 0.76,
                                       width: constraints.maxWidth * 0.48,
                                       decoration: kTableContainer,
+                                      child: ProuctCatergoriesTable(),
                                     ),
                                     GestureDetector(
                                       onTap: () {
@@ -254,7 +263,7 @@ class _InventoryState extends State<Inventory> {
                                       child: Container(
                                         margin: EdgeInsets.only(
                                             top: constraints.maxHeight * 0.06),
-                                        height: constraints.maxHeight * 0.163,
+                                        height: constraints.maxHeight * 0.133,
                                         width: constraints.maxWidth * 0.156,
                                         decoration: BoxDecoration(
                                           borderRadius:
@@ -263,11 +272,11 @@ class _InventoryState extends State<Inventory> {
                                         ),
                                         child: Center(
                                           child: Text(
-                                            'Save changes',
+                                            'Save Changes',
                                             style: TextStyle(
                                               color: Colors.white,
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 13,
+                                              fontWeight: FontWeight.w400,
+                                              fontSize: 15,
                                             ),
                                           ),
                                         ),
@@ -467,6 +476,160 @@ class _InventoryState extends State<Inventory> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class ProuctCatergoriesTable extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return DataTable(
+      headingTextStyle: TextStyle(
+        color: Color(0xFF75759E),
+        fontSize: 13,
+        fontWeight: FontWeight.w400,
+      ),
+      dataTextStyle: TextStyle(
+        color: Colors.black,
+        fontSize: 13,
+        //fontWeight: FontWeight.w400,
+      ),
+      columnSpacing: 5.0,
+      dataRowHeight: 65.0,
+      columns: [
+        DataColumn(label: Text('Category')),
+        DataColumn(label: Text('Products')),
+        DataColumn(label: Text('')),
+      ],
+      rows: [
+        DataRow(cells: [
+          DataCell(Text('Obi Cubana and ')),
+          DataCell(Text('500')),
+          DataCell(ReusableDeleteText()),
+        ]),
+        DataRow(cells: [
+          DataCell(Text('Obi Cubana ')),
+          DataCell(Text('330')),
+          DataCell(ReusableDeleteText()),
+        ]),
+      ],
+    );
+  }
+}
+
+class ReusableDeleteText extends StatelessWidget {
+
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: (){
+        print('Delete');
+      },
+      child: Row(
+          children: [
+            Text(
+              'Delete ',
+              style: TextStyle(
+                color: Color(0xFFF64932),
+                fontSize: 14,
+              ),
+            ),
+            Icon(
+              Icons.delete,
+              color: Color(0xFFF64932),
+              size: 15,
+            ),
+          ],
+        ),
+    );
+  }
+}
+
+class ProductsTableDetails extends StatelessWidget {
+  ProductsTableDetails({
+    required this.inStockColor,
+    required this.outOfStockColor,
+    required this.shortStockColor,
+  });
+
+  final Color inStockColor;
+  final Color outOfStockColor;
+  final Color shortStockColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return DataTable(
+      headingTextStyle: TextStyle(
+        color: Color(0xFF75759E),
+        fontSize: 13,
+        fontWeight: FontWeight.w400,
+      ),
+      dataTextStyle: TextStyle(
+        color: Colors.black,
+        fontSize: 13,
+        //fontWeight: FontWeight.w400,
+      ),
+      columnSpacing: 3.0,
+      dataRowHeight: 65.0,
+      columns: [
+        DataColumn(label: Text(' Product Name')),
+        DataColumn(label: Text('Caategory')),
+        DataColumn(label: Text('Quantity')),
+        DataColumn(label: Text('Unit Cost Price')),
+        DataColumn(label: Text('Unit Selling Price')),
+        DataColumn(label: Text('Status')),
+        DataColumn(label: Text('')),
+      ],
+      rows: [
+        DataRow(cells: [
+          DataCell(Text('Carton of Smirnoff non-acholic drink 300cl')),
+          DataCell(Text('Drinks')),
+          DataCell(Text('500')),
+          DataCell(Text('N50,000')),
+          DataCell(Text('N55,000')),
+          DataCell(Text('In Stock', style: TextStyle(color: inStockColor))),
+          DataCell(ReusableTableArrowButton()),
+        ]),
+        DataRow(cells: [
+          DataCell(Text('Carton of Smirnoff non-acholic drink 300cl')),
+          DataCell(Text('Drinks')),
+          DataCell(Text('3')),
+          DataCell(Text('N50,000')),
+          DataCell(Text('N55,000')),
+          DataCell(
+              Text('Out Of Stock', style: TextStyle(color: outOfStockColor))),
+          DataCell(ReusableTableArrowButton()),
+        ]),
+        DataRow(cells: [
+          DataCell(Text('Carton of Smirnoff non-acholic drink 300cl')),
+          DataCell(Text('Drinks')),
+          DataCell(Text('500')),
+          DataCell(Text('N50,000')),
+          DataCell(Text('N55,000')),
+          DataCell(Text('In Stock', style: TextStyle(color: inStockColor))),
+          DataCell(ReusableTableArrowButton()),
+        ]),
+        DataRow(cells: [
+          DataCell(Text('Carton of Smirnoff non-acholic drink 300cl')),
+          DataCell(Text('Drinks')),
+          DataCell(Text('10')),
+          DataCell(Text('N50,000')),
+          DataCell(Text('N55,000')),
+          DataCell(
+              Text('Short Stock', style: TextStyle(color: shortStockColor))),
+          DataCell(ReusableTableArrowButton()),
+        ]),
+        DataRow(cells: [
+          DataCell(Text('Carton of Smirnoff non-acholic drink 300cl')),
+          DataCell(Text('Drinks')),
+          DataCell(Text('500')),
+          DataCell(Text('N50,000')),
+          DataCell(Text('N55,000')),
+          DataCell(Text('In Stock', style: TextStyle(color: inStockColor))),
+          DataCell(ReusableTableArrowButton()),
+        ]),
+      ],
     );
   }
 }

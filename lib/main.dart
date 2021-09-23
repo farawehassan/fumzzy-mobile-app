@@ -43,6 +43,16 @@ class _MyAppState extends State<MyApp> {
         textSelectionTheme: TextSelectionThemeData(
           cursorColor: Color(0xFF00509A),
         ),
+        popupMenuTheme: PopupMenuThemeData(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(3.0),
+          ),
+          color: Colors.white,
+          textStyle: TextStyle(
+            color: Colors.black,
+            fontSize: 14,
+          ),
+        ),
       ),
       initialRoute: SplashScreen.id,
       routes: {
