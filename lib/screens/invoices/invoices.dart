@@ -195,6 +195,7 @@ class _InvoicesState extends State<Invoices> {
                             children: [
                               Container(
                                 decoration: kTableContainer,
+                                child: allInvoicesDetail(),
                               ), //tabView for all details
                               Container(
                                 decoration: kTableContainer,
@@ -218,5 +219,123 @@ class _InvoicesState extends State<Invoices> {
         ]),
       )),
     );
+  }
+}
+
+class allInvoicesDetail extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return DataTable(
+      headingTextStyle: TextStyle(
+        color: Color(0xFF75759E),
+        fontSize: 13,
+        fontWeight: FontWeight.w400,
+      ),
+      dataTextStyle: TextStyle(
+        color: Colors.black,
+        fontSize: 13,
+        //fontWeight: FontWeight.w400,
+      ),
+      columnSpacing: 5.0,
+      dataRowHeight: 65.0,
+      columns: [
+        DataColumn(label: Text('Invoice No')),
+        DataColumn(label: Text('Status')),
+        DataColumn(label: Text('Date')),
+        DataColumn(label: Text('Customer')),
+        DataColumn(label: Text('Balance')),
+        DataColumn(label: Text('Due')),
+      ],
+      rows: [
+        DataRow(cells: [
+          DataCell(ReusableDownloadPdf()),
+          DataCell(Text('Fully Paid')),
+          DataCell(Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('23, May 2021'),
+              Text(
+                '12:30pm',
+                style: TextStyle(fontWeight: FontWeight.w300),
+              ),
+            ],
+          )),
+          DataCell(Text('Obi Cubana and Sons Limited')),
+          DataCell(Text('-')),
+          DataCell(Text('-')),
+        ]),
+        DataRow(cells: [
+          DataCell(ReusableDownloadPdf()),
+          DataCell(Text('Part-Paid')),
+          DataCell(Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('23, May 2021'),
+              Text(
+                '12:30pm',
+                style: TextStyle(fontWeight: FontWeight.w300),
+              ),
+            ],
+          )),
+          DataCell(Text('Obi Cubana and Sons Limited')),
+          DataCell(Text('N20,000')),
+          DataCell(
+              Text('23, May 2021', style: TextStyle(color: Color(0xFFF64932)))),
+        ]),
+        DataRow(cells: [
+          DataCell(ReusableDownloadPdf()),
+          DataCell(Text('Credit')),
+          DataCell(Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('23, May 2021'),
+              Text(
+                '12:30pm',
+                style: TextStyle(fontWeight: FontWeight.w300),
+              ),
+            ],
+          )),
+          DataCell(Text('Obi Cubana and Sons Limited')),
+          DataCell(Text('N100,000')),
+          DataCell(
+              Text('23, May 2021', style: TextStyle(color: Color(0xFFF64932)))),
+        ]),
+      ],
+    );
+  }
+}
+
+class ReusableDownloadPdf extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Container(
+            width: 30,
+            height: 30,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/pdf-image.png'),
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+          Text('022341' + ' '),
+          Text(
+            'Download',
+            style: TextStyle(
+              decoration: TextDecoration.underline,
+              color: Color(0xFF75759E),
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ],
+      );
   }
 }
