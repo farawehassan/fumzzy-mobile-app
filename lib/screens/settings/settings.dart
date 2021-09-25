@@ -1,9 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:fumzy/components/app-bar.dart';
+import 'package:fumzy/components/button.dart';
 import 'package:fumzy/screens/dashboard/drawer.dart';
-import 'package:fumzy/screens/ReuseableWidgets.dart';
+import 'package:fumzy/utils/constant-styles.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
 
 class Settings extends StatefulWidget {
+
   static const String id = 'settings';
 
   @override
@@ -11,280 +16,457 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
+
+  /// A [GlobalKey] to hold the form state of my form widget for form validation
+  final _formKey = GlobalKey<FormState>();
+
+  /// A [TextEditingController] to control the input text for the name
+  TextEditingController _nameController = TextEditingController();
+
+  /// A [TextEditingController] to control the input text for the phone number
+  TextEditingController _phoneController = TextEditingController();
+
+  String _currentPin = '';
+
+  String _newPin = '';
+
+  String _confirmPin = '';
+
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) => (Scaffold(
-        appBar: buildAppBar(constraints,'Settings'),
-        drawer: RefactoredDrawer(),
-        body: ListView(
+    return GestureDetector(
+      onTap: (){
+        FocusScopeNode currentFocus = FocusScope.of(context);
+        if(!currentFocus.hasPrimaryFocus) currentFocus.unfocus();
+      },
+      child: LayoutBuilder(
+        builder: (context, constraints) => (Scaffold(
+          appBar: buildAppBar(constraints, 'SETTINGS'),
+          drawer: RefactoredDrawer(title: 'SETTINGS'),
+          body: Padding(
+            padding: const EdgeInsets.all(30),
+            child: DefaultTabController(
+              length: 2,
+              initialIndex: 0,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 194,
+                    child: TabBar(
+                      labelStyle: kTabBarTextStyle,
+                      labelColor: Color(0xFF004E92),
+                      unselectedLabelColor: Color(0xFF004E92).withOpacity(0.6),
+                      indicatorColor: Color(0xFF004E92),
+                      indicatorWeight: 3,
+                      tabs: [
+                        Tab(
+                          child: Text(
+                            'Account',
+                            style: kTabBarTextStyle,
+                          ),
+                        ),
+                        Tab(
+                          child: Text(
+                            'Security',
+                            style: kTabBarTextStyle,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 25),
+                  Expanded(
+                    child: TabBarView(
+                      children: [
+                        _accountSection(constraints),
+                        _securitySection(constraints),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        )),
+      ),
+    );
+  }
+
+  /// View for account details
+  Widget _accountSection(BoxConstraints constraints){
+    return SingleChildScrollView(
+      child: Container(
+        padding: EdgeInsets.all(30),
+        decoration: kTableContainer,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
+              width: 80,
+              height: 80,
               child: Container(
-                padding: EdgeInsets.only(
-                    top: constraints.maxHeight * 0.07,
-                    left: constraints.maxWidth * 0.050),
-                color: Color(0xFFF7F8F9),
-                child: DefaultTabController(
-                  length: 2,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 200.0,
-                        child: TabBar(
-                          tabs: [
-                            Tab(
-                              child: Text(
-                                'Account',
-                                style: kTabBarTextStyle,
-                              ),
-                            ),
-                            //account tab name
-                            Tab(
-                              child: Text(
-                                'Security',
-                                style: kTabBarTextStyle,
-                              ),
-                            ),
-                            //security tab name
-                          ],
-                        ),
-                      ),
-                      Container(
-                        height: constraints.maxHeight,
-                        width: constraints.maxWidth * 0.69,
-                        margin:
-                            EdgeInsets.only(top: constraints.maxHeight * 0.07),
-                        child: TabBarView(
-                          children: [
-                            Container(
-                              decoration: kTableContainer,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    margin: EdgeInsets.only(
-                                        top: constraints.maxHeight * 0.07,
-                                        bottom: constraints.maxHeight * 0.1),
-                                    width: 70,
-                                    height: 70,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                          image: AssetImage(
-                                              'assets/images/settingsgroup.png'),
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ),
-                                  ), //circle avater for profile picture
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        margin: EdgeInsets.only(
-                                            left: constraints.maxHeight * 0.05,
-                                            right: constraints.maxHeight * 0.14,
-                                            bottom:
-                                                constraints.maxHeight * 0.14),
-                                        child: ReusableTextField(
-                                          fieldName: 'First Name',
-                                          inputName: 'Victor',
-                                          margin: constraints.maxHeight * 0.023,
-                                          height: constraints.maxHeight * 0.163,
-                                          width: constraints.maxWidth * 0.25,
-                                        ),
-                                      ),
-                                      Container(
-                                        margin: EdgeInsets.only(
-                                            bottom:
-                                                constraints.maxHeight * 0.14),
-                                        child: ReusableTextField(
-                                          fieldName: 'Last Name',
-                                          inputName: 'Daudu',
-                                          margin: constraints.maxHeight * 0.023,
-                                          height: constraints.maxHeight * 0.163,
-                                          width: constraints.maxWidth * 0.25,
-                                        ),
-                                      ),
-                                    ],
-                                  ), //first row field selector
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        margin: EdgeInsets.only(
-                                            left: constraints.maxHeight * 0.05,
-                                            right: constraints.maxHeight * 0.14,
-                                            bottom:
-                                                constraints.maxHeight * 0.14),
-                                        child: ReusableTextField(
-                                          fieldName: 'Email Adress',
-                                          inputName:
-                                              'Daudu.victor173@gmail.com',
-                                          margin: constraints.maxHeight * 0.023,
-                                          height: constraints.maxHeight * 0.163,
-                                          width: constraints.maxWidth * 0.25,
-                                        ),
-                                      ),
-                                      Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            margin: EdgeInsets.only(
-                                                bottom: constraints.maxHeight *
-                                                    0.023),
-                                            child: Text(
-                                              'Phone Number',
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                          ),
-                                          Container(
-                                            margin: EdgeInsets.only(
-                                                bottom: constraints.maxHeight *
-                                                    0.14),
-                                            height:
-                                                constraints.maxHeight * 0.163,
-                                            width: constraints.maxWidth * 0.25,
-                                            padding: EdgeInsets.only(
-                                              top: 12.0,
-                                              bottom: 12.0,
-                                              left: 16.0,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(4.0),
-                                              color: Colors.white,
-                                              border: Border.all(
-                                                width: 1,
-                                                color: Color(0xFF7BBBE5),
-                                              ),
-                                            ),
-                                            child: Text(
-                                              '+234    8082734235',
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.w400,
-                                                fontSize: 15,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ), //phone number and country flag
-                                    ],
-                                  ), //second row field selector
-                                  GestureDetector(
-                                    onTap: () {
-                                      print("save changes");
-                                    },
-                                    child: Container(
-                                      margin: EdgeInsets.only(
-                                          left: constraints.maxHeight * 0.044),
-                                      height: constraints.maxHeight * 0.163,
-                                      width: constraints.maxWidth * 0.176,
-                                      decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(6.0),
-                                        color: Color(0xFF00509A),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          'Save changes',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w400,
-                                            fontSize: 15,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ), //save changes
-                                ],
-                              ),
-                            ), //view for account details
-                            Container(
-                              decoration: kTableContainer,
-                            ), //view for the security details
-                          ],
-                        ),
-                      ), //settings details
-                    ],
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/images/settingsgroup.png'),
+                    fit: BoxFit.cover,
                   ),
                 ),
               ),
             ),
+            SizedBox(height: 56),
+            _buildAccountForm(constraints),
+            SizedBox(height: 40),
+            Button(
+              onTap: (){
+                print("save changes");
+              },
+              buttonColor: Color(0xFF00509A),
+              child: Center(
+                child: Text(
+                  'Save Changes',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Color(0xFFFFFFFF),
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 100),
           ],
         ),
-      )),
+      ),
     );
   }
-}
 
-class ReusableTextField extends StatelessWidget {
-  ReusableTextField(
-      {required this.margin,
-      required this.height,
-      required this.width,
-      required this.fieldName,
-      required this.inputName});
-
-  final double margin;
-  final double height;
-  final double width;
-  final String fieldName;
-  final String inputName;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          margin: EdgeInsets.only(bottom: margin),
-          child: Text(
-            fieldName,
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
+  /// Form widget for account details
+  Widget _buildAccountForm(BoxConstraints constraints){
+    return Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Name
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Name',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 14,
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+              SizedBox(height: 10),
+              Container(
+                width: constraints.maxWidth,
+                child: TextFormField(
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                  ),
+                  textInputAction: TextInputAction.next,
+                  keyboardType: TextInputType.name,
+                  controller: _nameController,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp('[a-zA-Z]')),
+                  ],
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Enter your name';
+                    }
+                    return null;
+                  },
+                  decoration: kTextFieldBorderDecoration.copyWith(
+                    hintText: 'Enter name',
+                    hintStyle: TextStyle(
+                      color: Colors.black.withOpacity(0.5),
+                      fontSize: 14,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ),
-        Container(
-          height: height,
-          width: width,
-          padding: EdgeInsets.only(
-            top: 12.0,
-            bottom: 12.0,
-            left: 16.0,
+          SizedBox(height: 30),
+          // Phone Number
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Phone Number',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 14,
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+              SizedBox(height: 10),
+              Container(
+                width: constraints.maxWidth,
+                child: TextFormField(
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                  ),
+                  textInputAction: TextInputAction.done,
+                  keyboardType: TextInputType.number,
+                  controller: _phoneController,
+                  maxLength: 11,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp('[0-9]')),
+                  ],
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Enter your name';
+                    }
+                    return null;
+                  },
+                  decoration: kTextFieldBorderDecoration.copyWith(
+                    hintText: 'Enter phone number',
+                    hintStyle: TextStyle(
+                      color: Colors.black.withOpacity(0.5),
+                      fontSize: 14,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(4.0),
-            color: Colors.white,
-            border: Border.all(
-              width: 1,
-              color: Color(0xFF7BBBE5),
-            ),
-          ),
-          child: Text(
-            inputName,
-            style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.w400,
-              fontSize: 15,
-            ),
-          ),
-        ),
-      ],
+        ]
+      ),
     );
   }
+
+  /// View for security section
+  Widget _securitySection(BoxConstraints constraints){
+    return SingleChildScrollView(
+      child: Container(
+        padding: EdgeInsets.all(30),
+        decoration: kTableContainer,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Current PIN',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                  SizedBox(height: 13),
+                  Container(
+                    width: 280,
+                    child: PinCodeTextField(
+                        appContext: context,
+                        length: 4,
+                        animationType: AnimationType.fade,
+                        enablePinAutofill: false,
+                        obscuringCharacter: '*',
+                        textStyle: TextStyle(
+                          fontSize: 20,
+                          color: Color(0xFF004E92),
+                          fontWeight: FontWeight.w500,
+                        ),
+                        pinTheme: PinTheme(
+                            shape: PinCodeFieldShape.box,
+                            borderWidth: 1,
+                            fieldHeight: 60,
+                            fieldWidth: 60,
+                            activeColor: Color(0xFF7BBBE5),
+                            selectedColor: Color(0xFF7BBBE5),
+                            borderRadius: BorderRadius.all(Radius.circular(3))
+                        ),
+                        onChanged: (value) {
+                          if(!mounted)return;
+                          setState(() {
+                            _currentPin = value;
+                          });
+                        }
+                    ),
+                  ),
+                  InkWell(
+                    onTap: (){
+
+                    },
+                    child: Text(
+                      'Show',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Color(0xFF1F1F1F),
+                        fontSize: 14,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 36),
+                ],
+              ),
+            ),
+            Container(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'New PIN',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                  SizedBox(height: 13),
+                  Container(
+                    width: 280,
+                    child: PinCodeTextField(
+                        appContext: context,
+                        length: 4,
+                        animationType: AnimationType.fade,
+                        enablePinAutofill: false,
+                        obscuringCharacter: '*',
+                        textStyle: TextStyle(
+                          fontSize: 20,
+                          color: Color(0xFF004E92),
+                          fontWeight: FontWeight.w500,
+                        ),
+                        pinTheme: PinTheme(
+                            shape: PinCodeFieldShape.box,
+                            borderWidth: 1,
+                            fieldHeight: 60,
+                            fieldWidth: 60,
+                            activeColor: Color(0xFF7BBBE5),
+                            selectedColor: Color(0xFF7BBBE5),
+                            borderRadius: BorderRadius.all(Radius.circular(3))
+                        ),
+                        onChanged: (value) {
+                          if(!mounted)return;
+                          setState(() {
+                            _newPin = value;
+                          });
+                        }
+                    ),
+                  ),
+                  InkWell(
+                    onTap: (){
+
+                    },
+                    child: Text(
+                      'Show',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Color(0xFF1F1F1F),
+                        fontSize: 14,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 36),
+                ],
+              ),
+            ),
+            Container(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Confirm PIN',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                  SizedBox(height: 13),
+                  Container(
+                    width: 280,
+                    child: PinCodeTextField(
+                        appContext: context,
+                        length: 4,
+                        animationType: AnimationType.fade,
+                        enablePinAutofill: false,
+                        obscuringCharacter: '*',
+                        textStyle: TextStyle(
+                          fontSize: 20,
+                          color: Color(0xFF004E92),
+                          fontWeight: FontWeight.w500,
+                        ),
+                        pinTheme: PinTheme(
+                            shape: PinCodeFieldShape.box,
+                            borderWidth: 1,
+                            fieldHeight: 60,
+                            fieldWidth: 60,
+                            activeColor: Color(0xFF7BBBE5),
+                            selectedColor: Color(0xFF7BBBE5),
+                            borderRadius: BorderRadius.all(Radius.circular(3))
+                        ),
+                        onChanged: (value) {
+                          if(!mounted)return;
+                          setState(() {
+                            _confirmPin = value;
+                          });
+                        }
+                    ),
+                  ),
+                  InkWell(
+                    onTap: (){
+
+                    },
+                    child: Text(
+                      'Show',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Color(0xFF1F1F1F),
+                        fontSize: 14,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 36),
+                ],
+              ),
+            ),
+            SizedBox(height: 40),
+            Padding(
+              padding: const EdgeInsets.only(left: 50.0),
+              child: Button(
+                onTap: (){
+                  print("save changes");
+                },
+                buttonColor: Color(0xFF00509A),
+                child: Center(
+                  child: Text(
+                    'Save Changes',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color(0xFFFFFFFF),
+                      fontSize: 14,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 100),
+          ],
+        ),
+      ),
+    );
+  }
+
 }

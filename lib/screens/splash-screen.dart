@@ -71,8 +71,8 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
               elevation: 11.3,
               shadowColor: Colors.black,
               child: Container(
-                width: 70,//constraints.maxWidth*0.21,
-                height: 70,//constraints.maxHeight*0.10,
+                width: 70.7,
+                height: 70.7,
                 color: Colors.white,
                 child: Center(
                   child: Transform.rotate(

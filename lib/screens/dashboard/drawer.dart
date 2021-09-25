@@ -5,7 +5,17 @@ import 'package:fumzy/screens/creditors/creditors.dart';
 import 'package:fumzy/screens/staff/staff.dart';
 import 'package:fumzy/screens/inventory/inventory.dart';
 import 'package:fumzy/screens/invoices/invoices.dart';
+
+import 'dashboard.dart';
+
 class RefactoredDrawer extends StatefulWidget {
+
+  final String? title;
+
+  const RefactoredDrawer({
+    Key? key,
+    this.title
+  }) : super(key: key);
 
   @override
   _RefactoredDrawerState createState() => _RefactoredDrawerState();
@@ -54,7 +64,7 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                       ),
                     ),
                     Container(
-                      margin: EdgeInsets.only(left: 17,),
+                      margin: EdgeInsets.only(left: 17),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,222 +93,36 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
               ),
             ),//fgv logo
             Expanded(
-              child: Container(
-                padding: EdgeInsets.only(left: 7.2),
-                color: Color(0xFF00509A),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 13.0),
-                      child: ListTile(
-                        leading: Text(
-                          'Menu',
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.7),
-                            fontSize: 17,
-                            fontWeight: FontWeight.w500,
+              child: SingleChildScrollView(
+                child: Container(
+                  padding: EdgeInsets.only(left: 7.2),
+                  color: Color(0xFF00509A),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 13.0),
+                        child: ListTile(
+                          leading: Text(
+                            'Menu',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.7),
+                              fontSize: 17,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
+                          onTap: () {
+                            print("clicked dashboard");
+                          },
                         ),
-                        onTap: () {
-                          print("clicked dashboard");
-                        },
-                      ),
-                    ),//menu
-                    ListTile(
-                      leading: Icon(
-                        IconlyBold.category,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                      title: Text(
-                        'Dashboard',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      onTap: () {
-                        print("clicked dashboard");
-                      },
-                    ),//Dashboard
-                    ListTile(
-                      leading: Icon(
-                        IconlyBold.chart,
-                        color: _inactiveColor,
-                        size: 20,
-                      ),
-                      title: Text(
-                        'Transactions',
-                        style: TextStyle(
-                          color: _inactiveColor,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      onTap: () {
-                        print("clicked dashboard");
-                      },
-                    ),//Transactions
-                    ListTile(
-                      leading: Icon(
-                        IconlyBold.buy,
-                        color: _inactiveColor,
-                        size: 20,
-                      ),
-                      title: Text(
-                        'Inventory',
-                        style: TextStyle(
-                          color: _inactiveColor,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.pushNamed(context, Inventory.id);
-                      },
-                    ),//Inventory
-                    ListTile(
-                      leading: Icon(
-                        IconlyBold.document,
-                        color: _inactiveColor,
-                        size: 20,
-                      ),
-                      title: Text(
-                        'Invoices',
-                        style: TextStyle(
-                          color: _inactiveColor,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.pushNamed(context, Invoices.id);
-                      },
-                    ),//Invoices
-                    ListTile(
-                      leading: Icon(
-                        IconlyBold.user3,
-                        color: _inactiveColor,
-                        size: 20,
-                      ),
-                      title: Text(
-                        'Customers',
-                        style: TextStyle(
-                          color: _inactiveColor,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      onTap: () {
-                        print("clicked dashboard");
-                      },
-                    ),//Customers
-                    ListTile(
-                      leading: Icon(
-                        IconlyBold.wallet,
-                        color: _inactiveColor,
-                        size: 20,
-                      ),
-                      title: Text(
-                        'Creditors',
-                        style: TextStyle(
-                          color: _inactiveColor,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => Creditors(),));
-                      },
-                    ),//Creditors
-                    ListTile(
-                      leading: Icon(
-                        IconlyBold.user3,
-                        color: _inactiveColor,
-                        size: 20,
-                      ),
-                      title: Text(
-                        'Wallet',
-                        style: TextStyle(
-                          color: _inactiveColor,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      onTap: () {
-                        print("clicked dashboard");
-                      },
-                    ),//Wallet
-                    ListTile(
-                      leading: Icon(
-                        IconlyBold.notification,
-                        color: _inactiveColor,
-                        size: 20,
-                      ),
-                      title: Text(
-                        'Notifications',
-                        style: TextStyle(
-                          color: _inactiveColor,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      onTap: () {
-                        print("clicked dashboard");
-                      },
-                    ),//Notifications
-                    ListTile(
-                      leading: Icon(
-                        IconlyBold.user2,
-                        color: _inactiveColor,
-                        size: 20,
-                      ),
-                      title: Text(
-                        'Staffs',
-                        style: TextStyle(
-                          color: _inactiveColor,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => Staff(),));
-                      },
-                    ),//Staffs
-                    ListTile(
-                      leading: Icon(
-                        IconlyBold.setting,
-                        color: _inactiveColor,
-                        size: 20,
-                      ),
-                      title: Text(
-                        'Settings',
-                        style: TextStyle(
-                          color: _inactiveColor,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => Settings(),));
-                      },
-                    ),//Settings
-                    Padding(
-                      padding: const EdgeInsets.only(top: 34.0),
-                      child: ListTile(
+                      ),//menu
+                      ListTile(
                         leading: Icon(
-                          IconlyBold.arrowLeft,
+                          IconlyBold.category,
                           color: Colors.white,
                           size: 20,
                         ),
                         title: Text(
-                          'Collapse',
+                          'Dashboard',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 17,
@@ -307,10 +131,211 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                         ),
                         onTap: () {
                           Navigator.pop(context);
+                          if(widget.title != 'DASHBOARD'){
+                            Navigator.pushNamed(context, Dashboard.id);
+                          }
                         },
-                      ),
-                    ),//collapse
-                  ],
+                      ),//Dashboard
+                      ListTile(
+                        leading: Icon(
+                          IconlyBold.chart,
+                          color: _inactiveColor,
+                          size: 20,
+                        ),
+                        title: Text(
+                          'Transactions',
+                          style: TextStyle(
+                            color: _inactiveColor,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        onTap: () {
+                          print("clicked dashboard");
+                        },
+                      ),//Transactions
+                      ListTile(
+                        leading: Icon(
+                          IconlyBold.buy,
+                          color: _inactiveColor,
+                          size: 20,
+                        ),
+                        title: Text(
+                          'Inventory',
+                          style: TextStyle(
+                            color: _inactiveColor,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        onTap: () {
+                          Navigator.pop(context);
+                          if(widget.title != 'INVENTORY'){
+                            Navigator.pushNamed(context, Inventory.id);
+                          }
+                        },
+                      ),//Inventory
+                      ListTile(
+                        leading: Icon(
+                          IconlyBold.document,
+                          color: _inactiveColor,
+                          size: 20,
+                        ),
+                        title: Text(
+                          'Invoices',
+                          style: TextStyle(
+                            color: _inactiveColor,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        onTap: () {
+                          Navigator.pop(context);
+                          if(widget.title != 'INVOICES'){
+                            Navigator.pushNamed(context, Invoices.id);
+                          }
+                        },
+                      ),//Invoices
+                      ListTile(
+                        leading: Icon(
+                          IconlyBold.user3,
+                          color: _inactiveColor,
+                          size: 20,
+                        ),
+                        title: Text(
+                          'Customers',
+                          style: TextStyle(
+                            color: _inactiveColor,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        onTap: () {
+                          print("clicked dashboard");
+                        },
+                      ),//Customers
+                      ListTile(
+                        leading: Icon(
+                          IconlyBold.wallet,
+                          color: _inactiveColor,
+                          size: 20,
+                        ),
+                        title: Text(
+                          'Creditors',
+                          style: TextStyle(
+                            color: _inactiveColor,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        onTap: () {
+                          Navigator.pop(context);
+                          if(widget.title != 'CREDITORS'){
+                            Navigator.pushNamed(context, Creditors.id);
+                          }
+                        },
+                      ),//Creditors
+                      ListTile(
+                        leading: Icon(
+                          IconlyBold.user3,
+                          color: _inactiveColor,
+                          size: 20,
+                        ),
+                        title: Text(
+                          'Wallet',
+                          style: TextStyle(
+                            color: _inactiveColor,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        onTap: () {
+                          print("clicked dashboard");
+                        },
+                      ),//Wallet
+                      ListTile(
+                        leading: Icon(
+                          IconlyBold.notification,
+                          color: _inactiveColor,
+                          size: 20,
+                        ),
+                        title: Text(
+                          'Notifications',
+                          style: TextStyle(
+                            color: _inactiveColor,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        onTap: () {
+                          print("clicked dashboard");
+                        },
+                      ),//Notifications
+                      ListTile(
+                        leading: Icon(
+                          IconlyBold.user2,
+                          color: _inactiveColor,
+                          size: 20,
+                        ),
+                        title: Text(
+                          'Staffs',
+                          style: TextStyle(
+                            color: _inactiveColor,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        onTap: () {
+                          Navigator.pop(context);
+                          if(widget.title != 'STAFFS'){
+                            Navigator.pushNamed(context, Staff.id);
+                          }
+                        },
+                      ),//Staffs
+                      ListTile(
+                        leading: Icon(
+                          IconlyBold.setting,
+                          color: _inactiveColor,
+                          size: 20,
+                        ),
+                        title: Text(
+                          'Settings',
+                          style: TextStyle(
+                            color: _inactiveColor,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        onTap: () {
+                          Navigator.pop(context);
+                          if(widget.title != 'SETTINGS'){
+                            Navigator.pushNamed(context, Settings.id);
+                          }
+                        },
+                      ),//Settings
+                      Padding(
+                        padding: const EdgeInsets.only(top: 34.0, bottom: 40),
+                        child: ListTile(
+                          leading: Icon(
+                            IconlyBold.arrowLeft,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                          title: Text(
+                            'Collapse',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 17,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ),//collapse
+                    ],
+                  ),
                 ),
               ),
             ),

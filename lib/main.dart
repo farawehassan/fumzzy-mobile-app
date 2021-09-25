@@ -1,15 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fumzy/screens/inventory/inventory.dart';
-import 'package:fumzy/screens/invoices/invoices.dart';
+import 'screens/inventory/inventory.dart';
+import 'screens/invoices/invoices.dart';
 import 'screens/splash-screen.dart';
 import 'screens/creditors/creditors.dart';
 import 'screens/dashboard/dashboard.dart';
 import 'screens/login.dart';
 import 'screens/settings/settings.dart';
 import 'screens/staff/staff.dart';
-import 'screens/inventory/inventory.dart';
-import 'screens/invoices/invoices.dart';
+
 void main() {
   runApp(MyApp());
 }
