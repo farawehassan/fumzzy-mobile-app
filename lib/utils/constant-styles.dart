@@ -9,15 +9,15 @@ final TextStyle kTabBarTextStyle = TextStyle(
 /// Setting a constant [kTextFieldBorderDecoration] for [InputDecoration] styles
 final kTextFieldBorderDecoration = InputDecoration(
   border: OutlineInputBorder(
-    borderRadius: BorderRadius.all(Radius.circular(3.0)),
+    borderRadius: BorderRadius.circular(3.0),
   ),
   enabledBorder: OutlineInputBorder(
     borderSide: BorderSide(color: Color(0xFF7BBBE5), width: 1.0, style: BorderStyle.solid),
-    borderRadius: BorderRadius.all(Radius.circular(3.0)),
+    borderRadius: BorderRadius.circular(3.0),
   ),
   focusedBorder: OutlineInputBorder(
     borderSide: BorderSide(color: Color(0xFF7BBBE5), width: 1.5, style: BorderStyle.solid),
-    borderRadius: BorderRadius.all(Radius.circular(3.0)),
+    borderRadius: BorderRadius.circular(3.0),
   ),
 );
 
