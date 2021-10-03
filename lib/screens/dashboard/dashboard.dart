@@ -6,7 +6,6 @@ import 'package:fumzy/components/reusable-card.dart';
 import 'package:fumzy/components/sales-card.dart';
 import 'package:fumzy/utils/constant-styles.dart';
 import 'package:fumzy/utils/functions.dart';
-import 'package:fumzy/utils/size-config.dart';
 import 'drawer.dart';
 import 'package:fumzy/components/arrow-button.dart';
 import 'package:fumzy/components/bubble-color-indicator.dart';

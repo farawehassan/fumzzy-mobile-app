@@ -25,7 +25,7 @@ class _CustomersState extends State<Customers> {
         appBar: buildAppBar(constraints, 'CUSTOMERS'),
         drawer: RefactoredDrawer(title: 'CUSTOMERS'),
         body: Padding(
-          padding: EdgeInsets.fromLTRB(20, 30, 20, 10),
+          padding: EdgeInsets.fromLTRB(20, 30, 20, 0),
           child: DefaultTabController(
             length: 2,
             initialIndex: 0,
@@ -144,7 +144,7 @@ class _CustomersState extends State<Customers> {
                 ),
                 SizedBox(height: 37),
                 Container(
-                  width: 257,
+                  width: 163,
                   child: TabBar(
                     labelStyle: kTabBarTextStyle,
                     labelColor: Color(0xFF004E92),
