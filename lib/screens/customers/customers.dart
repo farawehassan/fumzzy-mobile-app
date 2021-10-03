@@ -142,9 +142,9 @@ class _CustomersState extends State<Customers> {
                     ],
                   ),
                 ),
-                SizedBox(height: 37),
+                SizedBox(height: 17),
                 Container(
-                  width: 257,
+                  width: 163,
                   child: TabBar(
                     labelStyle: kTabBarTextStyle,
                     labelColor: Color(0xFF004E92),
