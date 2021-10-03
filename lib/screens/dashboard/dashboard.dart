@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:fumzy/components/app-bar.dart';
+import 'package:fumzy/components/inventory-card.dart';
+import 'package:fumzy/components/reusable-card.dart';
+import 'package:fumzy/components/sales-card.dart';
+import 'package:fumzy/utils/constant-styles.dart';
+import 'package:fumzy/utils/functions.dart';
+import 'package:fumzy/utils/size-config.dart';
 import 'drawer.dart';
 import 'package:fumzy/components/arrow-button.dart';
 import 'package:fumzy/components/bubble-color-indicator.dart';
 
 class Dashboard extends StatefulWidget {
+
   static const String id = 'dashboard';
 
   const Dashboard({Key? key}) : super(key: key);
@@ -15,6 +22,18 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+
+  List<String> _view = [
+    "This Week",
+    "Yesterday",
+    "Today",
+    "This Month",
+    "6 Months",
+    "All Time"
+  ];
+
+  String? _selectedView = "This Week";
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -29,116 +48,131 @@ class _DashboardState extends State<Dashboard> {
               children: [
                 Container(
                   width: 200,
-                  height: 50,
-                  padding: EdgeInsets.symmetric(vertical: 13.5, horizontal: 25),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(3.0),
-                    border: Border.all(
-                      width: 1,
-                      color: Color(0xFFE2E2EA),
+                  child: DropdownButtonFormField<String>(
+                    value: _selectedView,
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedView = value;
+                      });
+                    },
+                    style: TextStyle(
+                        color: Color(0xFF171725),
+                        fontWeight: FontWeight.normal,
+                        fontSize: 14
                     ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'This week',
-                        style: TextStyle(
-                            color: Color(0xFF171725),
-                            fontWeight: FontWeight.normal,
-                            fontSize: 14),
+                    iconEnabledColor: Color(0xFF000000),
+                    icon: Icon(
+                      Icons.arrow_drop_down_sharp,
+                      color: Colors.black,
+                      size: 20,
+                    ),
+                    decoration: kTextFieldBorderDecoration.copyWith(
+                      contentPadding: EdgeInsets.all(12),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xFFE2E2EA), width: 1, style: BorderStyle.solid),
+                        borderRadius: BorderRadius.circular(3.0),
                       ),
-                      Icon(
-                        Icons.arrow_drop_down_sharp,
-                        color: Colors.black,
-                        size: 20,
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xFFE2E2EA), width: 1, style: BorderStyle.solid),
+                        borderRadius: BorderRadius.circular(3.0),
                       ),
-                    ],
+                    ),
+                    items: _view.map((value) {
+                      return DropdownMenuItem(
+                        child: Text(
+                          value,
+                          style: TextStyle(
+                              color: Color(0xFF171725),
+                              fontWeight: FontWeight.normal,
+                              fontSize: 14
+                          ),
+                        ),
+                        value: value,
+                      );
+                    }).toList(),
                   ),
-                ),//this week dropdown
+                ),
                 SizedBox(height: 20),
                 Wrap(
                   children: [
-                    ReusableTotalCard(
+                    TotalSalesCard(
                       cardName: 'Total Sales',
-                      totalPrice: '800,000,000',
+                      totalPrice: 800000000,
                     ),
-                    ReusableTotalCard(
+                    TotalSalesCard(
                       cardName: 'Total Purchases',
-                      totalPrice: '5,000,000',
+                      totalPrice: 5000000,
                     ),
-                    ReusableTotalCard(
+                    TotalSalesCard(
                       cardName: 'Total Expenses',
-                      totalPrice: '150,900',
+                      totalPrice: 150900,
                     ),
-                    ReusableTotalCard(
+                    TotalSalesCard(
                       cardName: 'Total Profit',
-                      totalPrice: '2,849,100',
+                      totalPrice: 2849100,
                     ),
-                    ReusableTotalCard(
+                    TotalSalesCard(
                       cardName: 'Total Discounts',
-                      totalPrice: '85,115',
+                      totalPrice: 85115,
                     ),
                   ],
-                ),//total sales cards
+                ),
                 SizedBox(height: 30),
                 Wrap(
                   children: [
-                    ReusableInventoryCard(
+                    InventoryCard(
                       cardName: 'Inventory Cost Price',
-                      totalPrice: '89,981,900',
+                      totalPrice: 89981900,
                       cardColor: Color(0xFFF64932),
                     ),
-                    ReusableInventoryCard(
+                    InventoryCard(
                       cardName: 'Inventory Selling Price',
-                      totalPrice: '150,981,900',
+                      totalPrice: 150981900,
                       cardColor: Color(0xFF00AF27),
                     ),
-                    ReusableInventoryCard(
+                    InventoryCard(
                       cardName: 'Inventory Profit',
-                      totalPrice: '600,981,900,000.0',
+                      totalPrice: 600981900000,
                       cardColor: Color(0xFF00509A),
                     ),
                   ],
-                ),//inventory cards
+                ),
                 SizedBox(height: 50),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      flex: 1,
-                      child: Column(
+                //outstanding cards, recent purchases
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 15),
-                            child: Text(
-                              'Outstanding',
-                              style: TextStyle(
-                                color: Color(0xFF171725),
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                              ),
+                          Text(
+                            'Outstanding',
+                            style: TextStyle(
+                              color: Color(0xFF171725),
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
                             ),
-                          ),//outstanding text
+                          ),
+                          SizedBox(height: 15),
                           Container(
-                            height: 160,
-                            width: constraints.maxWidth,
                             child: ReusableCard(
                               child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                    vertical: 24, horizontal: 20),
+                                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
+                                      mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Row(
+                                              mainAxisSize: MainAxisSize.min,
                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
                                                 Text(
@@ -154,7 +188,7 @@ class _DashboardState extends State<Dashboard> {
                                             ),
                                             SizedBox(height: 14),
                                             Text(
-                                              'N' + '110,000',
+                                              Functions.money(110000, 'N'),
                                               style: TextStyle(
                                                 color: Color(0xFF171725),
                                                 fontWeight: FontWeight.w700,
@@ -165,7 +199,7 @@ class _DashboardState extends State<Dashboard> {
                                         ),
                                         Container(
                                           height: 75,
-                                          margin: EdgeInsets.symmetric(horizontal: 26),
+                                          margin: EdgeInsets.symmetric(horizontal: 13),
                                           child: VerticalDivider(
                                             color: Colors.grey,
                                             thickness: 0.6,
@@ -213,8 +247,7 @@ class _DashboardState extends State<Dashboard> {
                                           Icon(
                                             IconlyBold.arrowRightCircle,
                                             size: 16.5,
-                                            color: Color(0xFF004E92)
-                                                .withOpacity(0.5),
+                                            color: Color(0xFF004E92).withOpacity(0.5),
                                           ),
                                         ],
                                       ),
@@ -223,25 +256,24 @@ class _DashboardState extends State<Dashboard> {
                                 ),
                               ),
                             ),
-                          ),//sales card
-                          SizedBox(height: 29.4),
+                          ),
+                          SizedBox(height: 23),
                           Container(
-                            height: 160,
-                            width: constraints.maxWidth,
                             child: ReusableCard(
                               child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                    vertical: 24, horizontal: 20),
+                                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
+                                      mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Row(
+                                              mainAxisSize: MainAxisSize.min,
                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
                                                 Text(
@@ -257,7 +289,7 @@ class _DashboardState extends State<Dashboard> {
                                             ),
                                             SizedBox(height: 14),
                                             Text(
-                                              'N' + '75,000',
+                                              Functions.money(75000, 'N'),
                                               style: TextStyle(
                                                 color: Color(0xFF171725),
                                                 fontWeight: FontWeight.w700,
@@ -268,7 +300,7 @@ class _DashboardState extends State<Dashboard> {
                                         ),//purchase
                                         Container(
                                           height: 75,
-                                          margin: EdgeInsets.symmetric(horizontal: 26),
+                                          margin: EdgeInsets.symmetric(horizontal: 13),
                                           child: VerticalDivider(
                                             color: Colors.grey,
                                             thickness: 0.6,
@@ -326,14 +358,11 @@ class _DashboardState extends State<Dashboard> {
                                 ),
                               ),
                             ),
-                          ),//purchase card
+                          ),
                         ],
                       ),
-                    ),//outstanding cards
-                    SizedBox(width: 13),
-                    Expanded(
-                      flex: 2,
-                      child: Column(
+                      SizedBox(width: 13),
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
@@ -347,6 +376,7 @@ class _DashboardState extends State<Dashboard> {
                                   fontSize: 14,
                                 ),
                               ),
+                              SizedBox(width: 470),
                               InkWell(
                                 onTap: () {
                                   print("see all");
@@ -375,9 +405,9 @@ class _DashboardState extends State<Dashboard> {
                           ),
                         ],
                       ),
-                    ),//recent purchases
-                  ],
-                ),//outstanding cards, recent purchases
+                    ],
+                  ),
+                ),
                 Column(
                   children: [
                     Container(
@@ -412,7 +442,7 @@ class _DashboardState extends State<Dashboard> {
                     ),
                     Container(
                       height: 340,
-                      width: constraints.maxWidth,
+                      //width: constraints.maxWidth,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(17),
@@ -438,6 +468,7 @@ class _DashboardState extends State<Dashboard> {
 }
 
 class RecentPurchaseTable extends StatelessWidget {
+
   const RecentPurchaseTable({
     Key? key,
   }) : super(key: key);
@@ -551,9 +582,11 @@ class RecentPurchaseTable extends StatelessWidget {
       ],
     );
   }
+
 }
 
 class RecentSalesTable extends StatelessWidget {
+
   const RecentSalesTable({
     Key? key,
   }) : super(key: key);
@@ -658,128 +691,7 @@ class RecentSalesTable extends StatelessWidget {
       ],
     );
   }
-}
 
-class ReusableTotalCard extends StatelessWidget {
-  ReusableTotalCard({required this.cardName, required this.totalPrice});
-
-  final String cardName;
-  final String totalPrice;
-
-  @override
-  Widget build(BuildContext context) {
-    return ReusableCard(
-      child: Container(
-        height: 99,
-        width: 150,
-        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 13),
-        child: Wrap(
-          runSpacing: 11,
-          children: [
-            Text(
-              cardName,
-              style: TextStyle(
-                fontSize: 14,
-                color: Color(0xFF75759E),
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-            Text(
-              'N' + totalPrice,
-              style: TextStyle(
-                fontSize: 21,
-                color: Color(0xFF171725),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class ReusableInventoryCard extends StatelessWidget {
-  ReusableInventoryCard(
-      {required this.cardName,
-      required this.totalPrice,
-      required this.cardColor});
-
-  final String cardName;
-  final String totalPrice;
-  final Color cardColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      color: cardColor,
-      elevation: 10,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side: BorderSide(
-          width: 2,
-          color: Colors.white,
-          style: BorderStyle.solid,
-        ),
-      ),
-      shadowColor: Color(0xFFF7F8F9),
-      child: Container(
-        height: 129,
-        width: 230,
-        padding: EdgeInsets.symmetric(vertical: 31, horizontal: 20),
-        child: Wrap(
-          runSpacing: 26.4,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  cardName,//name of the inventory card
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.white,
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-                Icon(
-                  IconlyBold.graph,
-                  color: Colors.white,
-                  size: 17,
-                ),
-              ],
-            ),
-            Text(
-              'N' + totalPrice,//price of the inventory card
-              style: TextStyle(
-                fontSize: 23,
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class ReusableCard extends StatelessWidget {
-  ReusableCard({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      color: Colors.white,
-      elevation: 10,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(17),
-      ),
-      shadowColor: Color(0xFFF7F8F9),
-      child: child,
-    );
-  }
 }
 
 ///TODO: 1. comment the code
