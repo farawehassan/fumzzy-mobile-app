@@ -5,6 +5,7 @@ import 'package:fumzy/screens/creditors/creditors.dart';
 import 'package:fumzy/screens/staff/staff.dart';
 import 'package:fumzy/screens/inventory/inventory.dart';
 import 'package:fumzy/screens/invoices/invoices.dart';
+import 'package:fumzy/screens/transactions/transactions.dart';
 import 'dashboard.dart';
 import 'package:fumzy/screens/customers/customers.dart';
 
@@ -91,7 +92,7 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                   ],
                 ),
               ),
-            ),//fgv logo
+            ),
             Expanded(
               child: SingleChildScrollView(
                 child: Container(
@@ -99,6 +100,7 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                   color: Color(0xFF00509A),
                   child: Column(
                     children: [
+                      //menu
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 13.0),
                         child: ListTile(
@@ -114,7 +116,8 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                             print("clicked dashboard");
                           },
                         ),
-                      ),//menu
+                      ),
+                      //Dashboard
                       ListTile(
                         leading: Icon(
                           IconlyBold.category,
@@ -135,7 +138,8 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                             Navigator.pushNamed(context, Dashboard.id);
                           }
                         },
-                      ),//Dashboard
+                      ),
+                      //Transactions
                       ListTile(
                         leading: Icon(
                           IconlyBold.chart,
@@ -151,9 +155,13 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                           ),
                         ),
                         onTap: () {
-                          print("clicked dashboard");
+                          Navigator.pop(context);
+                          if(widget.title != 'TRANSACTIONS'){
+                            Navigator.pushNamed(context, Transactions.id);
+                          }
                         },
-                      ),//Transactions
+                      ),
+                      //Inventory
                       ListTile(
                         leading: Icon(
                           IconlyBold.buy,
@@ -174,7 +182,8 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                             Navigator.pushNamed(context, Inventory.id);
                           }
                         },
-                      ),//Inventory
+                      ),
+                      //Invoices
                       ListTile(
                         leading: Icon(
                           IconlyBold.document,
@@ -195,7 +204,8 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                             Navigator.pushNamed(context, Invoices.id);
                           }
                         },
-                      ),//Invoices
+                      ),
+                      //Customers
                       ListTile(
                         leading: Icon(
                           IconlyBold.user3,
@@ -216,7 +226,8 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                             Navigator.pushNamed(context, Customers.id);
                           }
                         },
-                      ),//Customers
+                      ),
+                      //Creditor
                       ListTile(
                         leading: Icon(
                           IconlyBold.wallet,
@@ -237,25 +248,8 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                             Navigator.pushNamed(context, Creditors.id);
                           }
                         },
-                      ),//Creditors
-                      ListTile(
-                        leading: Icon(
-                          IconlyBold.user3,
-                          color: _inactiveColor,
-                          size: 20,
-                        ),
-                        title: Text(
-                          'Wallet',
-                          style: TextStyle(
-                            color: _inactiveColor,
-                            fontSize: 17,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        onTap: () {
-                          print("clicked dashboard");
-                        },
-                      ),//Wallet
+                      ),
+                      //Notifications
                       ListTile(
                         leading: Icon(
                           IconlyBold.notification,
@@ -273,7 +267,8 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                         onTap: () {
                           print("clicked dashboard");
                         },
-                      ),//Notifications
+                      ),
+                      //Staffs
                       ListTile(
                         leading: Icon(
                           IconlyBold.user2,
@@ -294,7 +289,8 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                             Navigator.pushNamed(context, Staff.id);
                           }
                         },
-                      ),//Staffs
+                      ),
+                      //Settings
                       ListTile(
                         leading: Icon(
                           IconlyBold.setting,
@@ -315,7 +311,8 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                             Navigator.pushNamed(context, Settings.id);
                           }
                         },
-                      ),//Settings
+                      ),
+                      //collapse
                       Padding(
                         padding: const EdgeInsets.only(top: 34.0, bottom: 40),
                         child: ListTile(
@@ -336,7 +333,7 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                             Navigator.pop(context);
                           },
                         ),
-                      ),//collapse
+                      ),
                     ],
                   ),
                 ),

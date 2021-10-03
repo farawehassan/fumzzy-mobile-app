@@ -502,7 +502,7 @@ class StaffTableContents extends StatelessWidget {
       columns: [
         DataColumn(label: Text('Username')),
         DataColumn(label: Text('Status')),
-        DataColumn(label: Text('Date Created')),
+        DataColumn(label: Text('Date')),
         DataColumn(label: Text('Actions')),
       ],
       rows: [

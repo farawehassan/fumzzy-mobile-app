@@ -5,29 +5,31 @@ import 'package:fumzy/components/app-bar.dart';
 import 'package:fumzy/components/button.dart';
 import 'package:fumzy/screens/dashboard/drawer.dart';
 import 'package:fumzy/utils/constant-styles.dart';
-import 'product-categories.dart';
-import 'products.dart';
 
-class Inventory extends StatefulWidget {
+import 'expenses.dart';
+import 'purchases.dart';
+import 'sales.dart';
 
-  static const String id = 'inventory';
+class Transactions extends StatefulWidget {
+
+  static const String id = 'transactions';
 
   @override
-  _InventoryState createState() => _InventoryState();
+  _TransactionsState createState() => _TransactionsState();
 }
 
-class _InventoryState extends State<Inventory> {
+class _TransactionsState extends State<Transactions> {
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) => (Scaffold(
-        appBar: buildAppBar(constraints, 'INVENTORY'),
-        drawer: RefactoredDrawer(title: 'INVENTORY'),
+        appBar: buildAppBar(constraints, 'TRANSACTIONS'),
+        drawer: RefactoredDrawer(title: 'TRANSACTIONS'),
         body: Padding(
           padding: EdgeInsets.fromLTRB(20, 30, 20, 0),
           child: DefaultTabController(
-            length: 2,
+            length: 3,
             initialIndex: 0,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -41,7 +43,7 @@ class _InventoryState extends State<Inventory> {
                     Padding(
                       padding: const EdgeInsets.only(top: 15.0),
                       child: Text(
-                        'All Inventory',
+                        'All Transactions',
                         style: TextStyle(
                           color: Color(0xFF171725),
                           fontWeight: FontWeight.w600,
@@ -59,12 +61,12 @@ class _InventoryState extends State<Inventory> {
                         children: [
                           TextButton(
                             onPressed: () {
-                              _addNewCategory(constraints);
+                              //_addNewCategory(constraints);
                             },
                             child: Container(
                               color: Colors.transparent,
                               child: Text(
-                                'Add new category',
+                                'Add expenses',
                                 style: TextStyle(
                                   color: Color(0xFF00509A),
                                   fontWeight: FontWeight.normal,
@@ -77,11 +79,29 @@ class _InventoryState extends State<Inventory> {
                             onTap: (){
                               print('add new product');
                             },
-                            buttonColor: Color(0xFF00509A),
+                            buttonColor: Color(0xFF00AF27),
                             width: 160,
                             child: Center(
                               child: Text(
-                                'Add New Product',
+                                'Add Sale',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Color(0xFFFFFFFF),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Button(
+                            onTap: (){
+                              print('add new product');
+                            },
+                            buttonColor: Color(0xFFF28301),
+                            width: 160,
+                            child: Center(
+                              child: Text(
+                                'Add Purchase',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: Color(0xFFFFFFFF),
@@ -170,38 +190,43 @@ class _InventoryState extends State<Inventory> {
                   ),
                 ),
                 SizedBox(height: 37),
-                SingleChildScrollView(
-                  child: Container(
-                    width: 257,
-                    child: TabBar(
-                      labelStyle: kTabBarTextStyle,
-                      labelColor: Color(0xFF004E92),
-                      unselectedLabelColor: Color(0xFF004E92).withOpacity(0.6),
-                      indicatorColor: Color(0xFF004E92),
-                      indicatorWeight: 3,
-                      tabs: [
-                        Tab(
-                          child: Text(
-                            'Products',
-                            style: kTabBarTextStyle,
-                          ),
+                Container(
+                  width: 296,
+                  child: TabBar(
+                    labelStyle: kTabBarTextStyle,
+                    labelColor: Color(0xFF004E92),
+                    unselectedLabelColor: Color(0xFF004E92).withOpacity(0.6),
+                    indicatorColor: Color(0xFF004E92),
+                    indicatorWeight: 3,
+                    tabs: [
+                      Tab(
+                        child: Text(
+                          'Sales',
+                          style: kTabBarTextStyle,
                         ),
-                        Tab(
-                          child: Text(
-                            'Product Categories',
-                            style: kTabBarTextStyle,
-                          ),
+                      ),
+                      Tab(
+                        child: Text(
+                          'Purchases',
+                          style: kTabBarTextStyle,
                         ),
-                      ],
-                    ),
+                      ),
+                      Tab(
+                        child: Text(
+                          'Expenses',
+                          style: kTabBarTextStyle,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 SizedBox(height: 25),
                 Expanded(
                   child: TabBarView(
                     children: [
-                      Products(),
-                      ProductCategories(),
+                      Sales(),
+                      Purchases(),
+                      Expenses(),
                     ],
                   ),
                 ),
@@ -213,9 +238,18 @@ class _InventoryState extends State<Inventory> {
     );
   }
 
-  Future<void> _addNewCategory(BoxConstraints constraints) {
+  List<String> categories = ['Drinks', 'Sweets', 'Chocolate'];
+
+  Future<void> _addNewPurchase(BoxConstraints constraints) {
     final formKey = GlobalKey<FormState>();
-    TextEditingController categoryController = TextEditingController();
+    TextEditingController productName = TextEditingController();
+    TextEditingController costPrice = TextEditingController();
+    TextEditingController sellingPrice = TextEditingController();
+    TextEditingController quantity = TextEditingController();
+    TextEditingController amount = TextEditingController();
+    TextEditingController sellersName = TextEditingController();
+    String selectedCategory;
+
     return showDialog(
       context: context,
       barrierColor: Color(0xFF000428).withOpacity(0.86),
@@ -245,7 +279,7 @@ class _InventoryState extends State<Inventory> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'NEW PRODUCT CATEGORY',
+                      'NEW PURCHASE',
                       style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w500,
@@ -271,7 +305,7 @@ class _InventoryState extends State<Inventory> {
                       Padding(
                         padding: EdgeInsets.only(top: 42),
                         child: Text(
-                          'Add New Category',
+                          'Add a New Purchase',
                           style: TextStyle(
                             color: Color(0xFF00509A),
                             fontSize: 19,
@@ -300,7 +334,7 @@ class _InventoryState extends State<Inventory> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Category',
+                                'Product Name',
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 14,
@@ -317,16 +351,16 @@ class _InventoryState extends State<Inventory> {
                                     fontWeight: FontWeight.normal,
                                   ),
                                   textInputAction: TextInputAction.next,
-                                  keyboardType: TextInputType.name,
-                                  controller: categoryController,
+                                  keyboardType: TextInputType.text,
+                                  controller: productName,
                                   validator: (value) {
                                     if (value!.isEmpty) {
-                                      return 'Enter category name';
+                                      return 'Enter product name';
                                     }
                                     return null;
                                   },
                                   decoration: kTextFieldBorderDecoration.copyWith(
-                                    hintText: 'Enter category name',
+                                    hintText: 'Enter product',
                                     hintStyle: TextStyle(
                                       color: Colors.black.withOpacity(0.5),
                                       fontSize: 14,
@@ -386,8 +420,3 @@ class _InventoryState extends State<Inventory> {
   }
 
 }
-
-
-
-
-

@@ -9,6 +9,8 @@ import 'screens/login.dart';
 import 'screens/settings/settings.dart';
 import 'screens/staff/staff.dart';
 import 'screens/customers/customers.dart';
+import 'screens/transactions/transactions.dart';
+
 
 void main() {
   runApp(MyApp());
@@ -62,10 +64,12 @@ class _MyAppState extends State<MyApp> {
         Staff.id: (context) => Staff(),
         Settings.id: (context) => Settings(),
         Creditors.id: (context) => Creditors(),
+        Transactions.id: (context) => Transactions(),
         Inventory.id: (context) => Inventory(),
         Invoices.id: (context) => Invoices(),
         Customers.id: (context) => Customers(),
       },
     );
   }
+
 }
