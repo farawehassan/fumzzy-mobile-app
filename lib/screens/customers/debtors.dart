@@ -15,13 +15,13 @@ class _DebtorsState extends State<Debtors> {
     return LayoutBuilder(
       builder: (context, constraints) => Container(
         decoration: kTableContainer,
-        child: ProductsTableDetails(),
+        child: DebtorsTableDetails(),
       ),
     );
   }
 }
 
-class ProductsTableDetails extends StatelessWidget {
+class DebtorsTableDetails extends StatelessWidget {
   final Color dueInvoiceColor = Color(0xFFF64932);
 
   @override

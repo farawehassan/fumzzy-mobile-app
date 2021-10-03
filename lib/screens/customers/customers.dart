@@ -51,7 +51,7 @@ class _CustomersState extends State<Customers> {
                     ),
                     Button(
                       onTap: () {
-                        _addNewCategory(constraints);
+                        _addNewDebtor(constraints);
                       },
                       buttonColor: Color(0xFF00509A),
                       width: 160,
@@ -184,7 +184,7 @@ class _CustomersState extends State<Customers> {
     );
   }
 
-  Future<void> _addNewCategory(BoxConstraints constraints) {
+  Future<void> _addNewDebtor(BoxConstraints constraints) {
     final formKey = GlobalKey<FormState>();
     TextEditingController categoryController = TextEditingController();
     return showDialog(
@@ -216,7 +216,7 @@ class _CustomersState extends State<Customers> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'NEW PRODUCT CATEGORY',
+                      'NEW DEBTOR',
                       style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w500,
@@ -242,7 +242,7 @@ class _CustomersState extends State<Customers> {
                       Padding(
                         padding: EdgeInsets.only(top: 42),
                         child: Text(
-                          'Add New Category',
+                          'Add New Debtor',
                           style: TextStyle(
                             color: Color(0xFF00509A),
                             fontSize: 19,
@@ -254,7 +254,7 @@ class _CustomersState extends State<Customers> {
                         padding:
                         const EdgeInsets.symmetric(horizontal: 35, vertical: 15.0),
                         child: Text(
-                          'You have made a new purchase. Please fill the fields to record your purchase.',
+                          'You have made additional purchase on credit. Please fill the fields to record your credit purchase.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Color(0xFF000428).withOpacity(0.6),
@@ -270,8 +270,9 @@ class _CustomersState extends State<Customers> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              ///text field for customer
                               Text(
-                                'Category',
+                                'Customer',
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 14,
@@ -297,7 +298,121 @@ class _CustomersState extends State<Customers> {
                                     return null;
                                   },
                                   decoration: kTextFieldBorderDecoration.copyWith(
-                                    hintText: 'Enter category name',
+                                    hintText: 'Select customer',
+                                    hintStyle: TextStyle(
+                                      color: Colors.black.withOpacity(0.5),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 20),//select customer
+                              ///field for amount
+                              Text(
+                                'Amount',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              Container(
+                                width: constraints.maxWidth,
+                                child: TextFormField(
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                  textInputAction: TextInputAction.next,
+                                  keyboardType: TextInputType.name,
+                                  controller: categoryController,
+                                  validator: (value) {
+                                    if (value!.isEmpty) {
+                                      return 'Enter amount';
+                                    }
+                                    return null;
+                                  },
+                                  decoration: kTextFieldBorderDecoration.copyWith(
+                                    hintText: 'Enter amount',
+                                    hintStyle: TextStyle(
+                                      color: Colors.black.withOpacity(0.5),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 20),//select customer
+                              ///field for reference
+                              Text(
+                                'Reference',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              Container(
+                                width: constraints.maxWidth,
+                                child: TextFormField(
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                  textInputAction: TextInputAction.next,
+                                  keyboardType: TextInputType.name,
+                                  controller: categoryController,
+                                  validator: (value) {
+                                    if (value!.isEmpty) {
+                                      return 'Enter reference or description';
+                                    }
+                                    return null;
+                                  },
+                                  decoration: kTextFieldBorderDecoration.copyWith(
+                                    hintText: 'Enter reference or description',
+                                    hintStyle: TextStyle(
+                                      color: Colors.black.withOpacity(0.5),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 20),
+                              ///field for date
+                              Text(
+                                'Due Date',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              Container(
+                                width: constraints.maxWidth,
+                                child: TextFormField(
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                  textInputAction: TextInputAction.next,
+                                  keyboardType: TextInputType.name,
+                                  controller: categoryController,
+                                  validator: (value) {
+                                    if (value!.isEmpty) {
+                                      return 'Enter due date';
+                                    }
+                                    return null;
+                                  },
+                                  decoration: kTextFieldBorderDecoration.copyWith(
+                                    hintText: 'Enter due date',
                                     hintStyle: TextStyle(
                                       color: Colors.black.withOpacity(0.5),
                                       fontSize: 14,
@@ -318,7 +433,7 @@ class _CustomersState extends State<Customers> {
                         buttonColor: Color(0xFF00509A),
                         child: Center(
                           child: Text(
-                            'Add Category',
+                            'Record Debt',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Color(0xFFFFFFFF),

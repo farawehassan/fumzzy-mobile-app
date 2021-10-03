@@ -17,14 +17,14 @@ class _AllState extends State<All> {
     return LayoutBuilder(
       builder: (context, constraints) => Container(
         decoration: kTableContainer,
-        child: ProductsTableDetails(),
+        child: AllTableDetails(),
       ),
     );
   }
 
 }
 
-class ProductsTableDetails extends StatelessWidget {
+class AllTableDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
