@@ -8,6 +8,7 @@ import 'screens/dashboard/dashboard.dart';
 import 'screens/login.dart';
 import 'screens/settings/settings.dart';
 import 'screens/staff/staff.dart';
+import 'screens/customers/customers.dart';
 
 void main() {
   runApp(MyApp());
@@ -63,6 +64,7 @@ class _MyAppState extends State<MyApp> {
         Creditors.id: (context) => Creditors(),
         Inventory.id: (context) => Inventory(),
         Invoices.id: (context) => Invoices(),
+        Customers.id: (context) => Customers(),
       },
     );
   }

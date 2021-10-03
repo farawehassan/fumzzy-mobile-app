@@ -5,8 +5,8 @@ import 'package:fumzy/screens/creditors/creditors.dart';
 import 'package:fumzy/screens/staff/staff.dart';
 import 'package:fumzy/screens/inventory/inventory.dart';
 import 'package:fumzy/screens/invoices/invoices.dart';
-
 import 'dashboard.dart';
+import 'package:fumzy/screens/customers/customers.dart';
 
 class RefactoredDrawer extends StatefulWidget {
 
@@ -211,7 +211,10 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                           ),
                         ),
                         onTap: () {
-                          print("clicked dashboard");
+                          Navigator.pop(context);
+                          if (widget.title != 'CUSTOMERS'){
+                            Navigator.pushNamed(context, Customers.id);
+                          }
                         },
                       ),//Customers
                       ListTile(

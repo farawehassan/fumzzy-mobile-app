@@ -5,27 +5,27 @@ import 'package:fumzy/components/app-bar.dart';
 import 'package:fumzy/components/button.dart';
 import 'package:fumzy/screens/dashboard/drawer.dart';
 import 'package:fumzy/utils/constant-styles.dart';
-import 'product-categories.dart';
-import 'products.dart';
+import 'all.dart';
+import 'debtors.dart';
 
-class Inventory extends StatefulWidget {
+class Customers extends StatefulWidget {
 
-  static const String id = 'inventory';
+  static const String id = 'cutomers';
 
   @override
-  _InventoryState createState() => _InventoryState();
+  _CustomersState createState() => _CustomersState();
 }
 
-class _InventoryState extends State<Inventory> {
+class _CustomersState extends State<Customers> {
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) => (Scaffold(
-        appBar: buildAppBar(constraints, 'INVENTORY'),
-        drawer: RefactoredDrawer(title: 'INVENTORY'),
+        appBar: buildAppBar(constraints, 'CUSTOMERS'),
+        drawer: RefactoredDrawer(title: 'CUSTOMERS'),
         body: Padding(
-          padding: EdgeInsets.fromLTRB(20, 30, 20, 0),
+          padding: EdgeInsets.fromLTRB(20, 30, 20, 10),
           child: DefaultTabController(
             length: 2,
             initialIndex: 0,
@@ -41,7 +41,7 @@ class _InventoryState extends State<Inventory> {
                     Padding(
                       padding: const EdgeInsets.only(top: 15.0),
                       child: Text(
-                        'All Inventory',
+                        'All Customers',
                         style: TextStyle(
                           color: Color(0xFF171725),
                           fontWeight: FontWeight.w600,
@@ -49,44 +49,23 @@ class _InventoryState extends State<Inventory> {
                         ),
                       ),
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        TextButton(
-                          onPressed: () {
-                            _addNewCategory(constraints);
-                          },
-                          child: Container(
-                            color: Colors.transparent,
-                            child: Text(
-                              'Add new category',
-                              style: TextStyle(
-                                color: Color(0xFF00509A),
-                                fontWeight: FontWeight.normal,
-                                fontSize: 14,
-                              ),
-                            ),
+                    Button(
+                      onTap: () {
+                        _addNewCategory(constraints);
+                      },
+                      buttonColor: Color(0xFF00509A),
+                      width: 160,
+                      child: Center(
+                        child: Text(
+                          'Add Debtor',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Color(0xFFFFFFFF),
+                            fontSize: 14,
+                            fontWeight: FontWeight.normal,
                           ),
                         ),
-                        Button(
-                          onTap: (){
-                            print('add new product');
-                          },
-                          buttonColor: Color(0xFF00509A),
-                          width: 160,
-                          child: Center(
-                            child: Text(
-                              'Add New Product',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Color(0xFFFFFFFF),
-                                fontSize: 14,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
@@ -164,38 +143,36 @@ class _InventoryState extends State<Inventory> {
                   ),
                 ),
                 SizedBox(height: 37),
-                SingleChildScrollView(
-                  child: Container(
-                    width: 257,
-                    child: TabBar(
-                      labelStyle: kTabBarTextStyle,
-                      labelColor: Color(0xFF004E92),
-                      unselectedLabelColor: Color(0xFF004E92).withOpacity(0.6),
-                      indicatorColor: Color(0xFF004E92),
-                      indicatorWeight: 3,
-                      tabs: [
-                        Tab(
-                          child: Text(
-                            'Products',
-                            style: kTabBarTextStyle,
-                          ),
+                Container(
+                  width: 257,
+                  child: TabBar(
+                    labelStyle: kTabBarTextStyle,
+                    labelColor: Color(0xFF004E92),
+                    unselectedLabelColor: Color(0xFF004E92).withOpacity(0.6),
+                    indicatorColor: Color(0xFF004E92),
+                    indicatorWeight: 3,
+                    tabs: [
+                      Tab(
+                        child: Text(
+                          'All',
+                          style: kTabBarTextStyle,
                         ),
-                        Tab(
-                          child: Text(
-                            'Product Categories',
-                            style: kTabBarTextStyle,
-                          ),
+                      ),
+                      Tab(
+                        child: Text(
+                          'Debtors',
+                          style: kTabBarTextStyle,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
                 SizedBox(height: 25),
                 Expanded(
                   child: TabBarView(
                     children: [
-                      Products(),
-                      ProductCategories(),
+                      All(),
+                      Debtors(),
                     ],
                   ),
                 ),

@@ -17,10 +17,6 @@ class Staff extends StatefulWidget {
 
 class _StaffState extends State<Staff> {
 
-  final Color activeStatusColor = Color(0xFF00AF27);
-
-  final Color blockedStatusColor = Color(0xFF4B545A);
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -144,10 +140,7 @@ class _StaffState extends State<Staff> {
                       Container(
                         width: constraints.maxWidth,
                         decoration: kTableContainer,
-                        child: StaffTableContents(
-                          activeStatusColor: activeStatusColor,
-                          blockedStatusColor: blockedStatusColor
-                        )
+                        child: StaffTableContents()
                       ),
                     ],
                   ),
@@ -487,14 +480,9 @@ class _StaffState extends State<Staff> {
 
 class StaffTableContents extends StatelessWidget {
 
-  StaffTableContents({
-    required this.activeStatusColor,
-    required this.blockedStatusColor,
-  });
+  final Color activeStatusColor = Color(0xFF00AF27);
 
-  final Color activeStatusColor;
-
-  final Color blockedStatusColor;
+  final Color blockedStatusColor = Color(0xFF4B545A);
 
   @override
   Widget build(BuildContext context) {

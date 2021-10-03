@@ -12,23 +12,13 @@ class Products extends StatefulWidget {
 
 class _ProductsState extends State<Products> {
 
-  final Color shortStockColor = Color(0xFFF28301);
-
-  final Color inStockColor = Color(0xFF00AF27);
-
-  final Color outOfStockColor = Color(0xFFF64932);
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) => SingleChildScrollView(
         child: Container(
           decoration: kTableContainer,
-          child: ProductsTableDetails(
-              inStockColor: inStockColor,
-              outOfStockColor: outOfStockColor,
-              shortStockColor: shortStockColor
-          ),
+          child: ProductsTableDetails(),
         ),
       ),
     );
@@ -38,16 +28,11 @@ class _ProductsState extends State<Products> {
 
 class ProductsTableDetails extends StatelessWidget {
 
-  ProductsTableDetails({
-    required this.inStockColor,
-    required this.outOfStockColor,
-    required this.shortStockColor,
-  });
+  final Color shortStockColor = Color(0xFFF28301);
 
-  final Color inStockColor;
-  final Color outOfStockColor;
-  final Color shortStockColor;
+  final Color inStockColor = Color(0xFF00AF27);
 
+  final Color outOfStockColor = Color(0xFFF64932);
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
