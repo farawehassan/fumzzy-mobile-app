@@ -186,7 +186,10 @@ class _CustomersState extends State<Customers> {
 
   Future<void> _addNewDebtor(BoxConstraints constraints) {
     final formKey = GlobalKey<FormState>();
-    TextEditingController categoryController = TextEditingController();
+    TextEditingController customerController = TextEditingController();
+    TextEditingController amountController = TextEditingController();
+    TextEditingController referenceController = TextEditingController();
+    TextEditingController dateController = TextEditingController();
     return showDialog(
       context: context,
       barrierColor: Color(0xFF000428).withOpacity(0.86),
@@ -290,7 +293,7 @@ class _CustomersState extends State<Customers> {
                                   ),
                                   textInputAction: TextInputAction.next,
                                   keyboardType: TextInputType.name,
-                                  controller: categoryController,
+                                  controller: customerController,
                                   validator: (value) {
                                     if (value!.isEmpty) {
                                       return 'Enter category name';
@@ -328,7 +331,7 @@ class _CustomersState extends State<Customers> {
                                   ),
                                   textInputAction: TextInputAction.next,
                                   keyboardType: TextInputType.name,
-                                  controller: categoryController,
+                                  controller: amountController,
                                   validator: (value) {
                                     if (value!.isEmpty) {
                                       return 'Enter amount';
@@ -366,7 +369,7 @@ class _CustomersState extends State<Customers> {
                                   ),
                                   textInputAction: TextInputAction.next,
                                   keyboardType: TextInputType.name,
-                                  controller: categoryController,
+                                  controller: referenceController,
                                   validator: (value) {
                                     if (value!.isEmpty) {
                                       return 'Enter reference or description';
@@ -404,7 +407,7 @@ class _CustomersState extends State<Customers> {
                                   ),
                                   textInputAction: TextInputAction.next,
                                   keyboardType: TextInputType.name,
-                                  controller: categoryController,
+                                  controller: dateController,
                                   validator: (value) {
                                     if (value!.isEmpty) {
                                       return 'Enter due date';

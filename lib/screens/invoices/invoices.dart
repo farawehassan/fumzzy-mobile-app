@@ -3,6 +3,7 @@ import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:fumzy/components/app-bar.dart';
 import 'package:fumzy/screens/dashboard/drawer.dart';
 import 'package:fumzy/utils/constant-styles.dart';
+import 'package:fumzy/components/invoice-pdf-download.dart';
 
 class Invoices extends StatefulWidget {
 
@@ -205,7 +206,7 @@ class AllInvoicesDetail extends StatelessWidget {
         ],
         rows: [
           DataRow(cells: [
-            DataCell(ReusableDownloadPdf()),
+            DataCell(ReusableDownloadPdf(invoiceNo: 022341)),
             DataCell(Text('Fully Paid')),
             DataCell(Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -223,7 +224,7 @@ class AllInvoicesDetail extends StatelessWidget {
             DataCell(Text('-')),
           ]),
           DataRow(cells: [
-            DataCell(ReusableDownloadPdf()),
+            DataCell(ReusableDownloadPdf(invoiceNo: 022341)),
             DataCell(Text('Part-Paid')),
             DataCell(Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -242,7 +243,7 @@ class AllInvoicesDetail extends StatelessWidget {
                 Text('23, May 2021', style: TextStyle(color: Color(0xFFF64932)))),
           ]),
           DataRow(cells: [
-            DataCell(ReusableDownloadPdf()),
+            DataCell(ReusableDownloadPdf(invoiceNo: 022341)),
             DataCell(Text('Credit')),
             DataCell(Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -264,38 +265,5 @@ class AllInvoicesDetail extends StatelessWidget {
       ),
     );
   }
-
 }
 
-class ReusableDownloadPdf extends StatelessWidget {
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-          Container(
-            width: 30,
-            height: 30,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/images/pdf-image.png'),
-                fit: BoxFit.contain,
-              ),
-            ),
-          ),
-          Text(
-            '022341',
-            style: TextStyle(
-              decoration: TextDecoration.underline,
-              color: Color(0xFF75759E),
-              fontSize: 12,
-              fontWeight: FontWeight.normal,
-            ),
-          ),
-        ],
-      );
-  }
-
-}

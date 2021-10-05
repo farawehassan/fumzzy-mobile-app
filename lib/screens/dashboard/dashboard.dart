@@ -41,7 +41,7 @@ class _DashboardState extends State<Dashboard> {
         drawer: RefactoredDrawer(title: 'DASHBOARD'),
         body: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.fromLTRB(20, 30, 23, 30),
+            padding: EdgeInsets.fromLTRB(20, 30, 23, 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -229,6 +229,7 @@ class _DashboardState extends State<Dashboard> {
                                         ),
                                       ],
                                     ),
+                                    SizedBox(height: 10),
                                     GestureDetector(
                                       onTap: () {
                                         print("see details");
@@ -330,6 +331,7 @@ class _DashboardState extends State<Dashboard> {
                                         ),//volume
                                       ],
                                     ),
+                                    SizedBox(height: 10),
                                     GestureDetector(
                                       onTap: () {
                                         print("see details");
@@ -375,7 +377,7 @@ class _DashboardState extends State<Dashboard> {
                                   fontSize: 14,
                                 ),
                               ),
-                              SizedBox(width: 470),
+                              SizedBox(width: 450),
                               InkWell(
                                 onTap: () {
                                   print("see all");

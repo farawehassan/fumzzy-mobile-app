@@ -24,7 +24,7 @@ class _StaffState extends State<Staff> {
         appBar: buildAppBar(constraints, 'STAFFS'),
         drawer: RefactoredDrawer(title: 'STAFFS'),
         body: Padding(
-          padding: EdgeInsets.fromLTRB(20, 30, 20, 40),
+          padding: EdgeInsets.fromLTRB(20, 30, 20, 5),
           child: Column(
             children: [
               Row(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fumzy/components/button.dart';
 import 'package:fumzy/utils/constant-styles.dart';
+import 'package:fumzy/components/delete-icon.dart';
 
 class ProductCategories extends StatefulWidget {
 
@@ -74,35 +75,6 @@ class _ProductCategoriesState extends State<ProductCategories> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-}
-
-class ReusableDeleteText extends StatelessWidget {
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: (){
-        print('Delete');
-      },
-      child: Row(
-        children: [
-          Text(
-            'Delete ',
-            style: TextStyle(
-              color: Color(0xFFF64932),
-              fontSize: 14,
-            ),
-          ),
-          Icon(
-            Icons.delete,
-            color: Color(0xFFF64932),
-            size: 15,
-          ),
-        ],
       ),
     );
   }

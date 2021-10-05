@@ -133,5 +133,4 @@ class _SalesState extends State<Sales> {
       ),
     );
   }
-
 }

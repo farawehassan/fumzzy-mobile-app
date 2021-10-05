@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fumzy/components/arrow-button.dart';
 import 'package:fumzy/utils/constant-styles.dart';
+import 'customer-detail/customer-detail.dart';
 
 class All extends StatefulWidget {
 
@@ -11,7 +12,6 @@ class All extends StatefulWidget {
 }
 
 class _AllState extends State<All> {
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -21,7 +21,6 @@ class _AllState extends State<All> {
       ),
     );
   }
-
 }
 
 class AllTableDetails extends StatelessWidget {
@@ -52,7 +51,31 @@ class AllTableDetails extends StatelessWidget {
         rows: [
           DataRow(cells: [
             DataCell(Text('Obi Cubana and Sons Limited')),
-            DataCell(Text('N'+'1,200,000')),
+            DataCell(Text('N' + '1,200,000')),
+            DataCell(Text('10')),
+            DataCell(Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('23, May 2021'),
+                Text(
+                  '12:30pm',
+                  style: TextStyle(fontWeight: FontWeight.w300),
+                ),
+              ],
+            )),
+            DataCell(
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, CustomersDetail.id);
+                },
+                child: TableArrowButton(),
+              ),
+            ),
+          ]),
+          DataRow(cells: [
+            DataCell(Text('Obi Cubana and Sons Limited')),
+            DataCell(Text('N' + '1,200,000')),
             DataCell(Text('10')),
             DataCell(Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -69,7 +92,7 @@ class AllTableDetails extends StatelessWidget {
           ]),
           DataRow(cells: [
             DataCell(Text('Obi Cubana and Sons Limited')),
-            DataCell(Text('N'+'1,200,000')),
+            DataCell(Text('N' + '1,200,000')),
             DataCell(Text('10')),
             DataCell(Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -86,24 +109,7 @@ class AllTableDetails extends StatelessWidget {
           ]),
           DataRow(cells: [
             DataCell(Text('Obi Cubana and Sons Limited')),
-            DataCell(Text('N'+'1,200,000')),
-            DataCell(Text('10')),
-            DataCell(Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('23, May 2021'),
-                Text(
-                  '12:30pm',
-                  style: TextStyle(fontWeight: FontWeight.w300),
-                ),
-              ],
-            )),
-            DataCell(TableArrowButton()),
-          ]),
-          DataRow(cells: [
-            DataCell(Text('Obi Cubana and Sons Limited')),
-            DataCell(Text('N'+'1,200,000')),
+            DataCell(Text('N' + '1,200,000')),
             DataCell(Text('10')),
             DataCell(Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -122,5 +128,4 @@ class AllTableDetails extends StatelessWidget {
       ),
     );
   }
-
 }
