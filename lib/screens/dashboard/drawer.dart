@@ -24,13 +24,19 @@ class RefactoredDrawer extends StatefulWidget {
 
 class _RefactoredDrawerState extends State<RefactoredDrawer> {
 
-  Color _inactiveColor = Colors.white.withOpacity(0.7);
+  Color _getColor (String title){
+    if(widget.title == title){
+      return Colors.white;
+    } else {
+      return Colors.white.withOpacity(0.7);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
       child: Container(
-        color:  Color(0xFF00509A),
+        color: Color(0xFF00509A),
         child: Column(
           children: [
             Container(
@@ -100,7 +106,7 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                   color: Color(0xFF00509A),
                   child: Column(
                     children: [
-                      //menu
+                      // Menu
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 13.0),
                         child: ListTile(
@@ -112,22 +118,20 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          onTap: () {
-                            print("clicked dashboard");
-                          },
+                          onTap: () { },
                         ),
                       ),
-                      //Dashboard
+                      // Dashboard
                       ListTile(
                         leading: Icon(
                           IconlyBold.category,
-                          color: Colors.white,
+                          color: _getColor('DASHBOARD'),
                           size: 20,
                         ),
                         title: Text(
                           'Dashboard',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: _getColor('DASHBOARD'),
                             fontSize: 17,
                             fontWeight: FontWeight.w500,
                           ),
@@ -139,17 +143,17 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                           }
                         },
                       ),
-                      //Transactions
+                      // Transactions
                       ListTile(
                         leading: Icon(
                           IconlyBold.chart,
-                          color: _inactiveColor,
+                          color: _getColor('TRANSACTIONS'),
                           size: 20,
                         ),
                         title: Text(
                           'Transactions',
                           style: TextStyle(
-                            color: _inactiveColor,
+                            color: _getColor('TRANSACTIONS'),
                             fontSize: 17,
                             fontWeight: FontWeight.w500,
                           ),
@@ -161,17 +165,17 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                           }
                         },
                       ),
-                      //Inventory
+                      // Inventory
                       ListTile(
                         leading: Icon(
                           IconlyBold.buy,
-                          color: _inactiveColor,
+                          color: _getColor('INVENTORY'),
                           size: 20,
                         ),
                         title: Text(
                           'Inventory',
                           style: TextStyle(
-                            color: _inactiveColor,
+                            color: _getColor('INVENTORY'),
                             fontSize: 17,
                             fontWeight: FontWeight.w500,
                           ),
@@ -183,17 +187,17 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                           }
                         },
                       ),
-                      //Invoices
+                      // Invoices
                       ListTile(
                         leading: Icon(
                           IconlyBold.document,
-                          color: _inactiveColor,
+                          color: _getColor('INVOICES'),
                           size: 20,
                         ),
                         title: Text(
                           'Invoices',
                           style: TextStyle(
-                            color: _inactiveColor,
+                            color: _getColor('INVOICES'),
                             fontSize: 17,
                             fontWeight: FontWeight.w500,
                           ),
@@ -205,17 +209,17 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                           }
                         },
                       ),
-                      //Customers
+                      // Customers
                       ListTile(
                         leading: Icon(
                           IconlyBold.user3,
-                          color: _inactiveColor,
+                          color: _getColor('CUSTOMERS'),
                           size: 20,
                         ),
                         title: Text(
                           'Customers',
                           style: TextStyle(
-                            color: _inactiveColor,
+                            color: _getColor('CUSTOMERS'),
                             fontSize: 17,
                             fontWeight: FontWeight.w500,
                           ),
@@ -227,17 +231,17 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                           }
                         },
                       ),
-                      //Creditor
+                      // Creditor
                       ListTile(
                         leading: Icon(
                           IconlyBold.wallet,
-                          color: _inactiveColor,
+                          color: _getColor('CREDITORS'),
                           size: 20,
                         ),
                         title: Text(
                           'Creditors',
                           style: TextStyle(
-                            color: _inactiveColor,
+                            color: _getColor('CREDITORS'),
                             fontSize: 17,
                             fontWeight: FontWeight.w500,
                           ),
@@ -249,36 +253,39 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                           }
                         },
                       ),
-                      //Notifications
+                      // Notifications
                       ListTile(
                         leading: Icon(
                           IconlyBold.notification,
-                          color: _inactiveColor,
+                          color: _getColor('NOTIFICATIONS'),
                           size: 20,
                         ),
                         title: Text(
                           'Notifications',
                           style: TextStyle(
-                            color: _inactiveColor,
+                            color: _getColor('NOTIFICATIONS'),
                             fontSize: 17,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                         onTap: () {
-                          print("clicked dashboard");
+                          Navigator.pop(context);
+                          if(widget.title != 'NOTIFICATIONS'){
+                            //Navigator.pushNamed(context, Creditors.id);
+                          }
                         },
                       ),
-                      //Staffs
+                      // Staffs
                       ListTile(
                         leading: Icon(
                           IconlyBold.user2,
-                          color: _inactiveColor,
+                          color: _getColor('STAFFS'),
                           size: 20,
                         ),
                         title: Text(
                           'Staffs',
                           style: TextStyle(
-                            color: _inactiveColor,
+                            color: _getColor('STAFFS'),
                             fontSize: 17,
                             fontWeight: FontWeight.w500,
                           ),
@@ -290,17 +297,17 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                           }
                         },
                       ),
-                      //Settings
+                      // Settings
                       ListTile(
                         leading: Icon(
                           IconlyBold.setting,
-                          color: _inactiveColor,
+                          color: _getColor('SETTINGS'),
                           size: 20,
                         ),
                         title: Text(
                           'Settings',
                           style: TextStyle(
-                            color: _inactiveColor,
+                            color: _getColor('SETTINGS'),
                             fontSize: 17,
                             fontWeight: FontWeight.w500,
                           ),
@@ -312,7 +319,7 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                           }
                         },
                       ),
-                      //collapse
+                      // Collapse
                       Padding(
                         padding: const EdgeInsets.only(top: 34.0, bottom: 40),
                         child: ListTile(

@@ -47,6 +47,7 @@ class InventoryCard extends StatelessWidget {
                     fontWeight: FontWeight.normal,
                   ),
                 ),
+                SizedBox(width: 10),
                 Icon(
                   IconlyBold.graph,
                   color: Colors.white,

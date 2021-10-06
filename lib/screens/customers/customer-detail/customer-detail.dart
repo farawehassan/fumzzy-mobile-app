@@ -30,290 +30,302 @@ class _CustomersDetailState extends State<CustomersDetail> {
         drawer: RefactoredDrawer(title: 'CUSTOMERS'),
         body: Padding(
           padding: EdgeInsets.fromLTRB(20, 30, 20, 0),
-          child: DefaultTabController(
-            length: 3,
-            initialIndex: 0,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                //customer detail, delete and marked as settled
-                Wrap(
-                  alignment: WrapAlignment.start,
-                  spacing: constraints.maxWidth / 1.95,
-                  runSpacing: 18.0,
-                  children: [
-                    //customer detail
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        InkWell(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: Icon(
-                            IconlyBold.arrowLeftCircle,
-                            size: 19,
-                            color: Color(0xFF004E92).withOpacity(0.5),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 2.0),
-                          child: Text(
-                            ' Customer Detail',
-                            style: TextStyle(
-                              color: Color(0xFF75759E),
-                              fontWeight: FontWeight.w600,
-                              fontSize: 15.7,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    //delete, mark as settled
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ReusableDeleteText(
-                          textSize: 16,
-                        ),
-                        Container(
-                          height: 25,
-                          margin: EdgeInsets.symmetric(horizontal: 9.0),
-                          child: VerticalDivider(
-                            color: Colors.grey,
-                            thickness: 0.6,
-                            width: 1,
-                          ),
-                        ),
-                        Container(
-                          height: 15,
-                          width: 30,
-                          child: Checkbox(
-                            value: checkBoxValue,
-                            onChanged: (onChanged) {
-                              setState(() {
-                                if (checkBoxValue == false) {
-                                  checkBoxValue = true;
-                                } else {
-                                  checkBoxValue = false;
-                                }
-                              });
-                            },
-                            activeColor: Color(0xFF00AF27),
-                            checkColor: Colors.white,
-                            shape: CircleBorder(),
-                            splashRadius: 23,
-                          ),
-                        ),
-                        Text(
-                          'Mark as Settled',
-                          style: TextStyle(
-                            color: Color(0xFF052121),
-                            fontSize: 15,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                SizedBox(height: 35),
-                //customers info
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Container(
-                    width: constraints.maxWidth,
-                    decoration: kTableContainer,
-                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 24),
+          child: NestedScrollView(
+            headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+              return [
+                SliverToBoxAdapter(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Customer’s Info',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            color: Color(0xFF004E92),
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.symmetric(vertical: 15.0),
-                          child: Divider(
-                            height: 1,
-                            thickness: 1,
-                            color: Colors.black.withOpacity(0.2),
-                          ),
-                        ),
                         Wrap(
-                          runSpacing: 20,
-                          spacing: 55,
+                          alignment: WrapAlignment.start,
+                          spacing: constraints.maxWidth / 1.95,
+                          runSpacing: 18.0,
                           children: [
-                            ReusableCustomerInfoFields(
-                              tableTitle: 'Name',
-                              widget: Text(
-                                'Obi Cubana and Sons Limited',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 14,
+                            //customer detail
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Icon(
+                                    IconlyBold.arrowLeftCircle,
+                                    size: 19,
+                                    color: Color(0xFF004E92).withOpacity(0.5),
+                                  ),
                                 ),
-                              ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 2.0),
+                                  child: Text(
+                                    ' Customer Detail',
+                                    style: TextStyle(
+                                      color: Color(0xFF75759E),
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 15.7,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            ReusableCustomerInfoFields(
-                              tableTitle: 'Total Sales',
-                              widget: Text(
-                                'Obi CSons Limited',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 14,
+                            //delete, mark as settled
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                ReusableDeleteText(
+                                  textSize: 16,
                                 ),
-                              ),
-                            ),
-                            ReusableCustomerInfoFields(
-                              tableTitle: 'Sales Volume',
-                              widget: Text(
-                                'Obi Cubanad',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 14,
+                                Container(
+                                  height: 25,
+                                  margin: EdgeInsets.symmetric(horizontal: 9.0),
+                                  child: VerticalDivider(
+                                    color: Colors.grey,
+                                    thickness: 0.6,
+                                    width: 1,
+                                  ),
                                 ),
-                              ),
-                            ),
-                            ReusableCustomerInfoFields(
-                              tableTitle: 'On-board Date',
-                              widget: Text(
-                                'Obi Cubana ',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 14,
+                                Container(
+                                  height: 15,
+                                  width: 30,
+                                  child: Checkbox(
+                                    value: checkBoxValue,
+                                    onChanged: (onChanged) {
+                                      setState(() {
+                                        if (checkBoxValue == false) {
+                                          checkBoxValue = true;
+                                        } else {
+                                          checkBoxValue = false;
+                                        }
+                                      });
+                                    },
+                                    activeColor: Color(0xFF00AF27),
+                                    checkColor: Colors.white,
+                                    shape: CircleBorder(),
+                                    splashRadius: 23,
+                                  ),
                                 ),
-                              ),
+                                Text(
+                                  'Mark as Settled',
+                                  style: TextStyle(
+                                    color: Color(0xFF052121),
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                        SizedBox(height: 30),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            ReusableCustomerInfoFields(
-                              tableTitle: 'Total Debts',
+                        SizedBox(height: 35),
+                        //customers info
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Container(
+                            width: constraints.maxWidth,
+                            decoration: kTableContainer,
+                            padding: EdgeInsets.symmetric(horizontal: 30, vertical: 24),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Customer’s Info',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                    color: Color(0xFF004E92),
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.symmetric(vertical: 15.0),
+                                  child: Divider(
+                                    height: 1,
+                                    thickness: 1,
+                                    color: Colors.black.withOpacity(0.2),
+                                  ),
+                                ),
+                                Wrap(
+                                  runSpacing: 20,
+                                  spacing: 55,
+                                  children: [
+                                    ReusableCustomerInfoFields(
+                                      tableTitle: 'Name',
+                                      widget: Text(
+                                        'Obi Cubana and Sons Limited',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ),
+                                    ReusableCustomerInfoFields(
+                                      tableTitle: 'Total Sales',
+                                      widget: Text(
+                                        'Obi CSons Limited',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ),
+                                    ReusableCustomerInfoFields(
+                                      tableTitle: 'Sales Volume',
+                                      widget: Text(
+                                        'Obi Cubanad',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ),
+                                    ReusableCustomerInfoFields(
+                                      tableTitle: 'On-board Date',
+                                      widget: Text(
+                                        'Obi Cubana ',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 30),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    ReusableCustomerInfoFields(
+                                      tableTitle: 'Total Debts',
+                                    ),
+                                    SizedBox(width: 40),
+                                    ReusableCustomerInfoFields(
+                                      tableTitle: 'Last Re-payment Date',
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
-                            SizedBox(width: 40),
-                            ReusableCustomerInfoFields(
-                              tableTitle: 'Last Re-payment Date',
-                            ),
-                          ],
+                          ),
                         ),
+                        SizedBox(height: 35),
                       ],
                     ),
-                  ),
                 ),
-                SizedBox(height: 35),
-                //tab bar, add debt button and record payment
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      width: constraints.maxWidth / 2.2,
-                      child: TabBar(
-                        labelStyle: kTabBarTextStyle,
-                        labelColor: Color(0xFF004E92),
-                        unselectedLabelColor:
-                            Color(0xFF004E92).withOpacity(0.6),
-                        indicatorColor: Color(0xFF004E92),
-                        indicatorWeight: 3,
-                        tabs: [
-                          Tab(
-                            child: Text(
-                              'Total Sales',
-                              style: kTabBarTextStyle,
-                            ),
-                          ),
-                          Tab(
-                            child: Text(
-                              'Debt History',
-                              style: kTabBarTextStyle,
-                            ),
-                          ),
-                          Tab(
-                            child: Text(
-                              'Re-payment History',
-                              style: kTabBarTextStyle,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.end,
-                        alignment: WrapAlignment.end,
-                        spacing: 10,
-                        runSpacing: 10,
-                        children: [
-                          OutlinedButton(
-                            onPressed: () {
-                              _addDebt(constraints);
-                            },
-                            style: OutlinedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(5)),
+              ];
+            },
+            body: DefaultTabController(
+              length: 3,
+              initialIndex: 0,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(height: 25),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        width: constraints.maxWidth / 2.2,
+                        child: TabBar(
+                          labelStyle: kTabBarTextStyle,
+                          labelColor: Color(0xFF004E92),
+                          unselectedLabelColor:
+                          Color(0xFF004E92).withOpacity(0.6),
+                          indicatorColor: Color(0xFF004E92),
+                          indicatorWeight: 3,
+                          tabs: [
+                            Tab(
+                              child: Text(
+                                'Total Sales',
+                                style: kTabBarTextStyle,
                               ),
-                              side: BorderSide(color: Color(0xFF004E92)),
                             ),
-                            child: Container(
+                            Tab(
+                              child: Text(
+                                'Debt History',
+                                style: kTabBarTextStyle,
+                              ),
+                            ),
+                            Tab(
+                              child: Text(
+                                'Re-payment History',
+                                style: kTabBarTextStyle,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.end,
+                          alignment: WrapAlignment.end,
+                          spacing: 10,
+                          runSpacing: 10,
+                          children: [
+                            OutlinedButton(
+                              onPressed: () {
+                                _addDebt(constraints);
+                              },
+                              style: OutlinedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                  BorderRadius.all(Radius.circular(5)),
+                                ),
+                                side: BorderSide(color: Color(0xFF004E92)),
+                              ),
+                              child: Container(
+                                width: 120,
+                                height: 50,
+                                child: Center(
+                                  child: Text(
+                                    'Add Debt',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Color(0xFF004E92),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Button(
+                              onTap: () {
+                                _recordRepayment(constraints);
+                              },
+                              buttonColor: Color(0xFF00509A),
                               width: 120,
-                              height: 50,
                               child: Center(
                                 child: Text(
-                                  'Add Debt',
+                                  'Record Payment',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                    color: Color(0xFF004E92),
+                                    color: Color(0xFFFFFFFF),
                                     fontSize: 14,
                                     fontWeight: FontWeight.normal,
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                          Button(
-                            onTap: () {
-                              _recordRepayment(constraints);
-                            },
-                            buttonColor: Color(0xFF00509A),
-                            width: 120,
-                            child: Center(
-                              child: Text(
-                                'Record Payment',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Color(0xFFFFFFFF),
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 25),
-                //table details
-                Expanded(
-                  child: TabBarView(
-                    children: [
-                      TotalSales(),
-                      DebtHistory(),
-                      RepaymentHistory(),
                     ],
                   ),
-                ),
-              ],
+                  SizedBox(height: 35),
+                  //table details
+                  Expanded(
+                    child: TabBarView(
+                      children: [
+                        TotalSales(),
+                        DebtHistory(),
+                        RepaymentHistory(),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -830,13 +842,14 @@ class _CustomersDetailState extends State<CustomersDetail> {
 }
 
 class ReusableCustomerInfoFields extends StatelessWidget {
+
   ReusableCustomerInfoFields({
     Key? key,
-    required this.tableTitle,
-    @required this.widget,
+    @required this.tableTitle,
+    this.widget,
   }) : super(key: key);
 
-  final String tableTitle;
+  final String? tableTitle;
 
   final Widget? widget;
 
@@ -846,7 +859,7 @@ class ReusableCustomerInfoFields extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          tableTitle,
+          tableTitle!,
           style: TextStyle(
             color: Color(0xFF75759E),
             fontWeight: FontWeight.w400,

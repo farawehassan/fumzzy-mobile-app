@@ -12,6 +12,7 @@ class TotalSales extends StatefulWidget {
 }
 
 class _TotalSalesState extends State<TotalSales> {
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -80,4 +81,5 @@ class _TotalSalesState extends State<TotalSales> {
       ),
     );
   }
+
 }

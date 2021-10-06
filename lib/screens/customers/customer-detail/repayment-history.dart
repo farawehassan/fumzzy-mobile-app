@@ -10,6 +10,7 @@ class RepaymentHistory extends StatefulWidget {
 }
 
 class _RepaymentHistoryState extends State<RepaymentHistory> {
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -58,4 +59,5 @@ class _RepaymentHistoryState extends State<RepaymentHistory> {
       ),
     );
   }
+
 }
