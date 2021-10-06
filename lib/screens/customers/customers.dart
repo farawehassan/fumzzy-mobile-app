@@ -407,7 +407,7 @@ class _CustomersState extends State<Customers> {
                                   ),
                                   textInputAction: TextInputAction.next,
                                   keyboardType: TextInputType.name,
-                                  controller: dateController,
+                                  controller: dateController ,
                                   validator: (value) {
                                     if (value!.isEmpty) {
                                       return 'Enter due date';
