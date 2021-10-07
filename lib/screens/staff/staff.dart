@@ -6,6 +6,7 @@ import 'package:fumzy/components/button.dart';
 import 'package:fumzy/screens/dashboard/drawer.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:fumzy/utils/constant-styles.dart';
+import 'pop-up.dart';
 
 class Staff extends StatefulWidget {
 
@@ -16,7 +17,6 @@ class Staff extends StatefulWidget {
 }
 
 class _StaffState extends State<Staff> {
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -39,7 +39,7 @@ class _StaffState extends State<Staff> {
                     ),
                   ),
                   Button(
-                    onTap: (){
+                    onTap: () {
                       _addStaffDialog(constraints);
                     },
                     buttonColor: Color(0xFF00509A),
@@ -93,8 +93,7 @@ class _StaffState extends State<Staff> {
                                 style: TextStyle(
                                     fontWeight: FontWeight.w400,
                                     fontSize: 15.0,
-                                    color: Colors.black
-                                ),
+                                    color: Colors.black),
                               ),
                             ), //search
                             InkWell(
@@ -114,7 +113,8 @@ class _StaffState extends State<Staff> {
                                   ),
                                 ),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       'Filter',
@@ -138,10 +138,9 @@ class _StaffState extends State<Staff> {
                       ),
                       SizedBox(height: 35),
                       Container(
-                        width: constraints.maxWidth,
-                        decoration: kTableContainer,
-                        child: StaffTableContents()
-                      ),
+                          width: constraints.maxWidth,
+                          decoration: kTableContainer,
+                          child: StaffTableContents()),
                     ],
                   ),
                 ),
@@ -210,36 +209,36 @@ class _StaffState extends State<Staff> {
               ),
               Expanded(
                 child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(top: 42),
-                        child: Text(
-                          'Add New Staff',
-                          style: TextStyle(
-                            color: Color(0xFF00509A),
-                            fontSize: 19,
-                            fontWeight: FontWeight.w500,
-                          ),
+                  child: Column(children: [
+                    Padding(
+                      padding: EdgeInsets.only(top: 42),
+                      child: Text(
+                        'Add New Staff',
+                        style: TextStyle(
+                          color: Color(0xFF00509A),
+                          fontSize: 19,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 15.0),
-                        child: Text(
-                          'To add a new staff enter a username and set a solid 4-digit pin for the new staff.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Color(0xFF000428).withOpacity(0.6),
-                            fontWeight: FontWeight.w400,
-                            fontSize: 15.0,
-                          ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 35, vertical: 15.0),
+                      child: Text(
+                        'To add a new staff enter a username and set a solid 4-digit pin for the new staff.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Color(0xFF000428).withOpacity(0.6),
+                          fontWeight: FontWeight.w400,
+                          fontSize: 15.0,
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 20, right: 20),
-                        child: Form(
-                          key: formKey,
-                          child: Column(
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20, right: 20),
+                      child: Form(
+                        key: formKey,
+                        child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Column(
@@ -266,7 +265,8 @@ class _StaffState extends State<Staff> {
                                       keyboardType: TextInputType.name,
                                       controller: nameController,
                                       inputFormatters: [
-                                        FilteringTextInputFormatter.allow(RegExp('[a-zA-Z]')),
+                                        FilteringTextInputFormatter.allow(
+                                            RegExp('[a-zA-Z]')),
                                       ],
                                       validator: (value) {
                                         if (value!.isEmpty) {
@@ -274,7 +274,8 @@ class _StaffState extends State<Staff> {
                                         }
                                         return null;
                                       },
-                                      decoration: kTextFieldBorderDecoration.copyWith(
+                                      decoration:
+                                          kTextFieldBorderDecoration.copyWith(
                                         hintText: 'Enter name',
                                         hintStyle: TextStyle(
                                           color: Colors.black.withOpacity(0.5),
@@ -312,7 +313,8 @@ class _StaffState extends State<Staff> {
                                       controller: phoneController,
                                       maxLength: 11,
                                       inputFormatters: [
-                                        FilteringTextInputFormatter.allow(RegExp('[0-9]')),
+                                        FilteringTextInputFormatter.allow(
+                                            RegExp('[0-9]')),
                                       ],
                                       validator: (value) {
                                         if (value!.isEmpty) {
@@ -320,7 +322,8 @@ class _StaffState extends State<Staff> {
                                         }
                                         return null;
                                       },
-                                      decoration: kTextFieldBorderDecoration.copyWith(
+                                      decoration:
+                                          kTextFieldBorderDecoration.copyWith(
                                         hintText: 'Enter phone number',
                                         hintStyle: TextStyle(
                                           color: Colors.black.withOpacity(0.5),
@@ -332,7 +335,6 @@ class _StaffState extends State<Staff> {
                                   ),
                                 ],
                               ),
-
                               Container(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -366,15 +368,14 @@ class _StaffState extends State<Staff> {
                                               fieldWidth: 60,
                                               activeColor: Color(0xFF7BBBE5),
                                               selectedColor: Color(0xFF7BBBE5),
-                                              borderRadius: BorderRadius.all(Radius.circular(3))
-                                          ),
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(3))),
                                           onChanged: (value) {
-                                            if(!mounted)return;
+                                            if (!mounted) return;
                                             setState(() {
                                               newPin = value;
                                             });
-                                          }
-                                      ),
+                                          }),
                                     ),
                                     SizedBox(height: 36),
                                   ],
@@ -413,60 +414,57 @@ class _StaffState extends State<Staff> {
                                               fieldWidth: 60,
                                               activeColor: Color(0xFF7BBBE5),
                                               selectedColor: Color(0xFF7BBBE5),
-                                              borderRadius: BorderRadius.all(Radius.circular(3))
-                                          ),
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(3))),
                                           onChanged: (value) {
-                                            if(!mounted)return;
+                                            if (!mounted) return;
                                             setState(() {
                                               confirmPin = value;
                                             });
-                                          }
-                                      ),
+                                          }),
                                     ),
                                     SizedBox(height: 36),
                                   ],
                                 ),
                               ),
-                            ]
+                            ]),
+                      ),
+                    ),
+                    Button(
+                      onTap: () {
+                        print("re-add staff");
+                      },
+                      buttonColor: Color(0xFF00509A),
+                      child: Center(
+                        child: Text(
+                          'Add Staff',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Color(0xFFFFFFFF),
+                            fontSize: 14,
+                            fontWeight: FontWeight.normal,
                           ),
                         ),
                       ),
-                      Button(
-                        onTap: (){
-                          print("re-add staff");
-                        },
-                        buttonColor: Color(0xFF00509A),
-                        child: Center(
-                          child: Text(
-                            'Add Staff',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Color(0xFFFFFFFF),
-                              fontSize: 14,
-                              fontWeight: FontWeight.normal,
-                            ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Center(
+                        child: Text(
+                          'No, Cancel',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            decoration: TextDecoration.underline,
                           ),
                         ),
                       ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: Center(
-                          child: Text(
-                            'No, Cancel',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 50),
-                    ]
-                  ),
+                    ),
+                    SizedBox(height: 50),
+                  ]),
                 ),
               ),
             ],
@@ -475,7 +473,6 @@ class _StaffState extends State<Staff> {
       ),
     );
   }
-
 }
 
 class StaffTableContents extends StatelessWidget {
@@ -591,67 +588,6 @@ class StaffTableContents extends StatelessWidget {
       ],
     );
   }
-}
-
-class ReusablePopMenu extends StatelessWidget {
-
-  @override
-  Widget build(BuildContext context) {
-    return PopupMenuButton(
-      offset: Offset(110, 40),
-      icon: Icon(
-        Icons.more_horiz,
-        color: Color(0xFF00509A),
-      ),
-      onSelected: (value) {
-        switch (value) {
-          case 0:
-            {
-              print('Reset Pin');
-            }
-            break;
-          case 1:
-            {
-              print('Block');
-            }
-            break;
-          case 2:
-            {
-              print('delete permanently');
-            }
-            break;
-        }
-      },
-      itemBuilder: (context) => [
-        PopupMenuItem(
-          child: Container(width: 135, child: Text('Reset Pin')),
-          value: 0,
-        ),
-        PopupMenuItem(
-          child: Text('Block'),
-          value: 1,
-        ),
-        PopupMenuItem(
-          child: Row(
-            children: [
-              Icon(
-                Icons.delete,
-                color: Color(0xFFF64932),
-                size: 14,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 1.5),
-                child: Text(
-                  'Reset Pin',
-                  style: TextStyle(color: Color(0xFFF64932)),
-                ),
-              ),
-            ],
-          ),
-          value: 2,
-        ),
-      ],
-    );
-  }
 
 }
+

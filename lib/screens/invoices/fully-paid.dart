@@ -6,6 +6,7 @@ import 'package:fumzy/utils/size-config.dart';
 class FullyPaidInvoicesDetail extends StatelessWidget {
 
   final double? screenWidth = SizeConfig.screenWidth;
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
