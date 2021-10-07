@@ -216,8 +216,8 @@ class _StaffState extends State<Staff> {
                         'Add New Staff',
                         style: TextStyle(
                           color: Color(0xFF00509A),
-                          fontSize: 19,
-                          fontWeight: FontWeight.w500,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),

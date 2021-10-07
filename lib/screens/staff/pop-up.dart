@@ -104,7 +104,7 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'RESET PIN',
+                      'NEW STAFF',
                       style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w600,
@@ -129,12 +129,24 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
                     Padding(
                       padding: EdgeInsets.only(top: 42),
                       child: Text(
-                        'Are you sure you want to reset this Staff\'s pin?',
-                        textAlign: TextAlign.center,
+                        'Reset PIN',
                         style: TextStyle(
                           color: Color(0xFF00509A),
-                          fontSize: 19,
-                          fontWeight: FontWeight.w500,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 35, vertical: 15.0),
+                      child: Text(
+                        'To add a new staff pin set a solid 4-digit pin for the new staff and confirm.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Color(0xFF000428).withOpacity(0.6),
+                          fontWeight: FontWeight.w400,
+                          fontSize: 15.0,
                         ),
                       ),
                     ),
@@ -146,53 +158,6 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               SizedBox(height: 20),
-                              Container(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Current PIN',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                    ),
-                                    SizedBox(height: 13),
-                                    Container(
-                                      width: 280,
-                                      child: PinCodeTextField(
-                                          appContext: context,
-                                          length: 4,
-                                          animationType: AnimationType.fade,
-                                          enablePinAutofill: false,
-                                          textStyle: TextStyle(
-                                            fontSize: 20,
-                                            color: Color(0xFF004E92),
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                          pinTheme: PinTheme(
-                                              shape: PinCodeFieldShape.box,
-                                              borderWidth: 1,
-                                              fieldHeight: 60,
-                                              fieldWidth: 60,
-                                              activeColor: Color(0xFF7BBBE5),
-                                              selectedColor: Color(0xFF7BBBE5),
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(3))),
-                                          onChanged: (value) {
-                                            if (!mounted) return;
-                                            setState(() {
-                                              newPin = value;
-                                            });
-                                          }),
-                                    ),
-                                    SizedBox(height: 36),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(height: 5),
                               Container(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -277,7 +242,7 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
                                           onChanged: (value) {
                                             if (!mounted) return;
                                             setState(() {
-                                              newPin = value;
+                                              confirmPin = value;
                                             });
                                           }),
                                     ),
@@ -301,7 +266,7 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
                       buttonColor: Color(0xFF00509A),
                       child: Center(
                         child: Text(
-                          'Yes, delete',
+                          'Save Changes',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Color(0xFFFFFFFF),
@@ -401,8 +366,8 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Color(0xFF00509A),
-                          fontSize: 19,
-                          fontWeight: FontWeight.w500,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),
@@ -631,8 +596,8 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Color(0xFF00509A),
-                          fontSize: 19,
-                          fontWeight: FontWeight.w500,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),
@@ -926,4 +891,5 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
       ),
     );
   }
+
 }
