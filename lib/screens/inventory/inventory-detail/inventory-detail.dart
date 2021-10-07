@@ -3,12 +3,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:fumzy/components/app-bar.dart';
 import 'package:fumzy/components/button.dart';
+import 'package:fumzy/components/info-table.dart';
 import 'package:fumzy/screens/dashboard/drawer.dart';
 import 'package:fumzy/utils/constant-styles.dart';
 import 'package:fumzy/components/delete-icon.dart';
 import 'package:fumzy/utils/functions.dart';
 
 class InventoryDetail extends StatefulWidget {
+
   static const String id = 'inventoryDetail';
 
   @override
@@ -140,40 +142,24 @@ class _InventoryDetailState extends State<InventoryDetail> {
                                       tableTitle: 'Product Name',
                                       widget: Text(
                                         'Carton of Smirnoff non-acholic drink 300cl',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 14,
-                                        ),
                                       ),
                                     ),
                                     ReusableCustomerInfoFields(
                                       tableTitle: 'Category',
                                       widget: Text(
                                         'Drinks',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 14,
-                                        ),
                                       ),
                                     ),
                                     ReusableCustomerInfoFields(
                                       tableTitle: 'Quantity',
                                       widget: Text(
                                         500.toString(),
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 14,
-                                        ),
                                       ),
                                     ),
                                     ReusableCustomerInfoFields(
                                       tableTitle: 'Status',
                                       widget: Text(
                                         'InStock',
-                                        style: TextStyle(
-                                          color: inStockColor,
-                                          fontSize: 14,
-                                        ),
                                       ),
                                     ),
                                   ],
@@ -202,7 +188,6 @@ class _InventoryDetailState extends State<InventoryDetail> {
                     ),
                   ),
                 ),
-                SizedBox(height: 25),
                 SizedBox(height: 35),
                 Expanded(
                   child: Column(
@@ -787,12 +772,7 @@ class RecentHistoryTable extends StatelessWidget {
                     DataCell(
                         Text(Functions.money(55000, 'N'))),
                     DataCell(Text(
-                      Functions.money(1086000, 'N'),
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    )),
+                      Functions.money(1086000, 'N'))),
                   ],
                 ),
                 DataRow(
@@ -806,12 +786,21 @@ class RecentHistoryTable extends StatelessWidget {
                     DataCell(
                         Text(Functions.money(55000, 'N'))),
                     DataCell(Text(
-                      Functions.money(1086000, 'N'),
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    )),
+                      Functions.money(1086000, 'N'))),
+                  ],
+                ),
+                DataRow(
+                  cells: [
+                    DataCell(Text('23, May 2021 - 12:13pm')),
+                    DataCell(
+                        Text('Obi Cubana and Sons Limited')),
+                    DataCell(Text(500.toString())),
+                    DataCell(
+                        Text(Functions.money(50000, 'N'))),
+                    DataCell(
+                        Text(Functions.money(55000, 'N'))),
+                    DataCell(
+                        Text(Functions.money(1086000, 'N'))),
                   ],
                 ),
                 DataRow(
@@ -825,67 +814,12 @@ class RecentHistoryTable extends StatelessWidget {
                     DataCell(
                         Text(Functions.money(55000, 'N'))),
                     DataCell(Text(
-                      Functions.money(1086000, 'N'),
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    )),
-                  ],
-                ),
-                DataRow(
-                  cells: [
-                    DataCell(Text('23, May 2021 - 12:13pm')),
-                    DataCell(
-                        Text('Obi Cubana and Sons Limited')),
-                    DataCell(Text(500.toString())),
-                    DataCell(
-                        Text(Functions.money(50000, 'N'))),
-                    DataCell(
-                        Text(Functions.money(55000, 'N'))),
-                    DataCell(Text(
-                      Functions.money(1086000, 'N'),
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    )),
+                      Functions.money(1086000, 'N'))),
                   ],
                 ),
               ],
             ),
           )),
-    );
-  }
-}
-
-class ReusableCustomerInfoFields extends StatelessWidget {
-  ReusableCustomerInfoFields({
-    Key? key,
-    @required this.tableTitle,
-    this.widget,
-  }) : super(key: key);
-
-  final String? tableTitle;
-
-  final Widget? widget;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          tableTitle!,
-          style: TextStyle(
-            color: Color(0xFF75759E),
-            fontWeight: FontWeight.w400,
-            fontSize: 14,
-          ),
-        ),
-        SizedBox(height: 15),
-        widget ?? Text('-', style: TextStyle(color: Colors.black)),
-      ],
     );
   }
 }

@@ -9,6 +9,7 @@ import 'total-sales.dart';
 import 'debt-history.dart';
 import 'repayment-history.dart';
 import 'package:fumzy/components/delete-icon.dart';
+import 'package:fumzy/components/info-table.dart';
 
 class CustomersDetail extends StatefulWidget {
 
@@ -157,40 +158,24 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                       tableTitle: 'Name',
                                       widget: Text(
                                         'Obi Cubana and Sons Limited',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 14,
-                                        ),
                                       ),
                                     ),
                                     ReusableCustomerInfoFields(
                                       tableTitle: 'Total Sales',
                                       widget: Text(
                                         'Obi CSons Limited',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 14,
-                                        ),
                                       ),
                                     ),
                                     ReusableCustomerInfoFields(
                                       tableTitle: 'Sales Volume',
                                       widget: Text(
                                         'Obi Cubanad',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 14,
-                                        ),
                                       ),
                                     ),
                                     ReusableCustomerInfoFields(
                                       tableTitle: 'On-board Date',
                                       widget: Text(
                                         'Obi Cubana ',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 14,
-                                        ),
                                       ),
                                     ),
                                   ],
@@ -832,38 +817,6 @@ class _CustomersDetailState extends State<CustomersDetail> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class ReusableCustomerInfoFields extends StatelessWidget {
-
-  ReusableCustomerInfoFields({
-    Key? key,
-    @required this.tableTitle,
-    this.widget,
-  }) : super(key: key);
-
-  final String? tableTitle;
-
-  final Widget? widget;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          tableTitle!,
-          style: TextStyle(
-            color: Color(0xFF75759E),
-            fontWeight: FontWeight.w400,
-            fontSize: 14,
-          ),
-        ),
-        SizedBox(height: 15),
-        widget ?? Text('-',style: TextStyle(color: Colors.black)),
-      ],
     );
   }
 }

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fumzy/components/arrow-button.dart';
 import 'package:fumzy/utils/constant-styles.dart';
+import 'purchase-info.dart';
 
 class Purchases extends StatefulWidget {
-
   const Purchases({Key? key}) : super(key: key);
 
   @override
@@ -11,7 +11,6 @@ class Purchases extends StatefulWidget {
 }
 
 class _PurchasesState extends State<Purchases> {
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -52,7 +51,12 @@ class _PurchasesState extends State<Purchases> {
                   DataCell(Text('N50,000')),
                   DataCell(Text('N55,000')),
                   DataCell(Text('N500,000')),
-                  DataCell(TableArrowButton()),
+                  DataCell(GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, PurchaseInfo.id);
+                    },
+                    child: TableArrowButton(),
+                  )),
                 ]),
                 DataRow(cells: [
                   DataCell(Text('23, May\n12:130pm')),
@@ -133,4 +137,3 @@ class _PurchasesState extends State<Purchases> {
   }
 
 }
-
