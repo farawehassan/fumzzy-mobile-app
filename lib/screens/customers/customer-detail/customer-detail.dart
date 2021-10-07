@@ -30,10 +30,15 @@ class _CustomersDetailState extends State<CustomersDetail> {
         drawer: RefactoredDrawer(title: 'CUSTOMERS'),
         body: Padding(
           padding: EdgeInsets.fromLTRB(20, 30, 20, 0),
-          child: NestedScrollView(
-            headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-              return [
-                SliverToBoxAdapter(
+          child: DefaultTabController(
+            length: 3,
+            initialIndex: 0,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -210,124 +215,114 @@ class _CustomersDetailState extends State<CustomersDetail> {
                         SizedBox(height: 35),
                       ],
                     ),
+                  ),
                 ),
-              ];
-            },
-            body: DefaultTabController(
-              length: 3,
-              initialIndex: 0,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(height: 25),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        width: constraints.maxWidth / 2.2,
-                        child: TabBar(
-                          labelStyle: kTabBarTextStyle,
-                          labelColor: Color(0xFF004E92),
-                          unselectedLabelColor:
-                          Color(0xFF004E92).withOpacity(0.6),
-                          indicatorColor: Color(0xFF004E92),
-                          indicatorWeight: 3,
-                          tabs: [
-                            Tab(
-                              child: Text(
-                                'Total Sales',
-                                style: kTabBarTextStyle,
-                              ),
+                SizedBox(height: 25),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      width: constraints.maxWidth / 2.2,
+                      child: TabBar(
+                        labelStyle: kTabBarTextStyle,
+                        labelColor: Color(0xFF004E92),
+                        unselectedLabelColor:
+                        Color(0xFF004E92).withOpacity(0.6),
+                        indicatorColor: Color(0xFF004E92),
+                        indicatorWeight: 3,
+                        tabs: [
+                          Tab(
+                            child: Text(
+                              'Total Sales',
+                              style: kTabBarTextStyle,
                             ),
-                            Tab(
-                              child: Text(
-                                'Debt History',
-                                style: kTabBarTextStyle,
-                              ),
+                          ),
+                          Tab(
+                            child: Text(
+                              'Debt History',
+                              style: kTabBarTextStyle,
                             ),
-                            Tab(
-                              child: Text(
-                                'Re-payment History',
-                                style: kTabBarTextStyle,
-                              ),
+                          ),
+                          Tab(
+                            child: Text(
+                              'Re-payment History',
+                              style: kTabBarTextStyle,
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                      Expanded(
-                        child: Wrap(
-                          crossAxisAlignment: WrapCrossAlignment.end,
-                          alignment: WrapAlignment.end,
-                          spacing: 10,
-                          runSpacing: 10,
-                          children: [
-                            OutlinedButton(
-                              onPressed: () {
-                                _addDebt(constraints);
-                              },
-                              style: OutlinedButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                  BorderRadius.all(Radius.circular(5)),
-                                ),
-                                side: BorderSide(color: Color(0xFF004E92)),
+                    ),
+                    Expanded(
+                      child: Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.end,
+                        alignment: WrapAlignment.end,
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: [
+                          OutlinedButton(
+                            onPressed: () {
+                              _addDebt(constraints);
+                            },
+                            style: OutlinedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(5)),
                               ),
-                              child: Container(
-                                width: 120,
-                                height: 50,
-                                child: Center(
-                                  child: Text(
-                                    'Add Debt',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: Color(0xFF004E92),
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.normal,
-                                    ),
-                                  ),
-                                ),
-                              ),
+                              side: BorderSide(color: Color(0xFF004E92)),
                             ),
-                            Button(
-                              onTap: () {
-                                _recordRepayment(constraints);
-                              },
-                              buttonColor: Color(0xFF00509A),
+                            child: Container(
                               width: 120,
+                              height: 50,
                               child: Center(
                                 child: Text(
-                                  'Record Payment',
+                                  'Add Debt',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                    color: Color(0xFFFFFFFF),
+                                    color: Color(0xFF004E92),
                                     fontSize: 14,
                                     fontWeight: FontWeight.normal,
                                   ),
                                 ),
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                          Button(
+                            onTap: () {
+                              _recordRepayment(constraints);
+                            },
+                            buttonColor: Color(0xFF00509A),
+                            width: 120,
+                            child: Center(
+                              child: Text(
+                                'Record Payment',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Color(0xFFFFFFFF),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 35),
+                //table details
+                Expanded(
+                  child: TabBarView(
+                    children: [
+                      TotalSales(),
+                      DebtHistory(),
+                      RepaymentHistory(),
                     ],
                   ),
-                  SizedBox(height: 35),
-                  //table details
-                  Expanded(
-                    child: TabBarView(
-                      children: [
-                        TotalSales(),
-                        DebtHistory(),
-                        RepaymentHistory(),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ),
+          )
         ),
       )),
     );
