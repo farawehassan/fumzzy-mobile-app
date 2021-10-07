@@ -11,6 +11,7 @@ import 'screens/staff/staff.dart';
 import 'screens/customers/customers.dart';
 import 'screens/transactions/transactions.dart';
 import 'screens/customers/customer-detail/customer-detail.dart';
+import 'screens/inventory/inventory-detail/inventory-detail.dart';
 
 
 void main() {
@@ -70,6 +71,7 @@ class _MyAppState extends State<MyApp> {
         Invoices.id: (context) => Invoices(),
         Customers.id: (context) => Customers(),
         CustomersDetail.id: (context) => CustomersDetail(),
+        InventoryDetail.id: (context) => InventoryDetail(),
       },
     );
   }
