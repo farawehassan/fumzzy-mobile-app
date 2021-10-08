@@ -6,8 +6,8 @@ import 'package:fumzy/components/button.dart';
 import 'package:fumzy/components/info-table.dart';
 import 'package:fumzy/screens/dashboard/drawer.dart';
 import 'package:fumzy/utils/constant-styles.dart';
-import 'package:fumzy/components/delete-icon.dart';
 import 'package:fumzy/utils/functions.dart';
+import 'delete-inventory.dart';
 
 class InventoryDetail extends StatefulWidget {
 

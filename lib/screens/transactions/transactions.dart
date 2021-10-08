@@ -8,6 +8,7 @@ import 'package:fumzy/utils/constant-styles.dart';
 import 'expenses.dart';
 import 'purchases.dart';
 import 'sales.dart';
+import 'add-sale.dart';
 
 class Transactions extends StatefulWidget {
 
@@ -76,7 +77,7 @@ class _TransactionsState extends State<Transactions> {
                           ),
                           Button(
                             onTap: (){
-                              print('add new product');
+                              Navigator.pushNamed(context, AddSale.id);
                             },
                             buttonColor: Color(0xFF00AF27),
                             width: 160,
@@ -94,7 +95,7 @@ class _TransactionsState extends State<Transactions> {
                           ),
                           Button(
                             onTap: (){
-                              print('add new product');
+                              _addNewPurchase(constraints);
                             },
                             buttonColor: Color(0xFFF28301),
                             width: 160,
@@ -247,6 +248,7 @@ class _TransactionsState extends State<Transactions> {
     TextEditingController quantity = TextEditingController();
     TextEditingController amount = TextEditingController();
     TextEditingController sellersName = TextEditingController();
+
     String selectedCategory;
 
     return showDialog(

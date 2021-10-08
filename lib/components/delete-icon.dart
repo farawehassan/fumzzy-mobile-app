@@ -8,26 +8,21 @@ class ReusableDeleteText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        print('Delete');
-      },
-      child: Row(
-        children: [
-          Text(
-            'Delete ',
-            style: TextStyle(
-              color: Color(0xFFF64932),
-              fontSize: textSize ?? 14,
-            ),
-          ),
-          Icon(
-            Icons.delete,
+    return Row(
+      children: [
+        Text(
+          'Delete ',
+          style: TextStyle(
             color: Color(0xFFF64932),
-            size: 15,
+            fontSize: textSize ?? 14,
           ),
-        ],
-      ),
+        ),
+        Icon(
+          Icons.delete,
+          color: Color(0xFFF64932),
+          size: 15,
+        ),
+      ],
     );
   }
 }

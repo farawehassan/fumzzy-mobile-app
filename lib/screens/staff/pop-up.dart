@@ -723,7 +723,7 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
                           Color(0xFFF64932),
                         );
                       },
-                      buttonColor: Color(0xFF00509A),
+                      buttonColor: Color(0xFFF64932),
                       child: Center(
                         child: Text(
                           'Yes, delete',

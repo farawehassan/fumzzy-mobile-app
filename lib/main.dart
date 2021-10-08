@@ -15,6 +15,7 @@ import 'screens/inventory/inventory-detail/inventory-detail.dart';
 import 'screens/transactions/sales-info.dart';
 import 'screens/transactions/expense-info.dart';
 import 'screens/transactions/purchase-info.dart';
+import 'screens/transactions/add-sale.dart';
 
 
 void main() {
@@ -78,6 +79,7 @@ class _MyAppState extends State<MyApp> {
         SalesInfo.id: (context) => SalesInfo(),
         ExpenseInfo.id: (context) => ExpenseInfo(),
         PurchaseInfo.id: (context) => PurchaseInfo(),
+        AddSale.id: (context) => AddSale(),
       },
     );
   }

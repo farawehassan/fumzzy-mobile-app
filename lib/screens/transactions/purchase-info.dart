@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:fumzy/components/app-bar.dart';
-import 'package:fumzy/components/delete-icon.dart';
 import 'package:fumzy/components/info-table.dart';
 import 'package:fumzy/screens/dashboard/drawer.dart';
 import 'package:fumzy/utils/constant-styles.dart';
 import 'package:fumzy/utils/functions.dart';
+import 'delete-transaction.dart';
 
 class PurchaseInfo extends StatefulWidget {
 

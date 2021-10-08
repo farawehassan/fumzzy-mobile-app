@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fumzy/components/button.dart';
 import 'package:fumzy/utils/constant-styles.dart';
-import 'package:fumzy/components/delete-icon.dart';
+import 'delete-product.dart';
 
 class ProductCategories extends StatefulWidget {
 
