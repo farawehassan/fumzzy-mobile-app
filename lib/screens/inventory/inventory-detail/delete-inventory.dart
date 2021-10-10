@@ -334,7 +334,8 @@ class _ReusableDeleteTextState extends State<ReusableDeleteText> {
                             size: 45,
                           ),
                         ),
-                        Padding(
+                        Container(
+                          width: 200,
                           padding: EdgeInsets.only(top: 22),
                           child: Text(
                             'Inventory Deleted Successfully',

@@ -5,7 +5,6 @@ import 'package:fumzy/components/app-bar.dart';
 import 'package:fumzy/components/button.dart';
 import 'package:fumzy/screens/dashboard/drawer.dart';
 import 'package:fumzy/utils/constant-styles.dart';
-import 'package:fumzy/utils/functions.dart';
 import 'expenses.dart';
 import 'purchases.dart';
 import 'sales.dart';
@@ -62,7 +61,7 @@ class _TransactionsState extends State<Transactions> {
                         children: [
                           TextButton(
                             onPressed: () {
-                              //_addNewCategory(constraints);
+                              _addExpense(constraints);
                             },
                             child: Container(
                               color: Colors.transparent,
@@ -239,19 +238,18 @@ class _TransactionsState extends State<Transactions> {
     );
   }
 
-  List<String> categories = ['Drinks', 'Sweets', 'Chocolate'];
+  List<String> categories = ["Drinks", "Sweet", "Furniture", "Wine"];
 
   Future<void> _addNewPurchase(BoxConstraints constraints) {
     final formKey = GlobalKey<FormState>();
     TextEditingController productName = TextEditingController();
-    TextEditingController productCategory = TextEditingController();
     TextEditingController costPrice = TextEditingController();
     TextEditingController sellingPrice = TextEditingController();
     TextEditingController quantity = TextEditingController();
     TextEditingController amount = TextEditingController();
     TextEditingController sellersName = TextEditingController();
 
-    String selectedCategory;
+    String? selectedCategory = "Drinks";
 
     return showDialog(
       context: context,
@@ -261,7 +259,7 @@ class _TransactionsState extends State<Transactions> {
           borderRadius: BorderRadius.circular(20),
           color: Color(0xFFFFFFFF),
         ),
-        margin: EdgeInsets.all(50),
+        margin: EdgeInsets.all(40),
         child: Material(
           borderRadius: BorderRadius.circular(20),
           child: Column(
@@ -393,29 +391,40 @@ class _TransactionsState extends State<Transactions> {
                                   SizedBox(height: 10),
                                   Container(
                                     width: constraints.maxWidth,
-                                    child: TextFormField(
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                      textInputAction: TextInputAction.next,
-                                      keyboardType: TextInputType.text,
-                                      controller: productCategory,
-                                      validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return 'Enter product category';
-                                        }
-                                        return null;
+                                    child: DropdownButtonFormField<String>(
+                                      value: selectedCategory,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          selectedCategory = value;
+                                        });
                                       },
-                                      decoration: kTextFieldBorderDecoration.copyWith(
-                                        hintText: 'Enter product category',
-                                        hintStyle: TextStyle(
-                                          color: Colors.black.withOpacity(0.5),
-                                          fontSize: 14,
+                                      style: TextStyle(
+                                          color: Color(0xFF171725),
                                           fontWeight: FontWeight.normal,
-                                        ),
+                                          fontSize: 14
                                       ),
+                                      iconEnabledColor: Color(0xFF000000),
+                                      icon: Icon(
+                                        Icons.arrow_drop_down_sharp,
+                                        color: Colors.black,
+                                        size: 20,
+                                      ),
+                                      decoration: kTextFieldBorderDecoration.copyWith(
+                                        contentPadding: EdgeInsets.all(12),
+                                      ),
+                                      items: categories.map((value) {
+                                        return DropdownMenuItem(
+                                          child: Text(
+                                            value,
+                                            style: TextStyle(
+                                                color: Color(0xFF171725),
+                                                fontWeight: FontWeight.normal,
+                                                fontSize: 14
+                                            ),
+                                          ),
+                                          value: value,
+                                        );
+                                      }).toList(),
                                     ),
                                   ),
                                 ],
@@ -425,8 +434,7 @@ class _TransactionsState extends State<Transactions> {
                               Row(
                                 children: [
                                   // Cost Price
-                                  Container(
-                                    width: constraints.maxWidth/3.5,
+                                  Expanded(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
@@ -440,6 +448,7 @@ class _TransactionsState extends State<Transactions> {
                                         ),
                                         SizedBox(height: 10),
                                         Container(
+                                          width: constraints.maxWidth,
                                           child: TextFormField(
                                             style: TextStyle(
                                               color: Colors.black,
@@ -459,7 +468,7 @@ class _TransactionsState extends State<Transactions> {
                                               return null;
                                             },
                                             decoration: kTextFieldBorderDecoration.copyWith(
-                                              hintText: 'N Enter amount',
+                                              hintText: 'Enter amount',
                                               hintStyle: TextStyle(
                                                 color: Colors.black.withOpacity(0.5),
                                                 fontSize: 14,
@@ -471,10 +480,8 @@ class _TransactionsState extends State<Transactions> {
                                       ],
                                     ),
                                   ),
-                                  Spacer(),
-                                  //selling Price
-                                  Container(
-                                    width: constraints.maxWidth/3.5,
+                                  SizedBox(width: 10),
+                                  Expanded(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
@@ -488,6 +495,7 @@ class _TransactionsState extends State<Transactions> {
                                         ),
                                         SizedBox(height: 10),
                                         Container(
+                                          width: constraints.maxWidth,
                                           child: TextFormField(
                                             style: TextStyle(
                                               color: Colors.black,
@@ -507,7 +515,7 @@ class _TransactionsState extends State<Transactions> {
                                               return null;
                                             },
                                             decoration: kTextFieldBorderDecoration.copyWith(
-                                              hintText: 'N Enter amount',
+                                              hintText: 'Enter amount',
                                               hintStyle: TextStyle(
                                                 color: Colors.black.withOpacity(0.5),
                                                 fontSize: 14,
@@ -594,6 +602,7 @@ class _TransactionsState extends State<Transactions> {
                                       inputFormatters: [
                                         FilteringTextInputFormatter.allow(RegExp('[0-9]')),
                                       ],
+                                      readOnly: true,
                                       controller: amount,
                                       validator: (value) {
                                         if (value!.isEmpty) {
@@ -635,7 +644,7 @@ class _TransactionsState extends State<Transactions> {
                                         fontSize: 14,
                                         fontWeight: FontWeight.normal,
                                       ),
-                                      textInputAction: TextInputAction.next,
+                                      textInputAction: TextInputAction.done,
                                       keyboardType: TextInputType.text,
                                       controller: sellersName,
                                       validator: (value) {
@@ -663,12 +672,238 @@ class _TransactionsState extends State<Transactions> {
                       SizedBox(height: 40),
                       Button(
                         onTap: (){
-                          print("Record Purchase");
+                          print("Add Purchase");
                         },
                         buttonColor: Color(0xFF00509A),
                         child: Center(
                           child: Text(
                             'Record Purchase',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Color(0xFFFFFFFF),
+                              fontSize: 14,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Center(
+                          child: Text(
+                            'No, Cancel',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 50),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _addExpense (BoxConstraints constraints) {
+    final formKey = GlobalKey<FormState>();
+    TextEditingController description = TextEditingController();
+    TextEditingController amount = TextEditingController();
+
+    return showDialog(
+      context: context,
+      barrierColor: Color(0xFF000428).withOpacity(0.86),
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: Color(0xFFFFFFFF),
+        ),
+        margin: EdgeInsets.all(40),
+        child: Material(
+          borderRadius: BorderRadius.circular(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                padding: EdgeInsets.fromLTRB(24, 30, 24, 27),
+                decoration: BoxDecoration(
+                  color: Color(0xFFF5F8FF),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(15.0),
+                    topRight: Radius.circular(15.0),
+                  ),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'NEW EXPENSE',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 15,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Icon(
+                        IconlyBold.closeSquare,
+                        color: Colors.black.withOpacity(0.7),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(top: 42),
+                        child: Text(
+                          'Add a New Expense',
+                          style: TextStyle(
+                            color: Color(0xFF00509A),
+                            fontSize: 19,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding:
+                        const EdgeInsets.symmetric(horizontal: 35, vertical: 15.0),
+                        child: Text(
+                          'You have made a new purchase. Please fill the fields to record your purchase.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Color(0xFF000428).withOpacity(0.6),
+                            fontWeight: FontWeight.w400,
+                            fontSize: 15.0,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.only(left: 20, right: 20),
+                        child: Form(
+                          key: formKey,
+                          child: Column(
+                            children: [
+                              //description
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Description',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                  SizedBox(height: 10),
+                                  Container(
+                                    width: constraints.maxWidth,
+                                    child: TextFormField(
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                      textInputAction: TextInputAction.next,
+                                      keyboardType: TextInputType.text,
+                                      controller: description,
+                                      maxLines: 3,
+                                      validator: (value) {
+                                        if (value!.isEmpty) {
+                                          return 'Enter Description';
+                                        }
+                                        return null;
+                                      },
+                                      decoration: kTextFieldBorderDecoration.copyWith(
+                                        hintText: 'Bought 10 litres petrol',
+                                        hintStyle: TextStyle(
+                                          color: Colors.black.withOpacity(0.5),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.normal,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 20),
+                              // Amount
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Amount',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                  SizedBox(height: 10),
+                                  Container(
+                                    width: constraints.maxWidth,
+                                    child: TextFormField(
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                      textInputAction: TextInputAction.done,
+                                      keyboardType: TextInputType.number,
+                                      inputFormatters: [
+                                        FilteringTextInputFormatter.allow(RegExp('[0-9]')),
+                                      ],
+                                      controller: amount,
+                                      validator: (value) {
+                                        if (value!.isEmpty) {
+                                          return 'Enter amount';
+                                        }
+                                        return null;
+                                      },
+                                      decoration: kTextFieldBorderDecoration.copyWith(
+                                        hintText: 'N Enter amount',
+                                        hintStyle: TextStyle(
+                                          color: Colors.black.withOpacity(0.5),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.normal,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 40),
+                      Button(
+                        onTap: (){
+                          print("Add Expense");
+                        },
+                        buttonColor: Color(0xFF00509A),
+                        child: Center(
+                          child: Text(
+                            'Record Expense',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Color(0xFFFFFFFF),

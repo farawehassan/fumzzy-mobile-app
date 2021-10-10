@@ -193,7 +193,7 @@ class _AddSaleState extends State<AddSale> {
                                                   return null;
                                                 },
                                                 decoration: kTextFieldBorderDecoration.copyWith(
-                                                  hintText: '0',
+                                                  hintText: '00',
                                                   contentPadding: EdgeInsets.all(12.0),
                                                   hintStyle: TextStyle(
                                                     color: Colors.black.withOpacity(0.5),
