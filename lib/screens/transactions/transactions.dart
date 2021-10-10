@@ -5,6 +5,7 @@ import 'package:fumzy/components/app-bar.dart';
 import 'package:fumzy/components/button.dart';
 import 'package:fumzy/screens/dashboard/drawer.dart';
 import 'package:fumzy/utils/constant-styles.dart';
+import 'package:fumzy/utils/functions.dart';
 import 'expenses.dart';
 import 'purchases.dart';
 import 'sales.dart';
@@ -243,6 +244,7 @@ class _TransactionsState extends State<Transactions> {
   Future<void> _addNewPurchase(BoxConstraints constraints) {
     final formKey = GlobalKey<FormState>();
     TextEditingController productName = TextEditingController();
+    TextEditingController productCategory = TextEditingController();
     TextEditingController costPrice = TextEditingController();
     TextEditingController sellingPrice = TextEditingController();
     TextEditingController quantity = TextEditingController();
@@ -333,6 +335,7 @@ class _TransactionsState extends State<Transactions> {
                           key: formKey,
                           child: Column(
                             children: [
+                              //product name
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -374,101 +377,151 @@ class _TransactionsState extends State<Transactions> {
                                   ),
                                 ],
                               ),
-
-
+                              SizedBox(height: 20),
+                              //product category
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Product Category',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                  SizedBox(height: 10),
+                                  Container(
+                                    width: constraints.maxWidth,
+                                    child: TextFormField(
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                      textInputAction: TextInputAction.next,
+                                      keyboardType: TextInputType.text,
+                                      controller: productCategory,
+                                      validator: (value) {
+                                        if (value!.isEmpty) {
+                                          return 'Enter product category';
+                                        }
+                                        return null;
+                                      },
+                                      decoration: kTextFieldBorderDecoration.copyWith(
+                                        hintText: 'Enter product category',
+                                        hintStyle: TextStyle(
+                                          color: Colors.black.withOpacity(0.5),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.normal,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 20),
+                              //unit cost and selling price
                               Row(
                                 children: [
                                   // Cost Price
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Unit Cost Price',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.normal,
-                                        ),
-                                      ),
-                                      SizedBox(height: 10),
-                                      Container(
-                                        width: constraints.maxWidth,
-                                        child: TextFormField(
+                                  Container(
+                                    width: constraints.maxWidth/3.5,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Unit Cost Price',
                                           style: TextStyle(
                                             color: Colors.black,
                                             fontSize: 14,
                                             fontWeight: FontWeight.normal,
                                           ),
-                                          textInputAction: TextInputAction.next,
-                                          keyboardType: TextInputType.number,
-                                          inputFormatters: [
-                                            FilteringTextInputFormatter.allow(RegExp('[0-9]')),
-                                          ],
-                                          controller: costPrice,
-                                          validator: (value) {
-                                            if (value!.isEmpty) {
-                                              return 'Enter amount';
-                                            }
-                                            return null;
-                                          },
-                                          decoration: kTextFieldBorderDecoration.copyWith(
-                                            hintText: 'Enter amount',
-                                            hintStyle: TextStyle(
-                                              color: Colors.black.withOpacity(0.5),
+                                        ),
+                                        SizedBox(height: 10),
+                                        Container(
+                                          child: TextFormField(
+                                            style: TextStyle(
+                                              color: Colors.black,
                                               fontSize: 14,
                                               fontWeight: FontWeight.normal,
                                             ),
+                                            textInputAction: TextInputAction.next,
+                                            keyboardType: TextInputType.number,
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.allow(RegExp('[0-9]')),
+                                            ],
+                                            controller: costPrice,
+                                            validator: (value) {
+                                              if (value!.isEmpty) {
+                                                return 'Enter amount';
+                                              }
+                                              return null;
+                                            },
+                                            decoration: kTextFieldBorderDecoration.copyWith(
+                                              hintText: 'N Enter amount',
+                                              hintStyle: TextStyle(
+                                                color: Colors.black.withOpacity(0.5),
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Unit Selling Price',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.normal,
-                                        ),
-                                      ),
-                                      SizedBox(height: 10),
-                                      Container(
-                                        width: constraints.maxWidth,
-                                        child: TextFormField(
+                                  Spacer(),
+                                  //selling Price
+                                  Container(
+                                    width: constraints.maxWidth/3.5,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Unit Selling Price',
                                           style: TextStyle(
                                             color: Colors.black,
                                             fontSize: 14,
                                             fontWeight: FontWeight.normal,
                                           ),
-                                          textInputAction: TextInputAction.next,
-                                          keyboardType: TextInputType.number,
-                                          inputFormatters: [
-                                            FilteringTextInputFormatter.allow(RegExp('[0-9]')),
-                                          ],
-                                          controller: sellingPrice,
-                                          validator: (value) {
-                                            if (value!.isEmpty) {
-                                              return 'Enter amount';
-                                            }
-                                            return null;
-                                          },
-                                          decoration: kTextFieldBorderDecoration.copyWith(
-                                            hintText: 'Enter amount',
-                                            hintStyle: TextStyle(
-                                              color: Colors.black.withOpacity(0.5),
+                                        ),
+                                        SizedBox(height: 10),
+                                        Container(
+                                          child: TextFormField(
+                                            style: TextStyle(
+                                              color: Colors.black,
                                               fontSize: 14,
                                               fontWeight: FontWeight.normal,
                                             ),
+                                            textInputAction: TextInputAction.next,
+                                            keyboardType: TextInputType.number,
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.allow(RegExp('[0-9]')),
+                                            ],
+                                            controller: sellingPrice,
+                                            validator: (value) {
+                                              if (value!.isEmpty) {
+                                                return 'Enter amount';
+                                              }
+                                              return null;
+                                            },
+                                            decoration: kTextFieldBorderDecoration.copyWith(
+                                              hintText: 'N Enter amount',
+                                              hintStyle: TextStyle(
+                                                color: Colors.black.withOpacity(0.5),
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ]
                               ),
+                              SizedBox(height: 20),
                               // Quantity
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -514,6 +567,7 @@ class _TransactionsState extends State<Transactions> {
                                   ),
                                 ],
                               ),
+                              SizedBox(height: 20),
                               // Amount
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -540,7 +594,6 @@ class _TransactionsState extends State<Transactions> {
                                       inputFormatters: [
                                         FilteringTextInputFormatter.allow(RegExp('[0-9]')),
                                       ],
-                                      readOnly: true,
                                       controller: amount,
                                       validator: (value) {
                                         if (value!.isEmpty) {
@@ -560,6 +613,7 @@ class _TransactionsState extends State<Transactions> {
                                   ),
                                 ],
                               ),
+                              SizedBox(height: 20),
                               // Sellers name
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -583,7 +637,7 @@ class _TransactionsState extends State<Transactions> {
                                       ),
                                       textInputAction: TextInputAction.next,
                                       keyboardType: TextInputType.text,
-                                      controller: amount,
+                                      controller: sellersName,
                                       validator: (value) {
                                         if (value!.isEmpty) {
                                           return 'Enter seller\'s name';
@@ -609,7 +663,7 @@ class _TransactionsState extends State<Transactions> {
                       SizedBox(height: 40),
                       Button(
                         onTap: (){
-                          print("Add Purchase");
+                          print("Record Purchase");
                         },
                         buttonColor: Color(0xFF00509A),
                         child: Center(
@@ -624,6 +678,7 @@ class _TransactionsState extends State<Transactions> {
                           ),
                         ),
                       ),
+                      SizedBox(height: 10),
                       TextButton(
                         onPressed: () {
                           Navigator.pop(context);

@@ -310,7 +310,7 @@ class _CustomersState extends State<Customers> {
                                   ),
                                 ),
                               ),
-                              SizedBox(height: 20),//select customer
+                              SizedBox(height: 20),
                               ///field for amount
                               Text(
                                 'Amount',
@@ -348,7 +348,7 @@ class _CustomersState extends State<Customers> {
                                   ),
                                 ),
                               ),
-                              SizedBox(height: 20),//select customer
+                              SizedBox(height: 20),
                               ///field for reference
                               Text(
                                 'Reference',

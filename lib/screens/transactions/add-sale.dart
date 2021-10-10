@@ -18,7 +18,18 @@ class AddSale extends StatefulWidget {
 
 class _AddSaleState extends State<AddSale> {
 
-  TextEditingController quantity = TextEditingController();
+  List<String> _productName = [
+    "Carton of Smirnoff non-acholic drink 100cl",
+    "Carton of Smirnoff non-acholic drink 200cl",
+    "Carton of Smirnoff non-acholic drink 300cl",
+    "Carton of Smirnoff non-acholic drink 400cl",
+    "Carton of Smirnoff non-acholic drink 500cl",
+    "Carton of Smirnoff non-acholic drink 600cl",
+  ];
+
+  String? _selectedProduct = "Carton of Smirnoff non-acholic drink 300cl";
+
+  //TextEditingController quantity = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -69,8 +80,7 @@ class _AddSaleState extends State<AddSale> {
                           child: Container(
                             width: constraints.maxWidth,
                             decoration: kTableContainer,
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 30, vertical: 24),
+                            padding: EdgeInsets.fromLTRB(30, 24, 20, 24),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -95,11 +105,57 @@ class _AddSaleState extends State<AddSale> {
                                         ),
                                       ),
                                       Wrap(
-                                        runSpacing: 10,
-                                        spacing: 60,
+                                        runSpacing: 20,
+                                        spacing: 15,
                                         children: [
                                           ReusableCustomerInfoFields(
                                             tableTitle: 'Product Name',
+                                            widget: Container(
+                                              width: 320,
+                                              child: DropdownButtonFormField<String>(
+                                                value: _selectedProduct,
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    _selectedProduct = value;
+                                                  });
+                                                },
+                                                style: TextStyle(
+                                                    color: Color(0xFF171725),
+                                                    fontWeight: FontWeight.normal,
+                                                    fontSize: 14
+                                                ),
+                                                iconEnabledColor: Color(0xFF000000),
+                                                icon: Icon(
+                                                  Icons.arrow_drop_down_sharp,
+                                                  color: Colors.black,
+                                                  size: 20,
+                                                ),
+                                                decoration: kTextFieldBorderDecoration.copyWith(
+                                                  contentPadding: EdgeInsets.all(12),
+                                                  enabledBorder: OutlineInputBorder(
+                                                    borderSide: BorderSide(color: Color(0xFFE2E2EA), width: 1, style: BorderStyle.solid),
+                                                    borderRadius: BorderRadius.circular(3.0),
+                                                  ),
+                                                  focusedBorder: OutlineInputBorder(
+                                                    borderSide: BorderSide(color: Color(0xFFE2E2EA), width: 1, style: BorderStyle.solid),
+                                                    borderRadius: BorderRadius.circular(3.0),
+                                                  ),
+                                                ),
+                                                items: _productName.map((value) {
+                                                  return DropdownMenuItem(
+                                                    child: Text(
+                                                      value,
+                                                      style: TextStyle(
+                                                          color: Color(0xFF171725),
+                                                          fontWeight: FontWeight.normal,
+                                                          fontSize: 14
+                                                      ),
+                                                    ),
+                                                    value: value,
+                                                  );
+                                                }).toList(),
+                                              ),
+                                            ),
                                           ),
                                           ReusableCustomerInfoFields(
                                             tableTitle: 'Unit Cost Price',
@@ -116,27 +172,35 @@ class _AddSaleState extends State<AddSale> {
                                           ReusableCustomerInfoFields(
                                             tableTitle: 'Quantity',
                                             widget: Container(
-                                              height: 40,
-                                              width: 55,
+                                              height: 44,
+                                              width: 67,
                                               child: TextFormField(
                                                 style: TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.normal,
                                                 ),
-                                                textInputAction: TextInputAction.next,
+                                                textInputAction: TextInputAction.done,
                                                 keyboardType: TextInputType.number,
                                                 inputFormatters: [
                                                   FilteringTextInputFormatter.allow(RegExp('[0-9]')),
                                                 ],
-                                                controller: quantity,
+                                                //controller: quantity,
                                                 validator: (value) {
                                                   if (value!.isEmpty) {
                                                     return 'Enter quantity';
                                                   }
                                                   return null;
                                                 },
-                                                decoration: kTextFieldBorderDecoration,
+                                                decoration: kTextFieldBorderDecoration.copyWith(
+                                                  hintText: '0',
+                                                  contentPadding: EdgeInsets.all(12.0),
+                                                  hintStyle: TextStyle(
+                                                    color: Colors.black.withOpacity(0.5),
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.normal,
+                                                  ),
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -147,8 +211,8 @@ class _AddSaleState extends State<AddSale> {
                                             ),
                                           ),
                                           Container(
-                                            width: 45,
-                                            height: 45,
+                                            width: 35,
+                                            height: 43,
                                             child: TextButton(
                                               onPressed: () {
                                                 print("Delete");
@@ -180,11 +244,57 @@ class _AddSaleState extends State<AddSale> {
                                         ),
                                       ),
                                       Wrap(
-                                        runSpacing: 10,
-                                        spacing: 60,
+                                        runSpacing: 20,
+                                        spacing: 15,
                                         children: [
                                           ReusableCustomerInfoFields(
                                             tableTitle: 'Product Name',
+                                            widget: Container(
+                                              width: 320,
+                                              child: DropdownButtonFormField<String>(
+                                                value: _selectedProduct,
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    _selectedProduct = value;
+                                                  });
+                                                },
+                                                style: TextStyle(
+                                                    color: Color(0xFF171725),
+                                                    fontWeight: FontWeight.normal,
+                                                    fontSize: 14
+                                                ),
+                                                iconEnabledColor: Color(0xFF000000),
+                                                icon: Icon(
+                                                  Icons.arrow_drop_down_sharp,
+                                                  color: Colors.black,
+                                                  size: 20,
+                                                ),
+                                                decoration: kTextFieldBorderDecoration.copyWith(
+                                                  contentPadding: EdgeInsets.all(12),
+                                                  enabledBorder: OutlineInputBorder(
+                                                    borderSide: BorderSide(color: Color(0xFFE2E2EA), width: 1, style: BorderStyle.solid),
+                                                    borderRadius: BorderRadius.circular(3.0),
+                                                  ),
+                                                  focusedBorder: OutlineInputBorder(
+                                                    borderSide: BorderSide(color: Color(0xFFE2E2EA), width: 1, style: BorderStyle.solid),
+                                                    borderRadius: BorderRadius.circular(3.0),
+                                                  ),
+                                                ),
+                                                items: _productName.map((value) {
+                                                  return DropdownMenuItem(
+                                                    child: Text(
+                                                      value,
+                                                      style: TextStyle(
+                                                          color: Color(0xFF171725),
+                                                          fontWeight: FontWeight.normal,
+                                                          fontSize: 14
+                                                      ),
+                                                    ),
+                                                    value: value,
+                                                  );
+                                                }).toList(),
+                                              ),
+                                            ),
                                           ),
                                           ReusableCustomerInfoFields(
                                             tableTitle: 'Unit Cost Price',
@@ -200,6 +310,38 @@ class _AddSaleState extends State<AddSale> {
                                           ),
                                           ReusableCustomerInfoFields(
                                             tableTitle: 'Quantity',
+                                            widget: Container(
+                                              height: 44,
+                                              width: 67,
+                                              child: TextFormField(
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.normal,
+                                                ),
+                                                textInputAction: TextInputAction.done,
+                                                keyboardType: TextInputType.number,
+                                                inputFormatters: [
+                                                  FilteringTextInputFormatter.allow(RegExp('[0-9]')),
+                                                ],
+                                                //controller: quantity,
+                                                validator: (value) {
+                                                  if (value!.isEmpty) {
+                                                    return 'Enter quantity';
+                                                  }
+                                                  return null;
+                                                },
+                                                decoration: kTextFieldBorderDecoration.copyWith(
+                                                  hintText: '0',
+                                                  contentPadding: EdgeInsets.all(12.0),
+                                                  hintStyle: TextStyle(
+                                                    color: Colors.black.withOpacity(0.5),
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.normal,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
                                           ),
                                           ReusableCustomerInfoFields(
                                             tableTitle: 'Amount',
@@ -208,8 +350,8 @@ class _AddSaleState extends State<AddSale> {
                                             ),
                                           ),
                                           Container(
-                                            width: 45,
-                                            height: 45,
+                                            width: 35,
+                                            height: 43,
                                             child: TextButton(
                                               onPressed: () {
                                                 print("Delete");
