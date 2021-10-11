@@ -339,11 +339,6 @@ class _TransactionsState extends State<Transactions> {
                                 children: [
                                   Text(
                                     'Product Name',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.normal,
-                                    ),
                                   ),
                                   SizedBox(height: 10),
                                   Container(
@@ -382,11 +377,6 @@ class _TransactionsState extends State<Transactions> {
                                 children: [
                                   Text(
                                     'Product Category',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.normal,
-                                    ),
                                   ),
                                   SizedBox(height: 10),
                                   Container(
@@ -440,11 +430,6 @@ class _TransactionsState extends State<Transactions> {
                                       children: [
                                         Text(
                                           'Unit Cost Price',
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.normal,
-                                          ),
                                         ),
                                         SizedBox(height: 10),
                                         Container(
@@ -487,11 +472,6 @@ class _TransactionsState extends State<Transactions> {
                                       children: [
                                         Text(
                                           'Unit Selling Price',
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.normal,
-                                          ),
                                         ),
                                         SizedBox(height: 10),
                                         Container(
@@ -536,11 +516,6 @@ class _TransactionsState extends State<Transactions> {
                                 children: [
                                   Text(
                                     'Quantity',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.normal,
-                                    ),
                                   ),
                                   SizedBox(height: 10),
                                   Container(
@@ -582,11 +557,6 @@ class _TransactionsState extends State<Transactions> {
                                 children: [
                                   Text(
                                     'Amount',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.normal,
-                                    ),
                                   ),
                                   SizedBox(height: 10),
                                   Container(
@@ -602,7 +572,6 @@ class _TransactionsState extends State<Transactions> {
                                       inputFormatters: [
                                         FilteringTextInputFormatter.allow(RegExp('[0-9]')),
                                       ],
-                                      readOnly: true,
                                       controller: amount,
                                       validator: (value) {
                                         if (value!.isEmpty) {
@@ -629,11 +598,6 @@ class _TransactionsState extends State<Transactions> {
                                 children: [
                                   Text(
                                     'Seller\'s Name',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.normal,
-                                    ),
                                   ),
                                   SizedBox(height: 10),
                                   Container(
@@ -808,11 +772,6 @@ class _TransactionsState extends State<Transactions> {
                                 children: [
                                   Text(
                                     'Description',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.normal,
-                                    ),
                                   ),
                                   SizedBox(height: 10),
                                   Container(
@@ -852,11 +811,6 @@ class _TransactionsState extends State<Transactions> {
                                 children: [
                                   Text(
                                     'Amount',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.normal,
-                                    ),
                                   ),
                                   SizedBox(height: 10),
                                   Container(
