@@ -72,7 +72,7 @@ class _StaffState extends State<Staff> {
                             Container(
                               width: 180,
                               height: 50,
-                              padding: EdgeInsets.symmetric(horizontal: 15.0),
+                              padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 15.0),
                               margin: EdgeInsets.only(right: 50),
                               decoration: BoxDecoration(
                                 color: Colors.white,
@@ -80,6 +80,7 @@ class _StaffState extends State<Staff> {
                               ),
                               child: TextField(
                                 textAlign: TextAlign.start,
+                                textInputAction: TextInputAction.search,
                                 decoration: InputDecoration(
                                   suffixIcon: Icon(
                                     IconlyLight.search,

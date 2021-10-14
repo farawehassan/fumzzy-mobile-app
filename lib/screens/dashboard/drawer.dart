@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:fumzy/screens/notification/notifications.dart';
 import 'package:fumzy/screens/settings/settings.dart';
 import 'package:fumzy/screens/creditors/creditors.dart';
 import 'package:fumzy/screens/staff/staff.dart';
@@ -271,7 +272,7 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                         onTap: () {
                           Navigator.pop(context);
                           if(widget.title != 'NOTIFICATIONS'){
-                            //Navigator.pushNamed(context, Creditors.id);
+                            Navigator.pushNamed(context, Notifications.id);
                           }
                         },
                       ),

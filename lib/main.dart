@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fumzy/screens/notification/mobile-notification-content.dart';
 import 'screens/inventory/inventory.dart';
 import 'screens/invoices/invoices.dart';
 import 'screens/splash-screen.dart';
@@ -16,6 +17,7 @@ import 'screens/transactions/sales-info.dart';
 import 'screens/transactions/expense-info.dart';
 import 'screens/transactions/purchase-info.dart';
 import 'screens/transactions/add-sale.dart';
+import 'screens/notification/notifications.dart';
 
 
 void main() {
@@ -80,6 +82,8 @@ class _MyAppState extends State<MyApp> {
         ExpenseInfo.id: (context) => ExpenseInfo(),
         PurchaseInfo.id: (context) => PurchaseInfo(),
         AddSale.id: (context) => AddSale(),
+        Notifications.id: (context) => Notifications(),
+        MobileNotificationScreen.id: (context) => MobileNotificationScreen(),
       },
     );
   }
