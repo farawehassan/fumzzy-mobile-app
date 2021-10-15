@@ -312,10 +312,12 @@ class _CustomersDetailState extends State<CustomersDetail> {
   }
 
   Future<void> _addDebt(BoxConstraints constraints) {
+
     final formKey = GlobalKey<FormState>();
     TextEditingController amountController = TextEditingController();
     TextEditingController descriptionController = TextEditingController();
     TextEditingController dateController = TextEditingController();
+
     return showDialog(
       context: context,
       barrierColor: Color(0xFF000428).withOpacity(0.86),
@@ -419,14 +421,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                               ),
                               SizedBox(height: 30),
                               ///field for amount
-                              Text(
-                                'Amount',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
+                              Text('Amount'),
                               SizedBox(height: 10),
                               Container(
                                 width: constraints.maxWidth,
@@ -437,7 +432,8 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                     fontWeight: FontWeight.normal,
                                   ),
                                   textInputAction: TextInputAction.next,
-                                  keyboardType: TextInputType.name,
+                                  keyboardType: TextInputType.number,
+                                  autofocus: true,
                                   controller: amountController,
                                   validator: (value) {
                                     if (value!.isEmpty) {
@@ -445,8 +441,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                     }
                                     return null;
                                   },
-                                  decoration:
-                                      kTextFieldBorderDecoration.copyWith(
+                                  decoration: kTextFieldBorderDecoration.copyWith(
                                     hintText: 'Enter amount',
                                     hintStyle: TextStyle(
                                       color: Colors.black.withOpacity(0.5),
@@ -458,14 +453,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                               ),
                               SizedBox(height: 20),
                               ///field for description
-                              Text(
-                                'Description',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
+                              Text('Description'),
                               SizedBox(height: 10),
                               Container(
                                 width: constraints.maxWidth,
@@ -480,12 +468,11 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                   controller: descriptionController,
                                   validator: (value) {
                                     if (value!.isEmpty) {
-                                      return 'Enter reference or description';
+                                      return 'Enter description';
                                     }
                                     return null;
                                   },
-                                  decoration:
-                                      kTextFieldBorderDecoration.copyWith(
+                                  decoration: kTextFieldBorderDecoration.copyWith(
                                     hintText: 'Enter description',
                                     hintStyle: TextStyle(
                                       color: Colors.black.withOpacity(0.5),
@@ -496,16 +483,8 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                 ),
                               ),
                               SizedBox(height: 20),
-
                               ///field for date
-                              Text(
-                                'Due Date',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
+                              Text('Due Date'),
                               SizedBox(height: 10),
                               Container(
                                 width: constraints.maxWidth,
@@ -515,8 +494,8 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                     fontSize: 14,
                                     fontWeight: FontWeight.normal,
                                   ),
-                                  textInputAction: TextInputAction.next,
-                                  keyboardType: TextInputType.name,
+                                  textInputAction: TextInputAction.done,
+                                  keyboardType: TextInputType.datetime,
                                   controller: dateController,
                                   validator: (value) {
                                     if (value!.isEmpty) {
@@ -524,9 +503,8 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                     }
                                     return null;
                                   },
-                                  decoration:
-                                      kTextFieldBorderDecoration.copyWith(
-                                    hintText: 'Enter due date',
+                                  decoration: kTextFieldBorderDecoration.copyWith(
+                                    hintText: 'DD / MM / YY',
                                     hintStyle: TextStyle(
                                       color: Colors.black.withOpacity(0.5),
                                       fontSize: 14,
@@ -557,18 +535,22 @@ class _CustomersDetailState extends State<CustomersDetail> {
                           ),
                         ),
                       ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: Center(
-                          child: Text(
-                            'No, Cancel',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              decoration: TextDecoration.underline,
+                      SizedBox(height: 10),
+                      Container(
+                        width: 100,
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Center(
+                            child: Text(
+                              'No, Cancel',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                decoration: TextDecoration.underline,
+                              ),
                             ),
                           ),
                         ),
@@ -586,9 +568,11 @@ class _CustomersDetailState extends State<CustomersDetail> {
   }
 
   Future<void> _recordRepayment(BoxConstraints constraints) {
+
     final formKey = GlobalKey<FormState>();
     TextEditingController amountController = TextEditingController();
     TextEditingController referenceController = TextEditingController();
+
     return showDialog(
       context: context,
       barrierColor: Color(0xFF000428).withOpacity(0.86),
@@ -675,11 +659,6 @@ class _CustomersDetailState extends State<CustomersDetail> {
                               ///text field for customer
                               Text(
                                 'Customer',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                ),
                               ),
                               SizedBox(height: 10),
                               Text(
@@ -692,14 +671,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                               ),
                               SizedBox(height: 30),
                               ///field for amount
-                              Text(
-                                'Amount',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
+                              Text('Amount'),
                               SizedBox(height: 10),
                               Container(
                                 width: constraints.maxWidth,
@@ -710,7 +682,8 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                     fontWeight: FontWeight.normal,
                                   ),
                                   textInputAction: TextInputAction.next,
-                                  keyboardType: TextInputType.name,
+                                  keyboardType: TextInputType.number,
+                                  autofocus: true,
                                   controller: amountController,
                                   validator: (value) {
                                     if (value!.isEmpty) {
@@ -718,8 +691,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                     }
                                     return null;
                                   },
-                                  decoration:
-                                      kTextFieldBorderDecoration.copyWith(
+                                  decoration: kTextFieldBorderDecoration.copyWith(
                                     hintText: 'Enter amount',
                                     hintStyle: TextStyle(
                                       color: Colors.black.withOpacity(0.5),
@@ -731,14 +703,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                               ),
                               SizedBox(height: 20),
                               ///field for reference
-                              Text(
-                                'Due Date',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
+                              Text('Reference'),
                               SizedBox(height: 10),
                               Container(
                                 width: constraints.maxWidth,
@@ -748,18 +713,17 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                     fontSize: 14,
                                     fontWeight: FontWeight.normal,
                                   ),
-                                  textInputAction: TextInputAction.next,
+                                  textInputAction: TextInputAction.done,
                                   keyboardType: TextInputType.name,
                                   controller: referenceController,
                                   validator: (value) {
                                     if (value!.isEmpty) {
-                                      return 'Enter due date';
+                                      return 'Select invoice or reference';
                                     }
                                     return null;
                                   },
-                                  decoration:
-                                      kTextFieldBorderDecoration.copyWith(
-                                    hintText: 'Enter due date',
+                                  decoration: kTextFieldBorderDecoration.copyWith(
+                                    hintText: 'Select invoice or reference',
                                     hintStyle: TextStyle(
                                       color: Colors.black.withOpacity(0.5),
                                       fontSize: 14,
@@ -790,18 +754,22 @@ class _CustomersDetailState extends State<CustomersDetail> {
                           ),
                         ),
                       ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: Center(
-                          child: Text(
-                            'No, Cancel',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              decoration: TextDecoration.underline,
+                      SizedBox(height: 10),
+                      Container(
+                        width: 100,
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Center(
+                            child: Text(
+                              'No, Cancel',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                decoration: TextDecoration.underline,
+                              ),
                             ),
                           ),
                         ),
@@ -819,9 +787,11 @@ class _CustomersDetailState extends State<CustomersDetail> {
   }
 
   Future<void> _markAsSettled() {
+
     final formKey = GlobalKey<FormState>();
     TextEditingController reasonController = TextEditingController();
     String newPin = '';
+
     return showDialog(
       context: context,
       barrierColor: Color(0xFF000428).withOpacity(0.86),
@@ -908,14 +878,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    'Reason',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.normal,
-                                    ),
-                                  ),
+                                  Text('Reason'),
                                   SizedBox(height: 10),
                                   Container(
                                     width: double.infinity,
@@ -927,6 +890,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                       ),
                                       textInputAction: TextInputAction.next,
                                       keyboardType: TextInputType.name,
+                                      autofocus: true,
                                       controller: reasonController,
                                       validator: (value) {
                                         if (value!.isEmpty) {
@@ -934,8 +898,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                         }
                                         return null;
                                       },
-                                      decoration:
-                                      kTextFieldBorderDecoration.copyWith(
+                                      decoration: kTextFieldBorderDecoration.copyWith(
                                         hintText: 'Enter reason',
                                         hintStyle: TextStyle(
                                           color: Colors.black.withOpacity(0.5),
@@ -965,30 +928,30 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                     Container(
                                       width: 280,
                                       child: PinCodeTextField(
-                                          appContext: context,
-                                          length: 4,
-                                          animationType: AnimationType.fade,
-                                          enablePinAutofill: false,
-                                          textStyle: TextStyle(
-                                            fontSize: 20,
-                                            color: Color(0xFF004E92),
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                          pinTheme: PinTheme(
-                                              shape: PinCodeFieldShape.box,
-                                              borderWidth: 1,
-                                              fieldHeight: 60,
-                                              fieldWidth: 60,
-                                              activeColor: Color(0xFF7BBBE5),
-                                              selectedColor: Color(0xFF7BBBE5),
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(3))),
-                                          onChanged: (value) {
-                                            if (!mounted) return;
-                                            setState(() {
-                                              newPin = value;
-                                            });
-                                          }),
+                                        appContext: context,
+                                        length: 4,
+                                        animationType: AnimationType.fade,
+                                        enablePinAutofill: false,
+                                        textStyle: TextStyle(
+                                          fontSize: 20,
+                                          color: Color(0xFF004E92),
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        pinTheme: PinTheme(
+                                          shape: PinCodeFieldShape.box,
+                                          borderWidth: 1,
+                                          fieldHeight: 60,
+                                          fieldWidth: 60,
+                                          activeColor: Color(0xFF7BBBE5),
+                                          selectedColor: Color(0xFF7BBBE5),
+                                          borderRadius: BorderRadius.all(Radius.circular(3)),
+                                        ),
+                                        onChanged: (value) {
+                                          if (!mounted) return;
+                                          setState(() {
+                                            newPin = value;
+                                          });
+                                        }),
                                     ),
                                     SizedBox(height: 36),
                                   ],
@@ -1022,18 +985,21 @@ class _CustomersDetailState extends State<CustomersDetail> {
                       ),
                     ),
                     SizedBox(height: 10),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: Center(
-                        child: Text(
-                          'No, Cancel',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            decoration: TextDecoration.underline,
+                    Container(
+                      width: 100,
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Center(
+                          child: Text(
+                            'No, Cancel',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              decoration: TextDecoration.underline,
+                            ),
                           ),
                         ),
                       ),

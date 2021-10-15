@@ -71,10 +71,12 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
   }
 
   Future<void> _resetPin() {
+
     final formKey = GlobalKey<FormState>();
     TextEditingController nameController = TextEditingController();
     String newPin = '';
     String confirmPin = '';
+
     return showDialog(
       context: context,
       barrierColor: Color(0xFF000428).withOpacity(0.86),
@@ -277,18 +279,21 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
                       ),
                     ),
                     SizedBox(height: 10),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: Center(
-                        child: Text(
-                          'No, Cancel',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            decoration: TextDecoration.underline,
+                    Container(
+                      width: 100,
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Center(
+                          child: Text(
+                            'No, Cancel',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              decoration: TextDecoration.underline,
+                            ),
                           ),
                         ),
                       ),
@@ -305,9 +310,11 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
   }
 
   Future<void> _block() {
+
     final formKey = GlobalKey<FormState>();
     TextEditingController reasonController = TextEditingController();
     String newPin = '';
+
     return showDialog(
       context: context,
       barrierColor: Color(0xFF000428).withOpacity(0.86),
@@ -394,14 +401,7 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    'Reason',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.normal,
-                                    ),
-                                  ),
+                                  Text('Reason'),
                                   SizedBox(height: 10),
                                   Container(
                                     width: double.infinity,
@@ -413,6 +413,7 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
                                       ),
                                       textInputAction: TextInputAction.next,
                                       keyboardType: TextInputType.name,
+                                      autofocus: true,
                                       controller: reasonController,
                                       validator: (value) {
                                         if (value!.isEmpty) {
@@ -420,8 +421,7 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
                                         }
                                         return null;
                                       },
-                                      decoration:
-                                          kTextFieldBorderDecoration.copyWith(
+                                      decoration: kTextFieldBorderDecoration.copyWith(
                                         hintText: 'Enter reason',
                                         hintStyle: TextStyle(
                                           color: Colors.black.withOpacity(0.5),
@@ -451,30 +451,30 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
                                     Container(
                                       width: 280,
                                       child: PinCodeTextField(
-                                          appContext: context,
-                                          length: 4,
-                                          animationType: AnimationType.fade,
-                                          enablePinAutofill: false,
-                                          textStyle: TextStyle(
-                                            fontSize: 20,
-                                            color: Color(0xFF004E92),
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                          pinTheme: PinTheme(
-                                              shape: PinCodeFieldShape.box,
-                                              borderWidth: 1,
-                                              fieldHeight: 60,
-                                              fieldWidth: 60,
-                                              activeColor: Color(0xFF7BBBE5),
-                                              selectedColor: Color(0xFF7BBBE5),
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(3))),
-                                          onChanged: (value) {
-                                            if (!mounted) return;
-                                            setState(() {
-                                              newPin = value;
-                                            });
-                                          }),
+                                        appContext: context,
+                                        length: 4,
+                                        animationType: AnimationType.fade,
+                                        enablePinAutofill: false,
+                                        textStyle: TextStyle(
+                                          fontSize: 20,
+                                          color: Color(0xFF004E92),
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        pinTheme: PinTheme(
+                                            shape: PinCodeFieldShape.box,
+                                            borderWidth: 1,
+                                            fieldHeight: 60,
+                                            fieldWidth: 60,
+                                            activeColor: Color(0xFF7BBBE5),
+                                            selectedColor: Color(0xFF7BBBE5),
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(3))),
+                                        onChanged: (value) {
+                                          if (!mounted) return;
+                                          setState(() {
+                                            newPin = value;
+                                          });
+                                        }),
                                     ),
                                     SizedBox(height: 36),
                                   ],
@@ -507,18 +507,21 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
                       ),
                     ),
                     SizedBox(height: 10),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: Center(
-                        child: Text(
-                          'No, Cancel',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            decoration: TextDecoration.underline,
+                    Container(
+                      width: 100,
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Center(
+                          child: Text(
+                            'No, Cancel',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              decoration: TextDecoration.underline,
+                            ),
                           ),
                         ),
                       ),
@@ -535,9 +538,11 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
   }
 
   Future<void> _deletePermanently() {
+
     final formKey = GlobalKey<FormState>();
     TextEditingController reasonController = TextEditingController();
     String newPin = '';
+
     return showDialog(
       context: context,
       barrierColor: Color(0xFF000428).withOpacity(0.86),
@@ -624,14 +629,7 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    'Reason',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.normal,
-                                    ),
-                                  ),
+                                  Text('Reason'),
                                   SizedBox(height: 10),
                                   Container(
                                     width: double.infinity,
@@ -643,6 +641,7 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
                                       ),
                                       textInputAction: TextInputAction.next,
                                       keyboardType: TextInputType.name,
+                                      autofocus: true,
                                       controller: reasonController,
                                       validator: (value) {
                                         if (value!.isEmpty) {
@@ -650,8 +649,7 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
                                         }
                                         return null;
                                       },
-                                      decoration:
-                                          kTextFieldBorderDecoration.copyWith(
+                                      decoration: kTextFieldBorderDecoration.copyWith(
                                         hintText: 'Enter reason',
                                         hintStyle: TextStyle(
                                           color: Colors.black.withOpacity(0.5),
@@ -681,30 +679,30 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
                                     Container(
                                       width: 280,
                                       child: PinCodeTextField(
-                                          appContext: context,
-                                          length: 4,
-                                          animationType: AnimationType.fade,
-                                          enablePinAutofill: false,
-                                          textStyle: TextStyle(
-                                            fontSize: 20,
-                                            color: Color(0xFF004E92),
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                          pinTheme: PinTheme(
-                                              shape: PinCodeFieldShape.box,
-                                              borderWidth: 1,
-                                              fieldHeight: 60,
-                                              fieldWidth: 60,
-                                              activeColor: Color(0xFF7BBBE5),
-                                              selectedColor: Color(0xFF7BBBE5),
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(3))),
-                                          onChanged: (value) {
-                                            if (!mounted) return;
-                                            setState(() {
-                                              newPin = value;
-                                            });
-                                          }),
+                                        appContext: context,
+                                        length: 4,
+                                        animationType: AnimationType.fade,
+                                        enablePinAutofill: false,
+                                        textStyle: TextStyle(
+                                          fontSize: 20,
+                                          color: Color(0xFF004E92),
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        pinTheme: PinTheme(
+                                          shape: PinCodeFieldShape.box,
+                                          borderWidth: 1,
+                                          fieldHeight: 60,
+                                          fieldWidth: 60,
+                                          activeColor: Color(0xFF7BBBE5),
+                                          selectedColor: Color(0xFF7BBBE5),
+                                          borderRadius: BorderRadius.all(Radius.circular(3)),
+                                        ),
+                                        onChanged: (value) {
+                                          if (!mounted) return;
+                                          setState(() {
+                                            newPin = value;
+                                          });
+                                        }),
                                     ),
                                     SizedBox(height: 36),
                                   ],
@@ -737,18 +735,21 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
                       ),
                     ),
                     SizedBox(height: 10),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: Center(
-                        child: Text(
-                          'No, Cancel',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            decoration: TextDecoration.underline,
+                    Container(
+                      width: 100,
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Center(
+                          child: Text(
+                            'No, Cancel',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              decoration: TextDecoration.underline,
+                            ),
                           ),
                         ),
                       ),

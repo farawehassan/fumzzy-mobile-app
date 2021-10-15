@@ -18,6 +18,8 @@ class Customers extends StatefulWidget {
 
 class _CustomersState extends State<Customers> {
 
+  TextEditingController search = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -87,6 +89,7 @@ class _CustomersState extends State<Customers> {
                         child: TextField(
                           textAlign: TextAlign.start,
                           textInputAction: TextInputAction.search,
+                          controller: search,
                           decoration: InputDecoration(
                             suffixIcon: Icon(
                               IconlyLight.search,
@@ -186,11 +189,13 @@ class _CustomersState extends State<Customers> {
   }
 
   Future<void> _addNewDebtor(BoxConstraints constraints) {
+
     final formKey = GlobalKey<FormState>();
     TextEditingController customerController = TextEditingController();
     TextEditingController amountController = TextEditingController();
     TextEditingController referenceController = TextEditingController();
     TextEditingController dateController = TextEditingController();
+
     return showDialog(
       context: context,
       barrierColor: Color(0xFF000428).withOpacity(0.86),
@@ -275,14 +280,7 @@ class _CustomersState extends State<Customers> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               ///text field for customer
-                              Text(
-                                'Customer',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
+                              Text('Customer'),
                               SizedBox(height: 10),
                               Container(
                                 width: constraints.maxWidth,
@@ -294,6 +292,7 @@ class _CustomersState extends State<Customers> {
                                   ),
                                   textInputAction: TextInputAction.next,
                                   keyboardType: TextInputType.name,
+                                  autofocus: true,
                                   controller: customerController,
                                   validator: (value) {
                                     if (value!.isEmpty) {
@@ -313,14 +312,7 @@ class _CustomersState extends State<Customers> {
                               ),
                               SizedBox(height: 20),
                               ///field for amount
-                              Text(
-                                'Amount',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
+                              Text('Amount',),
                               SizedBox(height: 10),
                               Container(
                                 width: constraints.maxWidth,
@@ -331,7 +323,7 @@ class _CustomersState extends State<Customers> {
                                     fontWeight: FontWeight.normal,
                                   ),
                                   textInputAction: TextInputAction.next,
-                                  keyboardType: TextInputType.name,
+                                  keyboardType: TextInputType.number,
                                   controller: amountController,
                                   validator: (value) {
                                     if (value!.isEmpty) {
@@ -351,14 +343,7 @@ class _CustomersState extends State<Customers> {
                               ),
                               SizedBox(height: 20),
                               ///field for reference
-                              Text(
-                                'Reference',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
+                              Text('Reference'),
                               SizedBox(height: 10),
                               Container(
                                 width: constraints.maxWidth,
@@ -389,14 +374,7 @@ class _CustomersState extends State<Customers> {
                               ),
                               SizedBox(height: 20),
                               ///field for date
-                              Text(
-                                'Due Date',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
+                              Text('Due Date'),
                               SizedBox(height: 10),
                               Container(
                                 width: constraints.maxWidth,
@@ -406,8 +384,8 @@ class _CustomersState extends State<Customers> {
                                     fontSize: 14,
                                     fontWeight: FontWeight.normal,
                                   ),
-                                  textInputAction: TextInputAction.next,
-                                  keyboardType: TextInputType.name,
+                                  textInputAction: TextInputAction.done,
+                                  keyboardType: TextInputType.datetime,
                                   controller: dateController ,
                                   validator: (value) {
                                     if (value!.isEmpty) {
@@ -416,7 +394,7 @@ class _CustomersState extends State<Customers> {
                                     return null;
                                   },
                                   decoration: kTextFieldBorderDecoration.copyWith(
-                                    hintText: 'Enter due date',
+                                    hintText: 'DD / MM / YY',
                                     hintStyle: TextStyle(
                                       color: Colors.black.withOpacity(0.5),
                                       fontSize: 14,
@@ -447,18 +425,22 @@ class _CustomersState extends State<Customers> {
                           ),
                         ),
                       ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: Center(
-                          child: Text(
-                            'No, Cancel',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              decoration: TextDecoration.underline,
+                      SizedBox(height: 10),
+                      Container(
+                        width: 100,
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Center(
+                            child: Text(
+                              'No, Cancel',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                decoration: TextDecoration.underline,
+                              ),
                             ),
                           ),
                         ),

@@ -38,6 +38,9 @@ class _NotificationsState extends State<Notifications> {
 }
 
 Widget _tabletLayout(BoxConstraints constraints){
+
+  TextEditingController search = TextEditingController();
+
   return Padding(
     padding: EdgeInsets.fromLTRB(20, 30, 20, 5),
     child: Column(
@@ -71,6 +74,7 @@ Widget _tabletLayout(BoxConstraints constraints){
                   child: TextField(
                     textAlign: TextAlign.start,
                     textInputAction: TextInputAction.search,
+                    controller: search,
                     decoration: InputDecoration(
                       suffixIcon: Icon(
                         IconlyLight.search,
@@ -235,6 +239,9 @@ Widget _tabletLayout(BoxConstraints constraints){
 }
 
 Widget _mobileLayout(BoxConstraints constraints){
+
+  TextEditingController search = TextEditingController();
+
   return Padding(
     padding: EdgeInsets.fromLTRB(20, 30, 20, 5),
     child: Column(
@@ -265,6 +272,7 @@ Widget _mobileLayout(BoxConstraints constraints){
               child: TextField(
                 textAlign: TextAlign.start,
                 textInputAction: TextInputAction.search,
+                controller: search,
                 decoration: InputDecoration(
                   suffixIcon: Icon(
                     IconlyLight.search,

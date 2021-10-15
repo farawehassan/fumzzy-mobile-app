@@ -18,6 +18,8 @@ class Inventory extends StatefulWidget {
 
 class _InventoryState extends State<Inventory> {
 
+  TextEditingController search = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -114,6 +116,7 @@ class _InventoryState extends State<Inventory> {
                         child: TextField(
                           textAlign: TextAlign.start,
                           textInputAction: TextInputAction.search,
+                          controller: search,
                           decoration: InputDecoration(
                             suffixIcon: Icon(
                               IconlyLight.search,
@@ -215,8 +218,10 @@ class _InventoryState extends State<Inventory> {
   }
 
   Future<void> _addNewCategory(BoxConstraints constraints) {
+
     final formKey = GlobalKey<FormState>();
     TextEditingController categoryController = TextEditingController();
+
     return showDialog(
       context: context,
       barrierColor: Color(0xFF000428).withOpacity(0.86),
@@ -302,11 +307,6 @@ class _InventoryState extends State<Inventory> {
                             children: [
                               Text(
                                 'Category',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.normal,
-                                ),
                               ),
                               SizedBox(height: 10),
                               Container(
@@ -317,8 +317,9 @@ class _InventoryState extends State<Inventory> {
                                     fontSize: 14,
                                     fontWeight: FontWeight.normal,
                                   ),
-                                  textInputAction: TextInputAction.next,
+                                  textInputAction: TextInputAction.done,
                                   keyboardType: TextInputType.name,
+                                  autofocus: true,
                                   controller: categoryController,
                                   validator: (value) {
                                     if (value!.isEmpty) {
@@ -358,18 +359,22 @@ class _InventoryState extends State<Inventory> {
                           ),
                         ),
                       ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: Center(
-                          child: Text(
-                            'No, Cancel',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              decoration: TextDecoration.underline,
+                      SizedBox(height: 10),
+                      Container(
+                        width: 100,
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Center(
+                            child: Text(
+                              'No, Cancel',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                decoration: TextDecoration.underline,
+                              ),
                             ),
                           ),
                         ),

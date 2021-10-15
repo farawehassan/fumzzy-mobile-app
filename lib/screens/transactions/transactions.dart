@@ -20,6 +20,26 @@ class Transactions extends StatefulWidget {
 
 class _TransactionsState extends State<Transactions> {
 
+  late FocusNode nextFocusNode;
+
+  @override
+  void initState() {
+
+    super.initState();
+    nextFocusNode = FocusNode();
+
+  }
+
+  @override
+  void dispose() {
+
+    nextFocusNode.dispose();
+    super.dispose();
+
+  }
+
+  TextEditingController search = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -95,7 +115,7 @@ class _TransactionsState extends State<Transactions> {
                           ),
                           Button(
                             onTap: (){
-                              _addNewPurchase(constraints);
+                              _addNewPurchase(constraints,nextFocusNode);
                             },
                             buttonColor: Color(0xFFF28301),
                             width: 160,
@@ -134,6 +154,7 @@ class _TransactionsState extends State<Transactions> {
                         child: TextField(
                           textAlign: TextAlign.start,
                           textInputAction: TextInputAction.search,
+                          controller: search,
                           decoration: InputDecoration(
                             suffixIcon: Icon(
                               IconlyLight.search,
@@ -241,7 +262,7 @@ class _TransactionsState extends State<Transactions> {
 
   List<String> categories = ["Drinks", "Sweet", "Furniture", "Wine"];
 
-  Future<void> _addNewPurchase(BoxConstraints constraints) {
+  Future<void> _addNewPurchase(BoxConstraints constraints, FocusNode nextFocusNode) {
     final formKey = GlobalKey<FormState>();
     TextEditingController productName = TextEditingController();
     TextEditingController costPrice = TextEditingController();
@@ -352,6 +373,7 @@ class _TransactionsState extends State<Transactions> {
                                       ),
                                       textInputAction: TextInputAction.next,
                                       keyboardType: TextInputType.text,
+                                      autofocus: true,
                                       controller: productName,
                                       validator: (value) {
                                         if (value!.isEmpty) {
@@ -387,6 +409,7 @@ class _TransactionsState extends State<Transactions> {
                                       onChanged: (value) {
                                         setState(() {
                                           selectedCategory = value;
+                                          nextFocusNode.requestFocus();
                                         });
                                       },
                                       style: TextStyle(
@@ -443,6 +466,7 @@ class _TransactionsState extends State<Transactions> {
                                             ),
                                             textInputAction: TextInputAction.next,
                                             keyboardType: TextInputType.number,
+                                            focusNode: nextFocusNode,
                                             inputFormatters: [
                                               FilteringTextInputFormatter.allow(RegExp('[0-9]')),
                                             ],
@@ -637,7 +661,7 @@ class _TransactionsState extends State<Transactions> {
                       SizedBox(height: 40),
                       Button(
                         onTap: (){
-                          print("Add Purchase");
+                          print("Record Purchase");
                         },
                         buttonColor: Color(0xFF00509A),
                         child: Center(
@@ -652,18 +676,22 @@ class _TransactionsState extends State<Transactions> {
                           ),
                         ),
                       ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: Center(
-                          child: Text(
-                            'No, Cancel',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              decoration: TextDecoration.underline,
+                      SizedBox(height: 10),
+                      Container(
+                        width: 100,
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Center(
+                            child: Text(
+                              'No, Cancel',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                decoration: TextDecoration.underline,
+                              ),
                             ),
                           ),
                         ),
@@ -681,6 +709,7 @@ class _TransactionsState extends State<Transactions> {
   }
 
   Future<void> _addExpense (BoxConstraints constraints) {
+
     final formKey = GlobalKey<FormState>();
     TextEditingController description = TextEditingController();
     TextEditingController amount = TextEditingController();
@@ -787,6 +816,7 @@ class _TransactionsState extends State<Transactions> {
                                       keyboardType: TextInputType.text,
                                       controller: description,
                                       maxLines: 3,
+                                      autofocus: true,
                                       validator: (value) {
                                         if (value!.isEmpty) {
                                           return 'Enter Description';
@@ -869,18 +899,21 @@ class _TransactionsState extends State<Transactions> {
                         ),
                       ),
                       SizedBox(height: 10),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: Center(
-                          child: Text(
-                            'No, Cancel',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              decoration: TextDecoration.underline,
+                      Container(
+                        width: 100,
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Center(
+                            child: Text(
+                              'No, Cancel',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                decoration: TextDecoration.underline,
+                              ),
                             ),
                           ),
                         ),

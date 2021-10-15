@@ -18,6 +18,8 @@ class Invoices extends StatefulWidget {
 
 class _InvoicesState extends State<Invoices> {
 
+  TextEditingController search = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -58,6 +60,7 @@ class _InvoicesState extends State<Invoices> {
                       child: TextField(
                         textAlign: TextAlign.start,
                         textInputAction: TextInputAction.search,
+                        controller: search,
                         decoration: InputDecoration(
                           suffixIcon: Icon(
                             IconlyLight.search,

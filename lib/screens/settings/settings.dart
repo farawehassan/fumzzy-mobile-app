@@ -155,11 +155,6 @@ class _SettingsState extends State<Settings> {
             children: [
               Text(
                 'Name',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 14,
-                  fontWeight: FontWeight.normal,
-                ),
               ),
               SizedBox(height: 10),
               Container(
@@ -170,7 +165,7 @@ class _SettingsState extends State<Settings> {
                     fontSize: 14,
                     fontWeight: FontWeight.normal,
                   ),
-                  textInputAction: TextInputAction.next,
+                  textInputAction: TextInputAction.done,
                   keyboardType: TextInputType.name,
                   controller: _nameController,
                   inputFormatters: [
@@ -201,11 +196,6 @@ class _SettingsState extends State<Settings> {
             children: [
               Text(
                 'Phone Number',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 14,
-                  fontWeight: FontWeight.normal,
-                ),
               ),
               SizedBox(height: 10),
               Container(
@@ -442,8 +432,7 @@ class _SettingsState extends State<Settings> {
               ),
             ),
             SizedBox(height: 40),
-            Padding(
-              padding: const EdgeInsets.only(left: 50.0),
+            Center(
               child: Button(
                 onTap: (){
                   print("save changes");
