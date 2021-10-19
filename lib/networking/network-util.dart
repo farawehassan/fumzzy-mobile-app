@@ -35,14 +35,18 @@ class NetworkHelper {
   /// A function to do any post request with the url and headers
   /// then sends back a json decoded result
   Future<dynamic> post(String url, {Map<String, String>? headers, body, encoding}) {
+    print(url);
+    print(headers);
+    print(body);
     try {
       return http
           .post(Uri.parse(url), body: jsonEncode(body), headers: headers, encoding: encoding)
           .then((http.Response response) {
         final String res = response.body;
+        print(res);
         final int statusCode = response.statusCode;
         var result = _decoder.convert(res);
-        if (statusCode < 200 || statusCode > 400) throw ("${result['message']}");
+        if (statusCode < 200 || statusCode > 400) throw result['message'];
         return result;
       });
     } catch (e) {
@@ -65,7 +69,7 @@ class NetworkHelper {
       final response = await http.Response.fromStream(streamedResponse);
       final dynamic res = json.decode(response.body);
       final int statusCode = response.statusCode;
-      if (statusCode < 200 || statusCode > 400) throw ("${res["message"]}");
+      if (statusCode < 200 || statusCode > 400) throw res["message"];
       return res;
     } catch (e) {
       print(e);
@@ -83,7 +87,7 @@ class NetworkHelper {
         final String res = response.body;
         final int statusCode = response.statusCode;
         var result = _decoder.convert(res);
-        if (statusCode < 200 || statusCode > 400) throw ("${result['message']}");
+        if (statusCode < 200 || statusCode > 400) throw result['message'];
         return result;
       });
     } catch (e) {
@@ -106,7 +110,7 @@ class NetworkHelper {
       final response = await http.Response.fromStream(streamedResponse);
       final dynamic res = json.decode(response.body);
       final int statusCode = response.statusCode;
-      if (statusCode < 200 || statusCode > 400) throw ('${res['message']}');
+      if (statusCode < 200 || statusCode > 400) throw res['message'];
       return res;
     } catch (e) {
       print(e);
@@ -124,7 +128,7 @@ class NetworkHelper {
         final String res = response.body;
         final int statusCode = response.statusCode;
         var result = _decoder.convert(res);
-        if (statusCode < 200 || statusCode > 400) throw ('${result['message']}');
+        if (statusCode < 200 || statusCode > 400) throw result['message'];
         return result;
       });
     } catch (e) {

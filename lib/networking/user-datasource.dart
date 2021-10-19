@@ -1,3 +1,4 @@
+import 'package:fumzy/model/user.dart';
 import 'endpoints.dart';
 import 'error-handler.dart';
 import 'network-util.dart';
@@ -10,18 +11,17 @@ class UserDataSource{
   /// Instantiating a class of the [NetworkHelper]
   var _netUtil = NetworkHelper();
 
-  /// A function that sends request for sign up with [body] as details
-  /// A post request to use the [SIGN_UP_URL]
+  /// A function that sends request for sign i with [body] as details
+  /// A post request to use the [LOGIN]
   /// It returns a [User] model
-  /*Future<User> signUp(Map<String, String> body) async {
-    Map<String, String> header = {};
-    return _netUtil.post(SIGN_UP_URL, headers: header, body: body).then((dynamic res) {
-      if (res['error']) throw res['msg'];
-      res['data']['user']['token'] = res['data']['token'];
-      return User.fromJson(res['data']['user']);
+  Future<User> signIn(Map<String, String> body) async {
+    Map<String, String> header = { 'Content-Type': 'application/json' };
+    return _netUtil.post(LOGIN, headers: header, body: body).then((dynamic res) {
+      if (res['error'] == 'true') throw res['message'];
+      return User.fromJson(res['data']);
     }).catchError((e) {
       errorHandler.handleError(e);
     });
-  }  */
+  }
 
 }

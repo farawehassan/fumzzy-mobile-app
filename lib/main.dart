@@ -39,7 +39,7 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primaryColor: Color(0xFF00509A),
-        backgroundColor: Color(0xFFF7F8F9),
+        backgroundColor: Colors.black,
         tabBarTheme: TabBarTheme(
           labelPadding: EdgeInsets.only(left: 0.0, right: 0.0),
           labelColor: Color(0xFF004E92),
@@ -50,6 +50,9 @@ class _MyAppState extends State<MyApp> {
           centerTitle: false
         ),
         fontFamily: "Overpass",
+        cupertinoOverrideTheme: CupertinoThemeData(
+          brightness: Brightness.dark,
+        ),
         textSelectionTheme: TextSelectionThemeData(
           cursorColor: Color(0xFF00509A),
         ),
