@@ -222,6 +222,11 @@ class _LoginState extends State<Login> {
                 child: PinCodeTextField(
                     appContext: context,
                     length: 4,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp('[0-9]')),
+                    ],
+                    textInputAction: TextInputAction.done,
                     animationType: AnimationType.fade,
                     enablePinAutofill: false,
                     textStyle: TextStyle(
@@ -240,9 +245,7 @@ class _LoginState extends State<Login> {
                     ),
                     onChanged: (value) {
                       if(!mounted)return;
-                      setState(() {
-                        _pin = value;
-                      });
+                      setState(() => _pin = value);
                     }
                 ),
               ),

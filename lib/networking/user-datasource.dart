@@ -17,7 +17,7 @@ class UserDataSource{
   Future<User> signIn(Map<String, String> body) async {
     Map<String, String> header = { 'Content-Type': 'application/json' };
     return _netUtil.post(LOGIN, headers: header, body: body).then((dynamic res) {
-      if (res['error'] == 'true') throw res['message'];
+      if (res['error']) throw res['message'];
       return User.fromJson(res['data']);
     }).catchError((e) {
       errorHandler.handleError(e);
