@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
+import 'dashboard/dashboard.dart';
 import 'login.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -15,9 +17,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   late AnimationController _controller;
 
   void _navigate(){
-    Timer(Duration(seconds: 3), () {
-      Navigator.pushNamed(context, Login.id);
-    });
+    Timer(Duration(seconds: 3), ()=> _getBoolValuesFromSp());
   }
 
   @override
@@ -93,6 +93,20 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
         )
       ),
     );
+  }
+
+  void _getBoolValuesFromSp() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool? loggedIn = prefs.getBool('loggedIn');
+    if(loggedIn == true){
+      Navigator.pushReplacementNamed(context, Dashboard.id);
+    }
+    else if(loggedIn == false){
+      Navigator.pushReplacementNamed(context, Login.id);
+    }
+    else {
+      Navigator.pushReplacementNamed(context, Login.id);
+    }
   }
 
 }
