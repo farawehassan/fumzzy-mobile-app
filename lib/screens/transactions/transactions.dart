@@ -33,221 +33,227 @@ class _TransactionsState extends State<Transactions> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) => (Scaffold(
-        appBar: buildAppBar(constraints, 'TRANSACTIONS'),
-        drawer: RefactoredDrawer(title: 'TRANSACTIONS'),
-        body: Padding(
-          padding: EdgeInsets.fromLTRB(20, 30, 20, 0),
-          child: DefaultTabController(
-            length: 3,
-            initialIndex: 0,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 15.0),
-                      child: Text(
-                        'All Transactions',
-                        style: TextStyle(
-                          color: Color(0xFF171725),
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14.0,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.end,
-                        alignment: WrapAlignment.end,
-                        runAlignment: WrapAlignment.end,
-                        runSpacing: 12,
-                        spacing: 12,
-                        children: [
-                          TextButton(
-                            onPressed: () {
-                              _addExpense(constraints,CircleProgressIndicator());
-                            },
-                            child: Container(
-                              color: Colors.transparent,
-                              child: Text(
-                                'Add expenses',
-                                style: TextStyle(
-                                  color: Color(0xFF00509A),
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Button(
-                            onTap: (){
-                              Navigator.pushNamed(context, AddSale.id);
-                            },
-                            buttonColor: Color(0xFF00AF27),
-                            width: 160,
-                            child: Center(
-                              child: Text(
-                                'Add Sale',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Color(0xFFFFFFFF),
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Button(
-                            onTap: (){
-                              _addNewPurchase(constraints);
-                            },
-                            buttonColor: Color(0xFFF28301),
-                            width: 160,
-                            child: Center(
-                              child: Text(
-                                'Add Purchase',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Color(0xFFFFFFFF),
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 35),
-                Container(
-                  child: Row(
+    return GestureDetector(
+      onTap: (){
+        FocusScopeNode currentFocus = FocusScope.of(context);
+        if(!currentFocus.hasPrimaryFocus) currentFocus.unfocus();
+      },
+      child: LayoutBuilder(
+        builder: (context, constraints) => (Scaffold(
+          appBar: buildAppBar(constraints, 'TRANSACTIONS'),
+          drawer: RefactoredDrawer(title: 'TRANSACTIONS'),
+          body: Padding(
+            padding: EdgeInsets.fromLTRB(20, 30, 20, 0),
+            child: DefaultTabController(
+              length: 3,
+              initialIndex: 0,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        width: 180,
-                        height: 50,
-                        padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 15.0),
-                        margin: EdgeInsets.only(right: 50),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(27.5),
-                        ),
-                        child: TextField(
-                          textAlign: TextAlign.start,
-                          textInputAction: TextInputAction.search,
-                          controller: search,
-                          decoration: InputDecoration(
-                            suffixIcon: Icon(
-                              IconlyLight.search,
-                              color: Colors.black,
-                              size: 17,
-                            ),
-                            hintText: 'Search',
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                          ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 15.0),
+                        child: Text(
+                          'All Transactions',
                           style: TextStyle(
-                              fontWeight: FontWeight.w400,
-                              fontSize: 15.0,
-                              color: Colors.black
+                            color: Color(0xFF171725),
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14.0,
                           ),
                         ),
-                      ), //search
-                      InkWell(
-                        onTap: () {
-                          print("filter");
-                        },
-                        child: Container(
-                          width: 110,
-                          height: 50,
-                          padding: EdgeInsets.all(15),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(3.0),
-                            color: Colors.white,
-                            border: Border.all(
-                              width: 1,
-                              color: Color(0xFFE2E2EA),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Filter',
-                                style: TextStyle(
-                                  color: Color(0xFF171725),
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 14,
+                      ),
+                      Expanded(
+                        child: Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.end,
+                          alignment: WrapAlignment.end,
+                          runAlignment: WrapAlignment.end,
+                          runSpacing: 12,
+                          spacing: 12,
+                          children: [
+                            TextButton(
+                              onPressed: () {
+                                _addExpense(constraints,CircleProgressIndicator());
+                              },
+                              child: Container(
+                                color: Colors.transparent,
+                                child: Text(
+                                  'Add expenses',
+                                  style: TextStyle(
+                                    color: Color(0xFF00509A),
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 14,
+                                  ),
                                 ),
                               ),
-                              Icon(
-                                Icons.tune,
-                                color: Colors.black,
-                                size: 18,
+                            ),
+                            Button(
+                              onTap: (){
+                                Navigator.pushNamed(context, AddSale.id);
+                              },
+                              buttonColor: Color(0xFF00AF27),
+                              width: 160,
+                              child: Center(
+                                child: Text(
+                                  'Add Sale',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Color(0xFFFFFFFF),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
                               ),
-                            ],
+                            ),
+                            Button(
+                              onTap: (){
+                                _addNewPurchase(constraints);
+                              },
+                              buttonColor: Color(0xFFF28301),
+                              width: 160,
+                              child: Center(
+                                child: Text(
+                                  'Add Purchase',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Color(0xFFFFFFFF),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 35),
+                  Container(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 180,
+                          height: 50,
+                          padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 15.0),
+                          margin: EdgeInsets.only(right: 50),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(27.5),
+                          ),
+                          child: TextField(
+                            textAlign: TextAlign.start,
+                            textInputAction: TextInputAction.search,
+                            controller: search,
+                            decoration: InputDecoration(
+                              suffixIcon: Icon(
+                                IconlyLight.search,
+                                color: Colors.black,
+                                size: 17,
+                              ),
+                              hintText: 'Search',
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                            ),
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 15.0,
+                                color: Colors.black
+                            ),
+                          ),
+                        ), //search
+                        InkWell(
+                          onTap: () {
+                            print("filter");
+                          },
+                          child: Container(
+                            width: 110,
+                            height: 50,
+                            padding: EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(3.0),
+                              color: Colors.white,
+                              border: Border.all(
+                                width: 1,
+                                color: Color(0xFFE2E2EA),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Filter',
+                                  style: TextStyle(
+                                    color: Color(0xFF171725),
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.tune,
+                                  color: Colors.black,
+                                  size: 18,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                SizedBox(height: 37),
-                Container(
-                  width: 296,
-                  child: TabBar(
-                    labelStyle: kTabBarTextStyle,
-                    labelColor: Color(0xFF004E92),
-                    unselectedLabelColor: Color(0xFF004E92).withOpacity(0.6),
-                    indicatorColor: Color(0xFF004E92),
-                    indicatorWeight: 3,
-                    tabs: [
-                      Tab(
-                        child: Text(
-                          'Sales',
-                          style: kTabBarTextStyle,
+                  SizedBox(height: 37),
+                  Container(
+                    width: 296,
+                    child: TabBar(
+                      labelStyle: kTabBarTextStyle,
+                      labelColor: Color(0xFF004E92),
+                      unselectedLabelColor: Color(0xFF004E92).withOpacity(0.6),
+                      indicatorColor: Color(0xFF004E92),
+                      indicatorWeight: 3,
+                      tabs: [
+                        Tab(
+                          child: Text(
+                            'Sales',
+                            style: kTabBarTextStyle,
+                          ),
                         ),
-                      ),
-                      Tab(
-                        child: Text(
-                          'Purchases',
-                          style: kTabBarTextStyle,
+                        Tab(
+                          child: Text(
+                            'Purchases',
+                            style: kTabBarTextStyle,
+                          ),
                         ),
-                      ),
-                      Tab(
-                        child: Text(
-                          'Expenses',
-                          style: kTabBarTextStyle,
+                        Tab(
+                          child: Text(
+                            'Expenses',
+                            style: kTabBarTextStyle,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                SizedBox(height: 25),
-                Expanded(
-                  child: TabBarView(
-                    children: [
-                      Sales(),
-                      Purchases(),
-                      Expenses(),
-                    ],
+                  SizedBox(height: 25),
+                  Expanded(
+                    child: TabBarView(
+                      children: [
+                        Sales(),
+                        Purchases(),
+                        Expenses(),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
-      )),
+        )),
+      ),
     );
   }
 
@@ -703,220 +709,225 @@ class _TransactionsState extends State<Transactions> {
     return showDialog(
       context: context,
       barrierColor: Color(0xFF000428).withOpacity(0.86),
-      builder: (context) => StatefulBuilder(
-        builder: (BuildContext context, StateSetter setDialogState) {
-          return AbsorbPointer(
-            absorbing: _showSpinner,
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: Color(0xFFFFFFFF),
-              ),
-              margin: EdgeInsets.all(40),
-              child: Material(
-                borderRadius: BorderRadius.circular(20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.fromLTRB(24, 30, 24, 27),
-                      decoration: BoxDecoration(
-                        color: Color(0xFFF5F8FF),
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(15.0),
-                          topRight: Radius.circular(15.0),
+      builder: (context) => GestureDetector(
+        onTap: (){
+          FocusScopeNode currentFocus = FocusScope.of(context);
+          if(!currentFocus.hasPrimaryFocus) currentFocus.unfocus();
+        },
+        child: StatefulBuilder(
+          builder: (BuildContext context, StateSetter setDialogState) {
+            return AbsorbPointer(
+              absorbing: _showSpinner,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Color(0xFFFFFFFF),
+                ),
+                margin: EdgeInsets.all(40),
+                child: Material(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.fromLTRB(24, 30, 24, 27),
+                        decoration: BoxDecoration(
+                          color: Color(0xFFF5F8FF),
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(15.0),
+                            topRight: Radius.circular(15.0),
+                          ),
                         ),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'NEW EXPENSE',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 15,
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
-                            child: Icon(
-                              IconlyBold.closeSquare,
-                              color: Colors.black.withOpacity(0.7),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Padding(
-                              padding: EdgeInsets.only(top: 42),
-                              child: Text(
-                                'Add a New Expense',
-                                style: TextStyle(
-                                  color: Color(0xFF00509A),
-                                  fontSize: 19,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                            Text(
+                              'NEW EXPENSE',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 15,
                               ),
                             ),
-                            Padding(
-                              padding:
-                              const EdgeInsets.symmetric(horizontal: 35, vertical: 15.0),
-                              child: Text(
-                                'You have made a new purchase. Please fill the fields to record your purchase.',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Color(0xFF000428).withOpacity(0.6),
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 15.0,
-                                ),
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.only(left: 20, right: 20),
-                              child: Form(
-                                key: _expenseFormKey,
-                                child: Column(
-                                  children: [
-                                    //description
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text('Description'),
-                                        SizedBox(height: 10),
-                                        Container(
-                                          width: constraints.maxWidth,
-                                          child: TextFormField(
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.normal,
-                                            ),
-                                            textInputAction: TextInputAction.next,
-                                            keyboardType: TextInputType.text,
-                                            controller: _expenseDescriptionController,
-                                            maxLines: 3,
-                                            autofocus: true,
-                                            validator: (value) {
-                                              if (value!.isEmpty) return 'Enter Description';
-                                              return null;
-                                            },
-                                            decoration: kTextFieldBorderDecoration.copyWith(
-                                              hintText: 'Bought 10 litres petrol',
-                                              hintStyle: TextStyle(
-                                                color: Colors.black.withOpacity(0.5),
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.normal,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 20),
-                                    // Amount
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text('Amount'),
-                                        SizedBox(height: 10),
-                                        Container(
-                                          width: constraints.maxWidth,
-                                          child: TextFormField(
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.normal,
-                                            ),
-                                            textInputAction: TextInputAction.done,
-                                            keyboardType: TextInputType.number,
-                                            inputFormatters: [
-                                              FilteringTextInputFormatter.allow(RegExp('[0-9]')),
-                                            ],
-                                            controller: _expenseAmountController,
-                                            validator: (value) {
-                                              if (value!.isEmpty) return 'Enter amount';
-                                              return null;
-                                            },
-                                            decoration: kTextFieldBorderDecoration.copyWith(
-                                              hintText: 'N Enter amount',
-                                              hintStyle: TextStyle(
-                                                color: Colors.black.withOpacity(0.5),
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.normal,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 40),
-                            Button(
-                              onTap: (){
-                                if(!_showSpinner){
-                                  if(_expenseFormKey.currentState!.validate()){
-                                    _createOneExpense(setDialogState);
-                                  }
-                                }
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pop(context);
                               },
-                              buttonColor: Color(0xFF00509A),
-                              child: Center(
-                                child: _showSpinner ?
-                                circleProgressIndicator :
-                                const Text(
-                                  'Record Expense',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Color(0xFFFFFFFF),
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.normal,
-                                  ),
-                                ),
+                              child: Icon(
+                                IconlyBold.closeSquare,
+                                color: Colors.black.withOpacity(0.7),
                               ),
                             ),
-                            SizedBox(height: 10),
-                            Container(
-                              width: 100,
-                              child: TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: Center(
-                                  child: Text(
-                                    'No, Cancel',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      decoration: TextDecoration.underline,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 50),
                           ],
                         ),
                       ),
-                    ),
-                  ],
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(top: 42),
+                                child: Text(
+                                  'Add a New Expense',
+                                  style: TextStyle(
+                                    color: Color(0xFF00509A),
+                                    fontSize: 19,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding:
+                                const EdgeInsets.symmetric(horizontal: 35, vertical: 15.0),
+                                child: Text(
+                                  'You have made a new purchase. Please fill the fields to record your purchase.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Color(0xFF000428).withOpacity(0.6),
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 15.0,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.only(left: 20, right: 20),
+                                child: Form(
+                                  key: _expenseFormKey,
+                                  child: Column(
+                                    children: [
+                                      //description
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text('Description'),
+                                          SizedBox(height: 10),
+                                          Container(
+                                            width: constraints.maxWidth,
+                                            child: TextFormField(
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                              textInputAction: TextInputAction.next,
+                                              keyboardType: TextInputType.text,
+                                              controller: _expenseDescriptionController,
+                                              maxLines: 3,
+                                              validator: (value) {
+                                                if (value!.isEmpty) return 'Enter Description';
+                                                return null;
+                                              },
+                                              decoration: kTextFieldBorderDecoration.copyWith(
+                                                hintText: 'Bought 10 litres petrol',
+                                                hintStyle: TextStyle(
+                                                  color: Colors.black.withOpacity(0.5),
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.normal,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: 20),
+                                      // Amount
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text('Amount'),
+                                          SizedBox(height: 10),
+                                          Container(
+                                            width: constraints.maxWidth,
+                                            child: TextFormField(
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                              textInputAction: TextInputAction.done,
+                                              keyboardType: TextInputType.number,
+                                              inputFormatters: [
+                                                FilteringTextInputFormatter.allow(RegExp('[0-9]')),
+                                              ],
+                                              controller: _expenseAmountController,
+                                              validator: (value) {
+                                                if (value!.isEmpty) return 'Enter amount';
+                                                return null;
+                                              },
+                                              decoration: kTextFieldBorderDecoration.copyWith(
+                                                hintText: 'N Enter amount',
+                                                hintStyle: TextStyle(
+                                                  color: Colors.black.withOpacity(0.5),
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.normal,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 40),
+                              Button(
+                                onTap: (){
+                                  if(!_showSpinner){
+                                    if(_expenseFormKey.currentState!.validate()){
+                                      _createOneExpense(setDialogState);
+                                    }
+                                  }
+                                },
+                                buttonColor: Color(0xFF00509A),
+                                child: Center(
+                                  child: _showSpinner ?
+                                  circleProgressIndicator :
+                                  const Text(
+                                    'Record Expense',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Color(0xFFFFFFFF),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              Container(
+                                width: 100,
+                                child: TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Center(
+                                    child: Text(
+                                      'No, Cancel',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 50),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

@@ -17,6 +17,7 @@ class NetworkHelper {
   /// then sends back a json decoded result
   Future<dynamic> get(String url, {Map<String, String>? headers}) async {
     try {
+      headers!['Content-Type'] = 'application/json';
       return
         http
             .get(Uri.parse(url), headers: headers)
@@ -39,6 +40,7 @@ class NetworkHelper {
     print(headers);
     print(body);
     try {
+      headers!['Content-Type'] = 'application/json';
       return http
           .post(Uri.parse(url), body: jsonEncode(body), headers: headers, encoding: encoding)
           .then((http.Response response) {
@@ -80,6 +82,7 @@ class NetworkHelper {
   /// then sends back a json decoded result
   Future<dynamic> put(String url, {Map<String, String>? headers, body, encoding}) {
     try {
+      headers!['Content-Type'] = 'application/json';
       return http
           .put(Uri.parse(url), body: jsonEncode(body), headers: headers, encoding: encoding)
           .then((http.Response response) {
@@ -121,6 +124,7 @@ class NetworkHelper {
   /// then sends back a json decoded result
   Future<dynamic> delete(String url, {Map<String, String>? headers}) {
     try {
+      headers!['Content-Type'] = 'application/json';
       return http
           .delete(Uri.parse(url), headers: headers)
           .then((http.Response response) {

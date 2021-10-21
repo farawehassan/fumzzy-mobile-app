@@ -19,8 +19,7 @@ class UserDataSource{
   /// A post request to use the [LOGIN]
   /// It returns a [User] model
   Future<User> signIn(Map<String, String> body) async {
-    Map<String, String> header = { 'Content-Type': 'application/json' };
-    return _netUtil.post(LOGIN, headers: header, body: body).then((dynamic res) {
+    return _netUtil.post(LOGIN, headers: {}, body: body).then((dynamic res) {
       if (res['error']) throw res['message'];
       return User.fromJson(res['data']);
     }).catchError((e) {
@@ -32,8 +31,7 @@ class UserDataSource{
   /// A post request to use the [SIGN_UP]
   /// It returns a [Message]
   Future<dynamic> signUP(Map<String, String> body) async {
-    Map<String, String> header = { 'Content-Type': 'application/json' };
-    return _netUtil.post(SIGN_UP, headers: header, body: body).then((dynamic res) {
+    return _netUtil.post(SIGN_UP, headers: {}, body: body).then((dynamic res) {
       if (res['error']) throw res['message'];
       return res['message'];
     }).catchError((e) {
