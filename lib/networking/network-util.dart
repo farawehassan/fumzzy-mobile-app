@@ -83,6 +83,7 @@ class NetworkHelper {
   Future<dynamic> put(String url, {Map<String, String>? headers, body, encoding}) {
     try {
       headers!['Content-Type'] = 'application/json';
+
       return http
           .put(Uri.parse(url), body: jsonEncode(body), headers: headers, encoding: encoding)
           .then((http.Response response) {

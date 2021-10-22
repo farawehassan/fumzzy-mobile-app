@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fumzy/components/app-bar.dart';
 import 'package:fumzy/components/button.dart';
+import 'package:fumzy/components/circle-indicator.dart';
+import 'package:fumzy/networking/user-datasource.dart';
 import 'package:fumzy/screens/dashboard/drawer.dart';
 import 'package:fumzy/utils/constant-styles.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
@@ -32,6 +34,8 @@ class _SettingsState extends State<Settings> {
 
   String _confirmPin = '';
 
+  bool _showSpinner = false;
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -39,57 +43,60 @@ class _SettingsState extends State<Settings> {
         FocusScopeNode currentFocus = FocusScope.of(context);
         if(!currentFocus.hasPrimaryFocus) currentFocus.unfocus();
       },
-      child: LayoutBuilder(
-        builder: (context, constraints) => (Scaffold(
-          appBar: buildAppBar(constraints, 'SETTINGS'),
-          drawer: RefactoredDrawer(title: 'SETTINGS'),
-          body: Padding(
-            padding: const EdgeInsets.all(30),
-            child: DefaultTabController(
-              length: 2,
-              initialIndex: 0,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 194,
-                    child: TabBar(
-                      labelStyle: kTabBarTextStyle,
-                      labelColor: Color(0xFF004E92),
-                      unselectedLabelColor: Color(0xFF004E92).withOpacity(0.6),
-                      indicatorColor: Color(0xFF004E92),
-                      indicatorWeight: 3,
-                      tabs: [
-                        Tab(
-                          child: Text(
-                            'Account',
-                            style: kTabBarTextStyle,
+      child: AbsorbPointer(
+        absorbing: _showSpinner,
+        child: LayoutBuilder(
+          builder: (context, constraints) => (Scaffold(
+            appBar: buildAppBar(constraints, 'SETTINGS'),
+            drawer: RefactoredDrawer(title: 'SETTINGS'),
+            body: Padding(
+              padding: const EdgeInsets.all(30),
+              child: DefaultTabController(
+                length: 2,
+                initialIndex: 0,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 194,
+                      child: TabBar(
+                        labelStyle: kTabBarTextStyle,
+                        labelColor: Color(0xFF004E92),
+                        unselectedLabelColor: Color(0xFF004E92).withOpacity(0.6),
+                        indicatorColor: Color(0xFF004E92),
+                        indicatorWeight: 3,
+                        tabs: [
+                          Tab(
+                            child: Text(
+                              'Account',
+                              style: kTabBarTextStyle,
+                            ),
                           ),
-                        ),
-                        Tab(
-                          child: Text(
-                            'Security',
-                            style: kTabBarTextStyle,
+                          Tab(
+                            child: Text(
+                              'Security',
+                              style: kTabBarTextStyle,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 25),
-                  Expanded(
-                    child: TabBarView(
-                      children: [
-                        _accountSection(constraints),
-                        _securitySection(constraints),
-                      ],
+                    SizedBox(height: 25),
+                    Expanded(
+                      child: TabBarView(
+                        children: [
+                          _accountSection(constraints),
+                          _securitySection(constraints),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        )),
+          )),
+        ),
       ),
     );
   }
@@ -120,11 +127,15 @@ class _SettingsState extends State<Settings> {
             SizedBox(height: 40),
             Button(
               onTap: (){
-                print("save changes");
+                if(!_showSpinner){
+                  if(_formKey.currentState!.validate())_editUser();
+                }
               },
               buttonColor: Color(0xFF00509A),
               child: Center(
-                child: Text(
+                child: _showSpinner ?
+                CircleProgressIndicator() :
+                const Text(
                   'Save Changes',
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -153,9 +164,7 @@ class _SettingsState extends State<Settings> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Name',
-              ),
+              Text('Name'),
               SizedBox(height: 10),
               Container(
                 width: constraints.maxWidth,
@@ -165,16 +174,14 @@ class _SettingsState extends State<Settings> {
                     fontSize: 14,
                     fontWeight: FontWeight.normal,
                   ),
-                  textInputAction: TextInputAction.done,
+                  textInputAction: TextInputAction.next,
                   keyboardType: TextInputType.name,
                   controller: _nameController,
                   inputFormatters: [
                     FilteringTextInputFormatter.allow(RegExp('[a-zA-Z]')),
                   ],
                   validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Enter your name';
-                    }
+                    if (value!.isEmpty) return 'Enter your name';
                     return null;
                   },
                   decoration: kTextFieldBorderDecoration.copyWith(
@@ -194,9 +201,7 @@ class _SettingsState extends State<Settings> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Phone Number',
-              ),
+              Text('Phone Number'),
               SizedBox(height: 10),
               Container(
                 width: constraints.maxWidth,
@@ -214,9 +219,7 @@ class _SettingsState extends State<Settings> {
                     FilteringTextInputFormatter.allow(RegExp('[0-9]')),
                   ],
                   validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Enter your name';
-                    }
+                    if (value!.isEmpty) return 'Enter  phone number';
                     return null;
                   },
                   decoration: kTextFieldBorderDecoration.copyWith(
@@ -234,6 +237,26 @@ class _SettingsState extends State<Settings> {
         ]
       ),
     );
+  }
+
+  ///function to make api call to [EDIT_USER]
+  void _editUser() async{
+    if(!mounted)return;
+    setState(() => _showSpinner = true);
+    var api = UserDataSource();
+    Map<String, String> body = {
+      "name": _nameController.text,
+      "phone": _phoneController.text,
+    };
+    await api.editUser(body).then((message) async{
+      if(!mounted)return;
+      setState(()=> _showSpinner = false);
+      print(message);
+    }).catchError((e){
+      if(!mounted)return;
+      setState(()=> _showSpinner = false);
+      print(e);
+    });
   }
 
   /// View for security section

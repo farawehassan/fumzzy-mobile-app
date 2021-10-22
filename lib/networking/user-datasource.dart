@@ -41,7 +41,7 @@ class UserDataSource{
 
   /// A function that sends request for creating an expense with [body] as details
   /// A post request to use the [CREATE_EXPENSES]
-  /// It returns an [Expense] model
+  /// It returns a [Message]
   Future<dynamic> createExpense(Map<String, String> body) async {
     late Map<String, String> header;
     Future<User> user = _futureValue.getCurrentUser();
@@ -50,6 +50,42 @@ class UserDataSource{
       header = {"Authorization": "Bearer ${value.token}"};
     });
     return _netUtil.post(CREATE_EXPENSES, headers: header, body: body).then((dynamic res) {
+      if (res['error']) throw res['message'];
+      return res['message'];
+    }).catchError((e) {
+      errorHandler.handleError(e);
+    });
+  }
+
+  /// A function that sends request for adding a category with [body] as details
+  /// A post request to use the [ADD_CATEGORY]
+  /// It returns a [Message]
+  Future<dynamic> createCategory(Map<String, String> body) async {
+    Map<String, String>? header;
+    Future<User> user = _futureValue.getCurrentUser();
+    await user.then((value) {
+      if(value.token == null) throw("You're not authorized, log out and log in back and try again!");
+      header = {"Authorization": "Bearer ${value.token}"};
+    });
+    return _netUtil.post(CREATE_CATEGORY, headers: header, body: body).then((dynamic res) {
+      if (res['error']) throw res['message'];
+      return res['message'];
+    }).catchError((e) {
+      errorHandler.handleError(e);
+    });
+  }
+
+  /// A function that sends request for editing a user with [body] as details
+  /// A post request to use the [EDIT_USER]
+  /// It returns a [Message]
+  Future<dynamic> editUser(Map<String, String> body) async {
+    Map<String, String>? header;
+    Future<User> user = _futureValue.getCurrentUser();
+    await user.then((value) {
+      if(value.token == null) throw("You're not authorized, log out and log in back and try again!");
+      header = {"Authorization": "Bearer ${value.token}"};
+    });
+    return _netUtil.put(EDIT_USER, headers: header, body: body).then((dynamic res) {
       if (res['error']) throw res['message'];
       return res['message'];
     }).catchError((e) {
