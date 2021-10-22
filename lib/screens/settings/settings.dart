@@ -19,8 +19,11 @@ class Settings extends StatefulWidget {
 
 class _SettingsState extends State<Settings> {
 
-  /// A [GlobalKey] to hold the form state of my form widget for form validation
-  final _formKey = GlobalKey<FormState>();
+  /// A [GlobalKey] to hold the form state of account form widget for form validation
+  final _accountFormKey = GlobalKey<FormState>();
+
+  /// A [GlobalKey] to hold the form state of security form widget for form validation
+  final _securityFormKey = GlobalKey<FormState>();
 
   /// A [TextEditingController] to control the input text for the name
   TextEditingController _nameController = TextEditingController();
@@ -128,7 +131,7 @@ class _SettingsState extends State<Settings> {
             Button(
               onTap: (){
                 if(!_showSpinner){
-                  if(_formKey.currentState!.validate())_editUser();
+                  if(_accountFormKey.currentState!.validate())_editUser();
                 }
               },
               buttonColor: Color(0xFF00509A),
@@ -156,7 +159,7 @@ class _SettingsState extends State<Settings> {
   /// Form widget for account details
   Widget _buildAccountForm(BoxConstraints constraints){
     return Form(
-      key: _formKey,
+      key: _accountFormKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -268,200 +271,28 @@ class _SettingsState extends State<Settings> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Current PIN',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  SizedBox(height: 13),
-                  Container(
-                    width: 280,
-                    child: PinCodeTextField(
-                        appContext: context,
-                        length: 4,
-                        animationType: AnimationType.fade,
-                        enablePinAutofill: false,
-                        obscuringCharacter: '*',
-                        textStyle: TextStyle(
-                          fontSize: 20,
-                          color: Color(0xFF004E92),
-                          fontWeight: FontWeight.w500,
-                        ),
-                        pinTheme: PinTheme(
-                            shape: PinCodeFieldShape.box,
-                            borderWidth: 1,
-                            fieldHeight: 60,
-                            fieldWidth: 60,
-                            activeColor: Color(0xFF7BBBE5),
-                            selectedColor: Color(0xFF7BBBE5),
-                            borderRadius: BorderRadius.all(Radius.circular(3))
-                        ),
-                        onChanged: (value) {
-                          if(!mounted)return;
-                          setState(() {
-                            _currentPin = value;
-                          });
-                        }
-                    ),
-                  ),
-                  InkWell(
-                    onTap: (){
-
-                    },
-                    child: Text(
-                      'Show',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Color(0xFF1F1F1F),
-                        fontSize: 14,
-                        fontWeight: FontWeight.normal,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 36),
-                ],
-              ),
-            ),
-            Container(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'New PIN',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  SizedBox(height: 13),
-                  Container(
-                    width: 280,
-                    child: PinCodeTextField(
-                        appContext: context,
-                        length: 4,
-                        animationType: AnimationType.fade,
-                        enablePinAutofill: false,
-                        obscuringCharacter: '*',
-                        textStyle: TextStyle(
-                          fontSize: 20,
-                          color: Color(0xFF004E92),
-                          fontWeight: FontWeight.w500,
-                        ),
-                        pinTheme: PinTheme(
-                            shape: PinCodeFieldShape.box,
-                            borderWidth: 1,
-                            fieldHeight: 60,
-                            fieldWidth: 60,
-                            activeColor: Color(0xFF7BBBE5),
-                            selectedColor: Color(0xFF7BBBE5),
-                            borderRadius: BorderRadius.all(Radius.circular(3))
-                        ),
-                        onChanged: (value) {
-                          if(!mounted)return;
-                          setState(() {
-                            _newPin = value;
-                          });
-                        }
-                    ),
-                  ),
-                  InkWell(
-                    onTap: (){
-
-                    },
-                    child: Text(
-                      'Show',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Color(0xFF1F1F1F),
-                        fontSize: 14,
-                        fontWeight: FontWeight.normal,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 36),
-                ],
-              ),
-            ),
-            Container(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Confirm PIN',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  SizedBox(height: 13),
-                  Container(
-                    width: 280,
-                    child: PinCodeTextField(
-                        appContext: context,
-                        length: 4,
-                        animationType: AnimationType.fade,
-                        enablePinAutofill: false,
-                        obscuringCharacter: '*',
-                        textStyle: TextStyle(
-                          fontSize: 20,
-                          color: Color(0xFF004E92),
-                          fontWeight: FontWeight.w500,
-                        ),
-                        pinTheme: PinTheme(
-                            shape: PinCodeFieldShape.box,
-                            borderWidth: 1,
-                            fieldHeight: 60,
-                            fieldWidth: 60,
-                            activeColor: Color(0xFF7BBBE5),
-                            selectedColor: Color(0xFF7BBBE5),
-                            borderRadius: BorderRadius.all(Radius.circular(3))
-                        ),
-                        onChanged: (value) {
-                          if(!mounted)return;
-                          setState(() {
-                            _confirmPin = value;
-                          });
-                        }
-                    ),
-                  ),
-                  InkWell(
-                    onTap: (){
-
-                    },
-                    child: Text(
-                      'Show',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Color(0xFF1F1F1F),
-                        fontSize: 14,
-                        fontWeight: FontWeight.normal,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 36),
-                ],
-              ),
-            ),
+            _buildSecurityForm(),
             SizedBox(height: 40),
             Center(
               child: Button(
                 onTap: (){
-                  print("save changes");
+                  if(!_showSpinner){
+                    if(_securityFormKey.currentState!.validate()){
+                      if(_currentPin.length == 4 && _newPin.length == 4){
+                        if(_currentPin != _newPin) _changeUserPin();
+                        else print("You cannot use this pin because it is your current PIN");
+                      }
+                    }
+                  }
                 },
                 buttonColor: Color(0xFF00509A),
-                child: Center(
+                child:  _showSpinner ?
+                SizedBox(
+                  height: 17,
+                  width: 17,
+                    child: CircleProgressIndicator(),
+                ) :
+                const Center(
                   child: Text(
                     'Save Changes',
                     textAlign: TextAlign.center,
@@ -479,6 +310,230 @@ class _SettingsState extends State<Settings> {
         ),
       ),
     );
+  }
+
+  /// Form Widget for security details
+  Widget _buildSecurityForm() {
+    return Form(
+      key: _securityFormKey,
+      child: Column(
+        children: [
+          Container(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Current PIN',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+                SizedBox(height: 13),
+                Container(
+                  width: 280,
+                  child: PinCodeTextField(
+                    appContext: context,
+                    length: 4,
+                    animationType: AnimationType.fade,
+                    enablePinAutofill: false,
+                    obscuringCharacter: '*',
+                    textStyle: TextStyle(
+                      fontSize: 20,
+                      color: Color(0xFF004E92),
+                      fontWeight: FontWeight.w500,
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) return 'Enter your 4 digit PIN!';
+                      return null;
+                    },
+                    pinTheme: PinTheme(
+                      shape: PinCodeFieldShape.box,
+                      borderWidth: 1,
+                      fieldHeight: 60,
+                      fieldWidth: 60,
+                      activeColor: Color(0xFF7BBBE5),
+                      selectedColor: Color(0xFF7BBBE5),
+                      borderRadius: BorderRadius.all(Radius.circular(3))
+                    ),
+                    onChanged: (value) {
+                      if(!mounted)return;
+                      setState(() => _currentPin = value);
+                    }
+                  ),
+                ),
+                InkWell(
+                  onTap: (){
+
+                  },
+                  child: Text(
+                    'Show',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color(0xFF1F1F1F),
+                      fontSize: 14,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 36),
+              ],
+            ),
+          ),
+          Container(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'New PIN',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+                SizedBox(height: 13),
+                Container(
+                  width: 280,
+                  child: PinCodeTextField(
+                    appContext: context,
+                    length: 4,
+                    animationType: AnimationType.fade,
+                    enablePinAutofill: false,
+                    obscuringCharacter: '*',
+                    textStyle: TextStyle(
+                      fontSize: 20,
+                      color: Color(0xFF004E92),
+                      fontWeight: FontWeight.w500,
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) return 'Enter your 4 digit PIN!';
+                      return null;
+                    },
+                    pinTheme: PinTheme(
+                      shape: PinCodeFieldShape.box,
+                      borderWidth: 1,
+                      fieldHeight: 60,
+                      fieldWidth: 60,
+                      activeColor: Color(0xFF7BBBE5),
+                      selectedColor: Color(0xFF7BBBE5),
+                      borderRadius: BorderRadius.all(Radius.circular(3))
+                    ),
+                    onChanged: (value) {
+                      if(!mounted)return;
+                      setState(() => _newPin = value);
+                    }
+                  ),
+                ),
+                InkWell(
+                  onTap: (){
+
+                  },
+                  child: Text(
+                    'Show',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color(0xFF1F1F1F),
+                      fontSize: 14,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 36),
+              ],
+            ),
+          ),
+          Container(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Confirm PIN',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+                SizedBox(height: 13),
+                Container(
+                  width: 280,
+                  child: PinCodeTextField(
+                    appContext: context,
+                    length: 4,
+                    animationType: AnimationType.fade,
+                    enablePinAutofill: false,
+                    obscuringCharacter: '*',
+                    textStyle: TextStyle(
+                      fontSize: 20,
+                      color: Color(0xFF004E92),
+                      fontWeight: FontWeight.w500,
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) return 'Enter your 4 digit PIN!';
+                      else if(_newPin != _confirmPin) return 'Re-confirm your PIN';
+                      return null;
+                    },
+                    pinTheme: PinTheme(
+                      shape: PinCodeFieldShape.box,
+                      borderWidth: 1,
+                      fieldHeight: 60,
+                      fieldWidth: 60,
+                      activeColor: Color(0xFF7BBBE5),
+                      selectedColor: Color(0xFF7BBBE5),
+                      borderRadius: BorderRadius.all(Radius.circular(3))
+                    ),
+                    onChanged: (value) {
+                      if(!mounted)return;
+                      setState(() => _confirmPin = value);
+                    }
+                  ),
+                ),
+                InkWell(
+                  onTap: (){
+
+                  },
+                  child: Text(
+                    'Show',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color(0xFF1F1F1F),
+                      fontSize: 14,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 36),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Function to  make api call to [CHANGE_PIN]
+  void _changeUserPin() async{
+    if(!mounted)return;
+    setState(() => _showSpinner = true);
+    var api = UserDataSource();
+    Map<String, String> body = {
+      "currentPin": _currentPin,
+      "newPin": _newPin,
+    };
+    await api.changePin(body).then((message) async{
+      if(!mounted)return;
+      setState(()=> _showSpinner = false);
+      print(message);
+    }).catchError((e){
+      if(!mounted)return;
+      setState(()=> _showSpinner = false);
+      print(e);
+    });
   }
 
 }

@@ -92,4 +92,41 @@ class UserDataSource{
       errorHandler.handleError(e);
     });
   }
+
+  /// A function that sends request to change user pin with [body] as details
+  /// A post request to use the [CHANGE_PIN]
+  /// It returns a [Message]
+  Future<dynamic> changePin(Map<String, String> body) async {
+    Map<String, String>? header;
+    Future<User> user = _futureValue.getCurrentUser();
+    await user.then((value) {
+      if(value.token == null) throw("You're not authorized, log out and log in back and try again!");
+      header = {"Authorization": "Bearer ${value.token}"};
+    });
+    return _netUtil.put(CHANGE_PIN, headers: header, body: body).then((dynamic res) {
+      if (res['error']) throw res['message'];
+      return res['message'];
+    }).catchError((e) {
+      errorHandler.handleError(e);
+    });
+  }
+
+  /// A function that sends request to reset staff [body] as details
+  /// A post request to use the [RESET_PIN]
+  /// It returns a [Message]
+  Future<dynamic> resetStaffPin() async {
+    Map<String, String>? header;
+    Future<User> user = _futureValue.getCurrentUser();
+    await user.then((value) {
+      if(value.token == null) throw("You're not authorized, log out and log in back and try again!");
+      header = {"Authorization": "Bearer ${value.token}"};
+    });
+    print(header);
+    return _netUtil.put(RESET_PIN, headers: header).then((dynamic res) {
+      if (res['error']) throw res['message'];
+      return res['message'];
+    }).catchError((e) {
+      errorHandler.handleError(e);
+    });
+  }
 }

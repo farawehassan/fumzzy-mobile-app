@@ -410,33 +410,33 @@ class _StaffState extends State<Staff> {
                                             Container(
                                               width: 280,
                                               child: PinCodeTextField(
-                                                  appContext: context,
-                                                  length: 4,
-                                                  animationType: AnimationType.fade,
-                                                  enablePinAutofill: false,
-                                                  textStyle: TextStyle(
-                                                    fontSize: 20,
-                                                    color: Color(0xFF004E92),
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                  pinTheme: PinTheme(
-                                                    shape: PinCodeFieldShape.box,
-                                                    borderWidth: 1,
-                                                    fieldHeight: 60,
-                                                    fieldWidth: 60,
-                                                    activeColor: Color(0xFF7BBBE5),
-                                                    selectedColor: Color(0xFF7BBBE5),
-                                                    borderRadius: BorderRadius.all(Radius.circular(3)),
-                                                  ),
-                                                  validator: (value) {
-                                                    if (value!.isEmpty) return 'Enter your 4 digit PIN!';
-                                                    else if(_newPin != _confirmPin) return 'Re-confirm your PIN';
-                                                    return null;
-                                                  },
-                                                  onChanged: (value) {
-                                                    if (!mounted) return;
-                                                    setState(() => _confirmPin = value);
-                                                  }),
+                                                appContext: context,
+                                                length: 4,
+                                                animationType: AnimationType.fade,
+                                                enablePinAutofill: false,
+                                                textStyle: TextStyle(
+                                                  fontSize: 20,
+                                                  color: Color(0xFF004E92),
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                                pinTheme: PinTheme(
+                                                  shape: PinCodeFieldShape.box,
+                                                  borderWidth: 1,
+                                                  fieldHeight: 60,
+                                                  fieldWidth: 60,
+                                                  activeColor: Color(0xFF7BBBE5),
+                                                  selectedColor: Color(0xFF7BBBE5),
+                                                  borderRadius: BorderRadius.all(Radius.circular(3)),
+                                                ),
+                                                validator: (value) {
+                                                  if (value!.isEmpty) return 'Enter your 4 digit PIN!';
+                                                  else if(_newPin != _confirmPin) return 'Re-confirm your PIN';
+                                                  return null;
+                                                },
+                                                onChanged: (value) {
+                                                  if (!mounted) return;
+                                                  setState(() => _confirmPin = value);
+                                                }),
                                             ),
                                             SizedBox(height: 36),
                                           ],
@@ -505,6 +505,7 @@ class _StaffState extends State<Staff> {
     );
   }
 
+  /// Function to call api for [ADD_USER]
   void _addStaff(StateSetter setDialogState) async{
     if(!mounted)return;
     setDialogState(() => _showSpinner = true);
