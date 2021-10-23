@@ -39,6 +39,12 @@ class _SettingsState extends State<Settings> {
 
   bool _showSpinner = false;
 
+  bool _showCurrentPin = true;
+
+  bool _showNewPin = true;
+
+  bool _showConfirmPin = true;
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -340,6 +346,7 @@ class _SettingsState extends State<Settings> {
                     animationType: AnimationType.fade,
                     enablePinAutofill: false,
                     obscuringCharacter: '*',
+                    obscureText: _showCurrentPin,
                     textStyle: TextStyle(
                       fontSize: 20,
                       color: Color(0xFF004E92),
@@ -366,7 +373,9 @@ class _SettingsState extends State<Settings> {
                 ),
                 InkWell(
                   onTap: (){
-
+                    setState(() {
+                      if(_showCurrentPin == true) _showCurrentPin = false;
+                    });
                   },
                   child: Text(
                     'Show',
@@ -404,6 +413,7 @@ class _SettingsState extends State<Settings> {
                     animationType: AnimationType.fade,
                     enablePinAutofill: false,
                     obscuringCharacter: '*',
+                    obscureText: _showNewPin,
                     textStyle: TextStyle(
                       fontSize: 20,
                       color: Color(0xFF004E92),
@@ -430,7 +440,9 @@ class _SettingsState extends State<Settings> {
                 ),
                 InkWell(
                   onTap: (){
-
+                    setState(() {
+                      if(_showNewPin == true) _showNewPin = false;
+                    });
                   },
                   child: Text(
                     'Show',
@@ -468,6 +480,7 @@ class _SettingsState extends State<Settings> {
                     animationType: AnimationType.fade,
                     enablePinAutofill: false,
                     obscuringCharacter: '*',
+                    obscureText: _showConfirmPin,
                     textStyle: TextStyle(
                       fontSize: 20,
                       color: Color(0xFF004E92),
@@ -495,7 +508,9 @@ class _SettingsState extends State<Settings> {
                 ),
                 InkWell(
                   onTap: (){
-
+                    setState(() {
+                      if(_showConfirmPin == true) _showConfirmPin = false;
+                    });
                   },
                   child: Text(
                     'Show',
