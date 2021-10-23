@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:fumzy/components/fade-animation.dart';
 import 'package:fumzy/utils/functions.dart';
 
 class InventoryCard extends StatelessWidget {
@@ -56,12 +57,15 @@ class InventoryCard extends StatelessWidget {
               ],
             ),
             SizedBox(height: 14),
-            Text(
-              Functions.money(totalPrice!, 'N'),
-              style: TextStyle(
-                fontSize: 23,
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
+            FadeAnimation(
+              delay: 1.3,
+              child: Text(
+                Functions.money(totalPrice!, 'N'),
+                style: TextStyle(
+                  fontSize: 23,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
           ],

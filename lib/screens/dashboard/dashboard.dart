@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:fumzy/components/app-bar.dart';
+import 'package:fumzy/components/fade-animation.dart';
 import 'package:fumzy/components/inventory-card.dart';
 import 'package:fumzy/components/reusable-card.dart';
 import 'package:fumzy/components/sales-card.dart';
@@ -187,12 +188,15 @@ class _DashboardState extends State<Dashboard> {
                                               ],
                                             ),
                                             SizedBox(height: 14),
-                                            Text(
-                                              Functions.money(110000, 'N'),
-                                              style: TextStyle(
-                                                color: Color(0xFF171725),
-                                                fontWeight: FontWeight.w700,
-                                                fontSize: 20,
+                                            FadeAnimation(
+                                              delay: 1.5,
+                                              child: Text(
+                                                Functions.money(110000, 'N'),
+                                                style: TextStyle(
+                                                  color: Color(0xFF171725),
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize: 20,
+                                                ),
                                               ),
                                             ),
                                           ],
@@ -218,12 +222,15 @@ class _DashboardState extends State<Dashboard> {
                                               ),
                                             ),
                                             SizedBox(height: 14),
-                                            Text(
-                                              '20',
-                                              style: TextStyle(
-                                                color: Color(0xFF171725),
-                                                fontWeight: FontWeight.w700,
-                                                fontSize: 20,
+                                            FadeAnimation(
+                                              delay: 1.5,
+                                              child: Text(
+                                                '20',
+                                                style: TextStyle(
+                                                  color: Color(0xFF171725),
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize: 20,
+                                                ),
                                               ),
                                             ),
                                           ],
@@ -289,12 +296,15 @@ class _DashboardState extends State<Dashboard> {
                                               ],
                                             ),
                                             SizedBox(height: 14),
-                                            Text(
-                                              Functions.money(75000, 'N'),
-                                              style: TextStyle(
-                                                color: Color(0xFF171725),
-                                                fontWeight: FontWeight.w700,
-                                                fontSize: 20,
+                                            FadeAnimation(
+                                              delay: 1.5,
+                                              child: Text(
+                                                Functions.money(75000, 'N'),
+                                                style: TextStyle(
+                                                  color: Color(0xFF171725),
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize: 20,
+                                                ),
                                               ),
                                             ),
                                           ],
@@ -320,12 +330,15 @@ class _DashboardState extends State<Dashboard> {
                                               ),
                                             ),
                                             SizedBox(height: 14),
-                                            Text(
-                                              '12',
-                                              style: TextStyle(
-                                                color: Color(0xFF171725),
-                                                fontWeight: FontWeight.w700,
-                                                fontSize: 20,
+                                            FadeAnimation(
+                                              delay: 1.5,
+                                              child: Text(
+                                                '12',
+                                                style: TextStyle(
+                                                  color: Color(0xFF171725),
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize: 20,
+                                                ),
                                               ),
                                             ),
                                           ],
