@@ -1,12 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fumzy/bloc/future-values.dart';
 import 'package:fumzy/components/app-bar.dart';
 import 'package:fumzy/components/button.dart';
 import 'package:fumzy/components/circle-indicator.dart';
+import 'package:fumzy/model/user.dart';
 import 'package:fumzy/networking/user-datasource.dart';
 import 'package:fumzy/screens/dashboard/drawer.dart';
 import 'package:fumzy/utils/constant-styles.dart';
+import 'package:fumzy/utils/functions.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
 class Settings extends StatefulWidget {
@@ -18,6 +21,9 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
+
+  /// Instantiating a class of the [FutureValues]
+  var futureValue = FutureValues();
 
   /// A [GlobalKey] to hold the form state of account form widget for form validation
   final _accountFormKey = GlobalKey<FormState>();
@@ -44,6 +50,26 @@ class _SettingsState extends State<Settings> {
   bool _showNewPin = true;
 
   bool _showConfirmPin = true;
+
+  /// This is a variable that holds the user model
+  User? _user;
+
+  /// Function to fetch the user's details and set their name and phone number
+  /// to [_nameController] and [_phoneController]
+  void _getCurrentUser() async {
+    await futureValue.getCurrentUser().then((User value) async {
+      setState(() {
+        _nameController.text = value.name!;
+        _phoneController.text = value.phone!;
+      });
+    }).catchError((e) => print(e));
+  }
+
+  @override
+  void initState() {
+    _getCurrentUser();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -260,13 +286,16 @@ class _SettingsState extends State<Settings> {
     await api.editUser(body).then((message) async{
       if(!mounted)return;
       setState(()=> _showSpinner = false);
-      print(message);
+      Functions.showSuccessMessage('Successfully updated user details');
+      await futureValue.updateUser();
     }).catchError((e){
       if(!mounted)return;
       setState(()=> _showSpinner = false);
       print(e);
+      Functions.showErrorMessage(e);
     });
   }
+
 
   /// View for security section
   Widget _securitySection(BoxConstraints constraints){
@@ -543,11 +572,12 @@ class _SettingsState extends State<Settings> {
     await api.changePin(body).then((message) async{
       if(!mounted)return;
       setState(()=> _showSpinner = false);
-      print(message);
+      Functions.showSuccessMessage('Successfully updated user\'s pin');
     }).catchError((e){
       if(!mounted)return;
       setState(()=> _showSpinner = false);
       print(e);
+      Functions.showErrorMessage(e);
     });
   }
 

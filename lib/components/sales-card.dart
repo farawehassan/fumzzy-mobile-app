@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fumzy/components/fade-animation.dart';
 import 'package:fumzy/utils/functions.dart';
 import 'package:fumzy/utils/size-config.dart';
 import 'reusable-card.dart';
@@ -32,12 +33,15 @@ class TotalSalesCard extends StatelessWidget {
               ),
             ),
             SizedBox(height: 12),
-            Text(
-              Functions.money(totalPrice!, 'N'),
-              style: TextStyle(
-                fontSize: 20,
-                color: Color(0xFF171725),
-                fontWeight: FontWeight.bold,
+            FadeAnimation(
+              delay: 1.3,
+              child: Text(
+                Functions.money(totalPrice!, 'N'),
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Color(0xFF171725),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],

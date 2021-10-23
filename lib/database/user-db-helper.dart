@@ -17,7 +17,7 @@ class DatabaseHelper {
   static late Database _db;
 
   /// A string value to hold the name of the table in the database
-  final String USER_TABLE = "User";
+  final String USER_TABLE = 'User';
 
   /// A function to get the database [_db] if it exists or wait to initialize
   /// a new database by calling [initDb()] and return [_db]
@@ -32,7 +32,7 @@ class DatabaseHelper {
   /// [_onCreate()] function to create its table and fields
   initDb() async {
     io.Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentsDirectory.path, "user.db");
+    String path = join(documentsDirectory.path, 'user.db');
     var theDb = await openDatabase(path, version: 1, onCreate: _onCreate);
     return theDb;
   }
@@ -49,7 +49,7 @@ class DatabaseHelper {
         "createdAt TEXT,"
         "updatedAt TEXT,"
         "token TEXT)");
-    print("Created tables");
+    print('Created tables');
   }
 
   /// This function insert user's details into the database records
@@ -72,7 +72,7 @@ class DatabaseHelper {
     var dbConnection = await db;
     List<Map<String, dynamic>> users = await dbConnection.rawQuery('SELECT * FROM $USER_TABLE');
     if (users.isNotEmpty) return User.fromJson(users[0]);
-    throw "No user";
+    throw 'No user';
   }
 
   /// This function deletes user's details from the database records

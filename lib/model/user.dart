@@ -39,25 +39,25 @@ class User {
 
   /// Function to map user's details from a JSON object
   factory User.fromJson(Map<String, dynamic> json) => User(
-    id: json["id"],
-    name: json["name"],
-    phone: json["phone"],
-    type: json["type"],
-    status: json["status"],
-    createdAt: DateTime.parse(json["createdAt"]),
-    updatedAt: DateTime.parse(json["updatedAt"]),
-    token: json["token"],
+    id: json['id'],
+    name: json['name'],
+    phone: json['phone'],
+    type: json['type'],
+    status: json['status'],
+    createdAt: DateTime.parse(json['createdAt']),
+    updatedAt: DateTime.parse(json['updatedAt']),
+    token: json['token'],
   );
 
   /// Function to map user's details to a [Map<String, dynamic>] object
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "name": name,
-    "phone": phone,
-    "type": type,
-    "status": status,
-    "createdAt": createdAt!.toIso8601String(),
-    "updatedAt": updatedAt!.toIso8601String(),
-    "token": token,
+    'id': id,
+    'name': name,
+    'phone': phone,
+    'type': type,
+    'status': status,
+    'createdAt': createdAt!.toIso8601String(),
+    'updatedAt': updatedAt!.toIso8601String(),
+    'token': token,
   };
 }

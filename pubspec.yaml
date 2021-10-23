@@ -12,7 +12,6 @@ dependencies:
   flutter:
     sdk: flutter
 
-
   cupertino_icons: ^1.0.3
   pin_code_fields: ^7.3.0
   flutter_iconly: ^1.0.2
@@ -23,6 +22,9 @@ dependencies:
   http: ^0.13.3
   path_provider: ^2.0.2
   flutter_typeahead: ^3.2.0
+  simple_animations: ^4.0.1
+  fluttertoast: ^8.0.8
+  shimmer: ^2.0.0
 
 dev_dependencies:
   flutter_test:

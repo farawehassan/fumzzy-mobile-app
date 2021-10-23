@@ -1,11 +1,35 @@
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 
 class Functions{
 
   /// Convert a double [value] to a currency
   static String money(double value, String currency) {
-    final nf = NumberFormat("#,##0.00", "en_US");
+    final nf = NumberFormat('#\,##0.00', 'en_US');
     return '${currencyMap[currency]}${nf.format(value)}';
+  }
+
+  static void showErrorMessage(String message){
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: Color(0xFFF64932),
+      textColor: Color(0xFFFFFFFF),
+      fontSize: 16.0,
+    );
+  }
+
+  static void showSuccessMessage(String message){
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: Color(0xFF00AF27),
+      textColor: Color(0xFFFFFFFF),
+      fontSize: 16.0,
+    );
   }
 
 }

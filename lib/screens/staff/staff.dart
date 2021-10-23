@@ -6,6 +6,7 @@ import 'package:fumzy/components/button.dart';
 import 'package:fumzy/components/circle-indicator.dart';
 import 'package:fumzy/networking/user-datasource.dart';
 import 'package:fumzy/screens/dashboard/drawer.dart';
+import 'package:fumzy/utils/functions.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:fumzy/utils/constant-styles.dart';
 import 'pop-up.dart';
@@ -526,8 +527,10 @@ class _StaffState extends State<Staff> {
       if(!mounted)return;
       setDialogState(()=> _showSpinner = false);
       print(e);
+      Functions.showErrorMessage(e);
     });
   }
+
 }
 
 class StaffTableContents extends StatelessWidget {

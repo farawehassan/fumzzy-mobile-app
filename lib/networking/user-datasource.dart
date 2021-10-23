@@ -46,28 +46,10 @@ class UserDataSource{
     late Map<String, String> header;
     Future<User> user = _futureValue.getCurrentUser();
     await user.then((value) {
-      if(value.token == null) throw("You're not authorized, log out and log in back and try again!");
-      header = {"Authorization": "Bearer ${value.token}"};
+      if(value.token == null) throw('You\'re not authorized, log out and log in back and try again!');
+      header = {'Authorization': 'Bearer ${value.token}'};
     });
     return _netUtil.post(CREATE_EXPENSES, headers: header, body: body).then((dynamic res) {
-      if (res['error']) throw res['message'];
-      return res['message'];
-    }).catchError((e) {
-      errorHandler.handleError(e);
-    });
-  }
-
-  /// A function that sends request for adding a category with [body] as details
-  /// A post request to use the [ADD_CATEGORY]
-  /// It returns a [Message]
-  Future<dynamic> createCategory(Map<String, String> body) async {
-    Map<String, String>? header;
-    Future<User> user = _futureValue.getCurrentUser();
-    await user.then((value) {
-      if(value.token == null) throw("You're not authorized, log out and log in back and try again!");
-      header = {"Authorization": "Bearer ${value.token}"};
-    });
-    return _netUtil.post(CREATE_CATEGORY, headers: header, body: body).then((dynamic res) {
       if (res['error']) throw res['message'];
       return res['message'];
     }).catchError((e) {
@@ -82,13 +64,34 @@ class UserDataSource{
     Map<String, String>? header;
     Future<User> user = _futureValue.getCurrentUser();
     await user.then((value) {
-      if(value.token == null) throw("You're not authorized, log out and log in back and try again!");
-      header = {"Authorization": "Bearer ${value.token}"};
+      if(value.token == null) throw('You\'re not authorized, log out and log in back and try again!');
+      header = {'Authorization': 'Bearer ${value.token}'};
     });
     return _netUtil.put(EDIT_USER, headers: header, body: body).then((dynamic res) {
       if (res['error']) throw res['message'];
       return res['message'];
     }).catchError((e) {
+      errorHandler.handleError(e);
+    });
+  }
+
+  /// A function to get current user details from the database
+  /// into a model of [User] GET.
+  Future<User> getCurrentUser() async {
+    Map<String, String>? header;
+    String? token;
+    Future<User> user = _futureValue.getCurrentUser();
+    await user.then((value) {
+      if(value.token == null) throw('You\'re not authorized, log out and log in back and try again!');
+      token = value.token!;
+      header = {'Authorization': 'Bearer $token'};
+    });
+    return _netUtil.get(GET_CURRENT_USER, headers: header).then((dynamic res) {
+      if(res['error']) throw res['message'];
+      User user = User.fromJson(res['data']);
+      user.token = token;
+      return user;
+    }).catchError((e){
       errorHandler.handleError(e);
     });
   }
@@ -100,8 +103,8 @@ class UserDataSource{
     Map<String, String>? header;
     Future<User> user = _futureValue.getCurrentUser();
     await user.then((value) {
-      if(value.token == null) throw("You're not authorized, log out and log in back and try again!");
-      header = {"Authorization": "Bearer ${value.token}"};
+      if(value.token == null) throw('You\'re not authorized, log out and log in back and try again!');
+      header = {'Authorization': 'Bearer ${value.token}'};
     });
     return _netUtil.put(CHANGE_PIN, headers: header, body: body).then((dynamic res) {
       if (res['error']) throw res['message'];
@@ -118,8 +121,8 @@ class UserDataSource{
     Map<String, String>? header;
     Future<User> user = _futureValue.getCurrentUser();
     await user.then((value) {
-      if(value.token == null) throw("You're not authorized, log out and log in back and try again!");
-      header = {"Authorization": "Bearer ${value.token}"};
+      if(value.token == null) throw('You\'re not authorized, log out and log in back and try again!');
+      header = {'Authorization': 'Bearer ${value.token}'};
     });
     print(header);
     return _netUtil.put(RESET_PIN, headers: header).then((dynamic res) {

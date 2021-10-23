@@ -24,7 +24,7 @@ class NetworkHelper {
             .then((http.Response response) {
           final String res = response.body;
           final int statusCode = response.statusCode;
-          if (statusCode < 200 || statusCode > 400) throw ("Error occurred");
+          if (statusCode < 200 || statusCode > 400) throw ('Error occurred');
           return _decoder.convert(res);
         });
     } catch (e) {
@@ -70,7 +70,7 @@ class NetworkHelper {
       final response = await http.Response.fromStream(streamedResponse);
       final dynamic res = json.decode(response.body);
       final int statusCode = response.statusCode;
-      if (statusCode < 200 || statusCode > 400) throw res["message"];
+      if (statusCode < 200 || statusCode > 400) throw res['message'];
       return res;
     } catch (e) {
       print(e);

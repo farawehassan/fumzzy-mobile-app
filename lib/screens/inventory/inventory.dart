@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:fumzy/bloc/future-values.dart';
 import 'package:fumzy/components/app-bar.dart';
+import 'package:fumzy/components/arrow-button.dart';
 import 'package:fumzy/components/button.dart';
 import 'package:fumzy/components/circle-indicator.dart';
-import 'package:fumzy/networking/user-datasource.dart';
+import 'package:fumzy/networking/product-datasource.dart';
+import 'package:fumzy/model/category.dart';
+import 'package:fumzy/model/product.dart';
 import 'package:fumzy/screens/dashboard/drawer.dart';
 import 'package:fumzy/utils/constant-styles.dart';
-import 'product-categories.dart';
-import 'products.dart';
+import 'package:fumzy/utils/functions.dart';
+import 'package:fumzy/utils/size-config.dart';
+import 'package:shimmer/shimmer.dart';
+import 'delete-product.dart';
 
 class Inventory extends StatefulWidget {
 
@@ -20,13 +26,322 @@ class Inventory extends StatefulWidget {
 
 class _InventoryState extends State<Inventory> {
 
-  TextEditingController _search = TextEditingController();
+  /// Instantiating a class of the [FutureValues]
+  var futureValue = FutureValues();
+
+  /// GlobalKey of a my RefreshIndicatorState to refresh my list items
+  final GlobalKey<RefreshIndicatorState> _refreshProductKey = GlobalKey<RefreshIndicatorState>();
+
+  /// GlobalKey of a my RefreshIndicatorState to refresh my list items
+  final GlobalKey<RefreshIndicatorState> _refreshCategoryKey = GlobalKey<RefreshIndicatorState>();
 
   final _formKey = GlobalKey<FormState>();
 
   TextEditingController _categoryController = TextEditingController();
 
   bool _showSpinner = false;
+
+  TextEditingController _search = TextEditingController();
+
+  Map<String, Color> _stockColor = {
+    'Short Stock': Color(0xFFF28301),
+    'In Stock': Color(0xFF00AF27),
+    'Out of Stock': Color(0xFFF64932),
+    '': Colors.transparent
+  };
+
+  /** Product aspect ***/
+
+  /// A List to hold the all the products
+  List<Product> _products = [];
+
+  /// A List to hold the all the filtered products
+  List<Product> _filteredProducts = [];
+
+  /// An Integer variable to hold the length of [_products]
+  int? _productsLength;
+
+  int? _totalProductCount;
+
+  int _productPageSize = 1;
+
+  bool _showProductSpinner = false;
+
+  void _getAllProducts({bool? refresh}) async {
+    Future<Map<String, dynamic>> products = futureValue.getAllProducts(
+        refresh: refresh, page: _productPageSize, limit: 50
+    );
+    await products.then((value) {
+      if(!mounted)return;
+      setState(() {
+        _products.addAll(value['items']);
+        _filteredProducts = _products;
+        _productsLength = _filteredProducts.length;
+        _totalProductCount = value['totalCount'];
+      });
+    }).catchError((e){
+      print(e);
+      Functions.showErrorMessage(e);
+      if(!mounted)return;
+      //_getAllProducts(refresh: false);
+    });
+  }
+
+  Future _loadMoreBookings() async {
+    setState(() { _productPageSize += 1; });
+    Future<Map<String, dynamic>> deliveries = futureValue.getAllProducts(page: _productPageSize, limit: 50);
+    await deliveries.then((value) {
+      if (!mounted) return;
+      setState(() {
+        _products.addAll(value['items']);
+        _filteredProducts = _products;
+        _productsLength = _products.length;
+        _totalProductCount = value['totalCount'];
+        _showProductSpinner = false;
+      });
+    }).catchError((e){
+      print(e);
+      if(!mounted)return;
+      Functions.showErrorMessage(e);
+    });
+  }
+
+  /// A function to build the list of all the products
+  Widget _buildProductList() {
+    List<DataRow> itemRow = [];
+    if(_filteredProducts.length > 0 && _filteredProducts.isNotEmpty){
+      for (int i = 0; i < _filteredProducts.length; i++){
+        Product product = _filteredProducts[i];
+        String stock = '';
+        if(product.currentQty! > 10) stock = 'In Stock';
+        else if(product.currentQty! > 0) stock = 'Short Stock';
+        else stock = 'Out of Stock';
+        itemRow.add(
+          DataRow(cells: [
+            DataCell(Text(product.productName!)),
+            DataCell(Text(product.category!.name!)),
+            DataCell(Text(product.currentQty.toString())),
+            DataCell(Text(Functions.money(product.costPrice!, 'N'))),
+            DataCell(Text(Functions.money(product.sellingPrice!, 'N'))),
+            DataCell(Text(stock, style: TextStyle(color: _stockColor[stock]))),
+            DataCell(GestureDetector(
+              onTap: () {
+                // Navigator.pushNamed(context, InventoryDetail.id);
+              },
+              child: TableArrowButton(),
+            )),
+          ]),
+        );
+      }
+      return NotificationListener<ScrollNotification>(
+        onNotification: (ScrollNotification scrollInfo) {
+          if (!_showProductSpinner && scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
+            if(_totalProductCount! > (_productPageSize * 50)){
+              setState(() { _showProductSpinner = true; });
+              _loadMoreBookings();
+            }
+          }
+          return true;
+        },
+        child: RefreshIndicator(
+          onRefresh: _refreshProducts,
+          key: _refreshProductKey,
+          color: Color(0xFF004E92),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    physics: BouncingScrollPhysics(),
+                    child: DataTable(
+                      headingTextStyle: TextStyle(
+                        color: Color(0xFF75759E),
+                        fontSize: 14,
+                        fontWeight: FontWeight.normal,
+                      ),
+                      dataTextStyle: TextStyle(
+                        color: Color(0xFF1F1F1F),
+                        fontSize: 14,
+                        fontWeight: FontWeight.normal,
+                      ),
+                      columnSpacing: 15.0,
+                      dataRowHeight: 65.0,
+                      columns: const [
+                        DataColumn(label: Text('Product Name')),
+                        DataColumn(label: Text('Category')),
+                        DataColumn(label: Text('Quantity')),
+                        DataColumn(label: Text('Cost Price')),
+                        DataColumn(label: Text('Selling Price')),
+                        DataColumn(label: Text('Status')),
+                        DataColumn(label: Text('')),
+                      ],
+                      rows: itemRow,
+                    )
+                ),
+                const SizedBox(height: 80),
+                _showProductSpinner
+                    ? Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(24.0),
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0A459F)),
+                    ),
+                  ),
+                )
+                    : Container(),
+                const SizedBox(height: 100),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+    else if(_productsLength == 0){
+      return Container();
+    }
+    return _shimmerLoader();
+  }
+
+  /// Function to refresh list of products from page 1 similar to [_getAllProducts()]
+  Future<Null> _refreshProducts() {
+    Future<Map<String, dynamic>> products = futureValue.getAllProducts(page: 1, limit: 50);
+    return products.then((value) {
+      _productsLength = null;
+      _products.clear();
+      _filteredProducts.clear();
+      _totalProductCount = null;
+      if(!mounted)return;
+      setState(() {
+        _products.addAll(value['items']);
+        _filteredProducts = _products;
+        _productsLength = _products.length;
+        _totalProductCount = value['totalCount'];
+      });
+    }).catchError((e){
+      print(e);
+      if(!mounted)return;
+      Functions.showErrorMessage(e);
+    });
+  }
+
+  /** Product Category aspect ***/
+
+  /// A List to hold the all the product categories
+  List<Category> _categories = [];
+
+  /// An Integer variable to hold the length of [_categories]
+  int? _categoriesLength;
+
+  void _getAllCategories() async {
+    Future<List<Category>> categories = futureValue.getAllCategories();
+    await categories.then((value) {
+      if(!mounted)return;
+      setState(() {
+        _categories.addAll(value);
+        _categoriesLength = _categories.length;
+      });
+    }).catchError((e){
+      print(e);
+      Functions.showErrorMessage(e);
+    });
+  }
+
+  /// A function to build the list of all the categories
+  Widget _buildCategoryList() {
+    List<DataRow> itemRow = [];
+    if(_categories.length > 0 && _categories.isNotEmpty){
+      for (int i = 0; i < _categories.length; i++){
+        Category category = _categories[i];
+        itemRow.add(
+          DataRow(cells: [
+            DataCell(Text(category.name!)),
+            DataCell(Text('500')),
+            DataCell(ReusableDeleteText()),
+          ]),
+        );
+      }
+      return RefreshIndicator(
+        onRefresh: _refreshCategories,
+        key: _refreshCategoryKey,
+        color: Color(0xFF004E92),
+        child: DataTable(
+          headingTextStyle: TextStyle(
+            color: Color(0xFF75759E),
+            fontSize: 14,
+            fontWeight: FontWeight.normal,
+          ),
+          dataTextStyle: TextStyle(
+            color: Color(0xFF1F1F1F),
+            fontSize: 14,
+            fontWeight: FontWeight.normal,
+          ),
+          columnSpacing: 15.0,
+          dataRowHeight: 65.0,
+          columns: [
+            DataColumn(label: Text('Category')),
+            DataColumn(label: Text('Products')),
+            DataColumn(label: Text('')),
+          ],
+          rows: itemRow,
+        ),
+      );
+    }
+    else if(_categoriesLength == 0){
+      return Container();
+    }
+    return _shimmerLoader();
+  }
+
+  /// Function to refresh list of categories similar to [_getAllCategories()]
+  Future<Null> _refreshCategories() {
+    Future<List<Category>> categories = futureValue.getAllCategories();
+    return categories.then((value) {
+      _categoriesLength = null;
+      _categories.clear();
+      if(!mounted)return;
+      setState(() {
+        _categories.addAll(value);
+        _categoriesLength = _categories.length;
+      });
+    }).catchError((e){
+      print(e);
+      if(!mounted)return;
+      Functions.showErrorMessage(e);
+    });
+  }
+
+  Widget _shimmerLoader(){
+    List<Widget> containers = [];
+    for(int i = 0; i < 20; i++){
+      containers.add(
+          Container(
+              width: SizeConfig.screenWidth,
+              height: 40,
+              margin: EdgeInsets.only(bottom: 10),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(3)),
+                  color: Color(0xFFF6F6F6)
+              )
+          )
+      );
+    }
+    return SingleChildScrollView(
+      physics: BouncingScrollPhysics(),
+      child: Shimmer.fromColors(
+          baseColor: Colors.grey[300]!,
+          highlightColor: Colors.grey[100]!,
+          child: Column(children: containers)
+      ),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getAllProducts(refresh: true);
+    _getAllCategories();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -149,7 +464,7 @@ class _InventoryState extends State<Inventory> {
                         ), //search
                         InkWell(
                           onTap: () {
-                            print("filter");
+                            print('filter');
                           },
                           child: Container(
                             width: 110,
@@ -197,18 +512,8 @@ class _InventoryState extends State<Inventory> {
                         indicatorColor: Color(0xFF004E92),
                         indicatorWeight: 3,
                         tabs: [
-                          Tab(
-                            child: Text(
-                              'Products',
-                              style: kTabBarTextStyle,
-                            ),
-                          ),
-                          Tab(
-                            child: Text(
-                              'Product Categories',
-                              style: kTabBarTextStyle,
-                            ),
-                          ),
+                          Tab(child: Text( 'Products', style: kTabBarTextStyle)),
+                          Tab(child: Text('Product Categories', style: kTabBarTextStyle)),
                         ],
                       ),
                     ),
@@ -217,16 +522,57 @@ class _InventoryState extends State<Inventory> {
                   Expanded(
                     child: TabBarView(
                       children: [
-                        Products(),
-                        ProductCategories(),
+                        _productView(),
+                        _productCategoriesView(),
                       ],
                     ),
-                  ),
+                  )
                 ],
               ),
             ),
           ),
         )),
+      ),
+    );
+  }
+
+  Widget _productView(){
+    return  Container(
+        decoration: kTableContainer,
+        child: _buildProductList()
+    );
+  }
+
+  Widget _productCategoriesView(){
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+              decoration: kTableContainer,
+              child: _buildCategoryList()
+          ),
+          SizedBox(height: 40),
+          Button(
+            onTap: (){
+              print('save changes');
+            },
+            buttonColor: Color(0xFF00509A),
+            width: 160,
+            child: Center(
+              child: Text(
+                'Save Changes',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color(0xFFFFFFFF),
+                  fontSize: 14,
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 80),
+        ],
       ),
     );
   }
@@ -418,25 +764,25 @@ class _InventoryState extends State<Inventory> {
     );
   }
 
-  ///function to make api call to [CREATE_EXPENSE]
+  /// function to make api call to [createCategory]
   void _createCategory(StateSetter setDialogState) async{
     if(!mounted)return;
     setDialogState(() => _showSpinner = true);
-    var api = UserDataSource();
-    Map<String, String> body = {
-      "name": _categoryController.text,
-    };
+    var api = ProductDataSource();
+    Map<String, String> body = { 'name': _categoryController.text };
     await api.createCategory(body).then((message) async{
       if(!mounted)return;
       setDialogState((){
         _showSpinner = false;
         Navigator.pop(context);
       });
-      print(message);
+      Functions.showSuccessMessage('Successfully added category');
+      _refreshCategories();
     }).catchError((e){
       if(!mounted)return;
       setDialogState(()=> _showSpinner = false);
       print(e);
+      Functions.showErrorMessage(e);
     });
   }
 

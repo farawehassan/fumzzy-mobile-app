@@ -140,7 +140,7 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                         onTap: () {
                           Navigator.pop(context);
                           if(widget.title != 'DASHBOARD'){
-                            Navigator.pushNamed(context, Dashboard.id);
+                            Navigator.pushReplacementNamed(context, Dashboard.id);
                           }
                         },
                       ),
@@ -162,7 +162,7 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                         onTap: () {
                           Navigator.pop(context);
                           if(widget.title != 'TRANSACTIONS'){
-                            Navigator.pushNamed(context, Transactions.id);
+                            Navigator.pushReplacementNamed(context, Transactions.id);
                           }
                         },
                       ),
@@ -184,7 +184,7 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                         onTap: () {
                           Navigator.pop(context);
                           if(widget.title != 'INVENTORY'){
-                            Navigator.pushNamed(context, Inventory.id);
+                            Navigator.pushReplacementNamed(context, Inventory.id);
                           }
                         },
                       ),
@@ -206,7 +206,7 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                         onTap: () {
                           Navigator.pop(context);
                           if(widget.title != 'INVOICES'){
-                            Navigator.pushNamed(context, Invoices.id);
+                            Navigator.pushReplacementNamed(context, Invoices.id);
                           }
                         },
                       ),
@@ -228,7 +228,7 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                         onTap: () {
                           Navigator.pop(context);
                           if (widget.title != 'CUSTOMERS'){
-                            Navigator.pushNamed(context, Customers.id);
+                            Navigator.pushReplacementNamed(context, Customers.id);
                           }
                         },
                       ),
@@ -250,7 +250,7 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                         onTap: () {
                           Navigator.pop(context);
                           if(widget.title != 'CREDITORS'){
-                            Navigator.pushNamed(context, Creditors.id);
+                            Navigator.pushReplacementNamed(context, Creditors.id);
                           }
                         },
                       ),
@@ -272,7 +272,7 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                         onTap: () {
                           Navigator.pop(context);
                           if(widget.title != 'NOTIFICATIONS'){
-                            Navigator.pushNamed(context, Notifications.id);
+                            Navigator.pushReplacementNamed(context, Notifications.id);
                           }
                         },
                       ),
@@ -294,7 +294,7 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                         onTap: () {
                           Navigator.pop(context);
                           if(widget.title != 'STAFFS'){
-                            Navigator.pushNamed(context, Staff.id);
+                            Navigator.pushReplacementNamed(context, Staff.id);
                           }
                         },
                       ),
@@ -316,7 +316,7 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                         onTap: () {
                           Navigator.pop(context);
                           if(widget.title != 'SETTINGS'){
-                            Navigator.pushNamed(context, Settings.id);
+                            Navigator.pushReplacementNamed(context, Settings.id);
                           }
                         },
                       ),
