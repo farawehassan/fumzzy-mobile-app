@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:fumzy/database/user-db-helper.dart';
 import 'package:fumzy/model/category.dart';
+import 'package:fumzy/model/product.dart';
 import 'package:fumzy/model/user.dart';
 import 'package:fumzy/networking/product-datasource.dart';
 import 'package:fumzy/networking/user-datasource.dart';
@@ -27,12 +28,21 @@ class FutureValues{
     });
   }
 
+  /// A function that fetches all purchases in the database with the help of
+  /// [ProductDataSource] - paginated
+  /// It returns a Map of [<String, dynamic>]
+  Future<Map<String, dynamic>> getAllPurchasesPaginated({bool? refresh, int? page, limit}) async{
+    var data = ProductDataSource();
+    Future<Map<String, dynamic>> purchases = data.getAllPurchasesPaginated(refresh: refresh, page: page, limit: limit);
+    return purchases;
+  }
+
   /// A function that fetches all products in the database with the help of
   /// [ProductDataSource]
-  /// It returns a Map of [<String, dynamic>]
-  Future<Map<String, dynamic>> getAllProducts({bool? refresh, int? page, limit}) async{
+  /// It returns list of model [Product]
+  Future<List<Product>> getAllProducts({bool? refresh}) async{
     var data = ProductDataSource();
-    Future<Map<String, dynamic>> products = data.getAllProducts(refresh: refresh, page: page, limit: limit);
+    Future<List<Product>> products = data.getAllProducts(refresh: refresh);
     return products;
   }
 

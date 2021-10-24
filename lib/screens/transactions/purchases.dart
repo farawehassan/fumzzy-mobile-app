@@ -4,6 +4,7 @@ import 'package:fumzy/utils/constant-styles.dart';
 import 'purchase-info.dart';
 
 class Purchases extends StatefulWidget {
+
   const Purchases({Key? key}) : super(key: key);
 
   @override

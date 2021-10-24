@@ -32,6 +32,24 @@ class Functions{
     );
   }
 
+  /// Converting [dateTime] to return a formatted time
+  /// of weekday, day, month and year
+  static String getFormattedDate(DateTime dateTime) {
+    return DateFormat('EEEE, d MMMM, y').format(dateTime).toString();
+  }
+
+  /// Converting [dateTime] to return a formatted time
+  /// hour with am or pm
+  static String getFormattedTime(DateTime dateTime) {
+    return DateFormat('h:mm a').format(dateTime).toString();
+  }
+
+  /// Converting [dateTime] to return a formatted time
+  /// of day, month, hour with am or pm
+  static String getFormattedDateTime(DateTime dateTime) { // 23, May\n12:130pm
+    return DateFormat('d, MMM\nh:mm a').format(dateTime).toString();
+  }
+
 }
 
 const Map currencyMap = {

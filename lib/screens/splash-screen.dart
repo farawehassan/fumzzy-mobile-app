@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fumzy/utils/size-config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'dashboard/dashboard.dart';
@@ -44,6 +45,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig().init(context);
     return SafeArea(
       top: false,
       bottom: false,

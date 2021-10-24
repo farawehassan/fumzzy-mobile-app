@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:fumzy/bloc/future-values.dart';
 import 'package:fumzy/model/category.dart';
 import 'package:fumzy/model/product.dart';
+import 'package:fumzy/model/purchases.dart';
 import 'package:fumzy/model/user.dart';
 import 'package:path_provider/path_provider.dart';
 import 'endpoints.dart';
@@ -22,7 +23,7 @@ class ProductDataSource{
 
   /// A function that fetches all products in the database GET
   /// It returns a Map of [<String, dynamic>]
-  Future<Map<String, dynamic>> getAllProducts({bool? refresh, int? page, int? limit}) async {
+  Future<Map<String, dynamic>> getAllPurchasesPaginated({bool? refresh, int? page, int? limit}) async {
     Map<String, dynamic> result = {};
     String fileName = 'products.json';
     var dir = await getTemporaryDirectory();
@@ -30,12 +31,12 @@ class ProductDataSource{
     if(refresh == false && file.existsSync()){
       final fileData = file.readAsStringSync();
       final res = jsonDecode(fileData);
-      List<Product> allProducts = [];
+      List<Purchase> allPurchases = [];
       var rest = res['data']['items'] as List;
-      allProducts = rest.map<Product>((json) => Product.fromJson(json)).toList();
+      allPurchases = rest.map<Purchase>((json) => Purchase.fromJson(json)).toList();
       result['totalCount'] = res['data']['totalCount'];
       result['page'] = res['data']['page'];
-      result['items'] = allProducts;
+      result['items'] = allPurchases;
       return result;
     }
     else {
@@ -45,17 +46,50 @@ class ProductDataSource{
         if(value.token == null) throw('You\'re not authorized, log out and log in back and try again!');
         header = {'Authorization': 'Bearer ${value.token}'};
       });
-      String GET_ALL_PRODUCTS_URL = GET_ALL_PRODUCTS + '?page=$page&limit=$limit';
-      return _netUtil.get(GET_ALL_PRODUCTS_URL, headers: header).then((dynamic res) {
+      String GET_ALL_PURCHASES_URL = GET_ALL_PURCHASES_PAGINATED + '?page=$page&limit=$limit';
+      return _netUtil.get(GET_ALL_PURCHASES_URL, headers: header).then((dynamic res) {
         if (res['error']) throw res['message'];
         file.writeAsStringSync(jsonEncode(res), flush: true, mode: FileMode.write);
-        List<Product> allProducts = [];
+        List<Purchase> allPurchases = [];
         var rest = res['data']['items'] as List;
-        allProducts = rest.map<Product>((json) => Product.fromJson(json)).toList();
+        allPurchases = rest.map<Purchase>((json) => Purchase.fromJson(json)).toList();
         result['totalCount'] = res['data']['totalCount'];
         result['page'] = res['data']['page'];
-        result['items'] = allProducts;
+        result['items'] = allPurchases;
         return result;
+      }).catchError((e) {
+        errorHandler.handleError(e);
+      });
+    }
+  }
+
+  /// A function that fetches all products in the database GET
+  /// It returns a list of [Product]
+  Future<List<Product>> getAllProducts({bool? refresh}) async {
+    List<Product> products = [];
+    String fileName = 'products.json';
+    var dir = await getTemporaryDirectory();
+    File file = File(dir.path + '/' + fileName);
+    if(refresh == false && file.existsSync()){
+      final fileData = file.readAsStringSync();
+      final res = jsonDecode(fileData);
+      var rest = res['data'] as List;
+      products = rest.map<Product>((json) => Product.fromJson(json)).toList();
+      return products;
+    }
+    else {
+      late Map<String, String> header;
+      Future<User> user = _futureValue.getCurrentUser();
+      await user.then((value) {
+        if(value.token == null) throw('You\'re not authorized, log out and log in back and try again!');
+        header = {'Authorization': 'Bearer ${value.token}'};
+      });
+      return _netUtil.get(GET_ALL_PRODUCTS, headers: header).then((dynamic res) {
+        if (res['error']) throw res['message'];
+        file.writeAsStringSync(jsonEncode(res), flush: true, mode: FileMode.write);
+        var rest = res['data'] as List;
+        products = rest.map<Product>((json) => Product.fromJson(json)).toList();
+        return products;
       }).catchError((e) {
         errorHandler.handleError(e);
       });

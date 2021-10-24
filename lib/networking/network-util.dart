@@ -16,6 +16,8 @@ class NetworkHelper {
   /// A function to do any get request with the url and headers
   /// then sends back a json decoded result
   Future<dynamic> get(String url, {Map<String, String>? headers}) async {
+    print(url);
+    print(headers);
     try {
       headers!['Content-Type'] = 'application/json';
       return

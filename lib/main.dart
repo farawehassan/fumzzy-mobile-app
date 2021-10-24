@@ -19,7 +19,6 @@ import 'screens/transactions/purchase-info.dart';
 import 'screens/transactions/add-sale.dart';
 import 'screens/notification/notifications.dart';
 
-
 void main() {
   runApp(MyApp());
 }

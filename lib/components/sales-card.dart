@@ -17,7 +17,6 @@ class TotalSalesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SizeConfig().init(context);
     return ReusableCard(
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 20, horizontal: 13),

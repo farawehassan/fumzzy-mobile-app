@@ -1,13 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:fumzy/bloc/future-values.dart';
 import 'package:fumzy/components/app-bar.dart';
+import 'package:fumzy/components/arrow-button.dart';
 import 'package:fumzy/components/button.dart';
 import 'package:fumzy/components/circle-indicator.dart';
+import 'package:fumzy/model/product.dart';
+import 'package:fumzy/model/purchases.dart';
 import 'package:fumzy/networking/user-datasource.dart';
 import 'package:fumzy/screens/dashboard/drawer.dart';
 import 'package:fumzy/utils/constant-styles.dart';
+import 'package:fumzy/utils/functions.dart';
+import 'package:fumzy/utils/size-config.dart';
+import 'package:shimmer/shimmer.dart';
 import 'expenses.dart';
+import 'purchase-info.dart';
 import 'purchases.dart';
 import 'sales.dart';
 import 'add-sale.dart';
@@ -22,6 +30,12 @@ class Transactions extends StatefulWidget {
 
 class _TransactionsState extends State<Transactions> {
 
+  /// Instantiating a class of the [FutureValues]
+  var futureValue = FutureValues();
+
+  /// GlobalKey of a my RefreshIndicatorState to refresh my list items
+  final GlobalKey<RefreshIndicatorState> _refreshPurchaseKey = GlobalKey<RefreshIndicatorState>();
+
   TextEditingController search = TextEditingController();
 
   ///[CONTROLLERS] and [KEY] for [EXPENSE DIALOG]
@@ -30,6 +44,206 @@ class _TransactionsState extends State<Transactions> {
   TextEditingController _expenseAmountController = TextEditingController();
 
   bool _showSpinner = false;
+
+  /// A List to hold the all the purchases
+  List<Purchase> _purchases = [];
+
+  /// A List to hold the all the filtered purchases
+  List<Purchase> _filteredPurchases = [];
+
+  /// An Integer variable to hold the length of [_purchases]
+  int? _purchasesLength;
+
+  int? _totalPurchaseCount;
+
+  int _purchasePageSize = 1;
+
+  bool _showPurchaseSpinner = false;
+
+  void _getAllPurchases({bool? refresh}) async {
+    Future<Map<String, dynamic>> products = futureValue.getAllPurchasesPaginated(
+        refresh: refresh, page: _purchasePageSize, limit: 50
+    );
+    await products.then((value) {
+      if(!mounted)return;
+      setState(() {
+        _purchases.addAll(value['items']);
+        _filteredPurchases = _purchases;
+        _purchasesLength = _filteredPurchases.length;
+        _totalPurchaseCount = value['totalCount'];
+      });
+    }).catchError((e){
+      print(e);
+      Functions.showErrorMessage(e);
+      if(!mounted)return;
+      //_getAllProducts(refresh: false);
+    });
+  }
+
+  Future _loadMorePurchases() async {
+    setState(() { _purchasePageSize += 1; });
+    Future<Map<String, dynamic>> deliveries = futureValue.getAllPurchasesPaginated(page: _purchasePageSize, limit: 50);
+    await deliveries.then((value) {
+      if (!mounted) return;
+      setState(() {
+        _purchases.addAll(value['items']);
+        _filteredPurchases = _purchases;
+        _purchasesLength = _purchases.length;
+        _totalPurchaseCount = value['totalCount'];
+        _showPurchaseSpinner = false;
+      });
+    }).catchError((e){
+      print(e);
+      if(!mounted)return;
+      Functions.showErrorMessage(e);
+    });
+  }
+
+  /// A function to build the list of all the purchases
+  Widget _buildPurchaseList() {
+    List<DataRow> itemRow = [];
+    if(_filteredPurchases.length > 0 && _filteredPurchases.isNotEmpty){
+      for (int i = 0; i < _filteredPurchases.length; i++){
+        Purchase purchase = _filteredPurchases[i];
+        itemRow.add(
+          DataRow(cells: [
+            DataCell(Text(Functions.getFormattedDateTime(purchase.createdAt!))),
+            DataCell(Text(purchase.product!.productName!)),
+            DataCell(Text(purchase.product!.category!.name!)),
+            DataCell(Text(purchase.quantity!.toString())),
+            DataCell(Text(Functions.money(purchase.product!.costPrice!, 'N'))),
+            DataCell(Text(Functions.money(purchase.product!.costPrice!, 'N'))),
+            DataCell(Text(Functions.money(purchase.product!.costPrice! * purchase.quantity!, 'N'))),
+            DataCell(GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, PurchaseInfo.id);
+              },
+              child: TableArrowButton(),
+            )),
+          ]),
+        );
+      }
+      return NotificationListener<ScrollNotification>(
+        onNotification: (ScrollNotification scrollInfo) {
+          if (!_showPurchaseSpinner && scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
+            if(_totalPurchaseCount! > (_purchasePageSize * 50)){
+              setState(() { _showPurchaseSpinner = true; });
+              _loadMorePurchases();
+            }
+          }
+          return true;
+        },
+        child: RefreshIndicator(
+          onRefresh: _refreshProducts,
+          key: _refreshPurchaseKey,
+          color: Color(0xFF004E92),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    physics: BouncingScrollPhysics(),
+                    child: DataTable(
+                      headingTextStyle: TextStyle(
+                        color: Color(0xFF75759E),
+                        fontSize: 14,
+                        fontWeight: FontWeight.normal,
+                      ),
+                      dataTextStyle: TextStyle(
+                        color: Color(0xFF1F1F1F),
+                        fontSize: 14,
+                        //fontWeight: FontWeight.w400,
+                      ),
+                      columnSpacing: 15.0,
+                      dataRowHeight: 65.0,
+                      columns: const [
+                        DataColumn(label: Text('Date')),
+                        DataColumn(label: Text('Product Name')),
+                        DataColumn(label: Text('Category')),
+                        DataColumn(label: Text('Quantity')),
+                        DataColumn(label: Text('Cost Price')),
+                        DataColumn(label: Text('Selling Price')),
+                        DataColumn(label: Text('Amount')),
+                        DataColumn(label: Text('')),
+                      ],
+                      rows: itemRow,
+                    )
+                ),
+                const SizedBox(height: 80),
+                _showPurchaseSpinner
+                    ? Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(24.0),
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0A459F)),
+                    ),
+                  ),
+                )
+                    : Container(),
+                const SizedBox(height: 100),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+    else if(_purchasesLength == 0) return Container();
+    return _shimmerLoader();
+  }
+
+  /// Function to refresh list of products from page 1 similar to [_getAllProducts()]
+  Future<Null> _refreshProducts() {
+    Future<Map<String, dynamic>> products = futureValue.getAllPurchasesPaginated(page: 1, limit: 50);
+    return products.then((value) {
+      _purchasesLength = null;
+      _purchases.clear();
+      _filteredPurchases.clear();
+      _totalPurchaseCount = null;
+      if(!mounted)return;
+      setState(() {
+        _purchases.addAll(value['items']);
+        _filteredPurchases = _purchases;
+        _purchasesLength = _purchases.length;
+        _totalPurchaseCount = value['totalCount'];
+      });
+    }).catchError((e){
+      print(e);
+      if(!mounted)return;
+      Functions.showErrorMessage(e);
+    });
+  }
+
+  Widget _shimmerLoader(){
+    List<Widget> containers = [];
+    for(int i = 0; i < 20; i++){
+      containers.add(
+          Container(
+              width: SizeConfig.screenWidth,
+              height: 40,
+              margin: EdgeInsets.only(bottom: 10),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(3)),
+                  color: Color(0xFFF6F6F6)
+              )
+          )
+      );
+    }
+    return SingleChildScrollView(
+      physics: BouncingScrollPhysics(),
+      child: Shimmer.fromColors(
+          baseColor: Colors.grey[300]!,
+          highlightColor: Colors.grey[100]!,
+          child: Column(children: containers)
+      ),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getAllPurchases(refresh: true);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -243,7 +457,7 @@ class _TransactionsState extends State<Transactions> {
                     child: TabBarView(
                       children: [
                         Sales(),
-                        Purchases(),
+                        _buildPurchaseList(),
                         Expenses(),
                       ],
                     ),
