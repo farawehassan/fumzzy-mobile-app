@@ -21,11 +21,11 @@ class ProductDataSource{
   /// Instantiating a class of the [FutureValues]
   var _futureValue = FutureValues();
 
-  /// A function that fetches all products in the database GET
+  /// A function that fetches all purchases in the database GET
   /// It returns a Map of [<String, dynamic>]
   Future<Map<String, dynamic>> getAllPurchasesPaginated({bool? refresh, int? page, int? limit}) async {
     Map<String, dynamic> result = {};
-    String fileName = 'products.json';
+    String fileName = 'purchases.json';
     var dir = await getTemporaryDirectory();
     File file = File(dir.path + '/' + fileName);
     if(refresh == false && file.existsSync()){
@@ -96,7 +96,7 @@ class ProductDataSource{
     }
   }
 
-  /// A function that fetches all products in the database GET
+  /// A function that fetches all categories in the database GET
   /// It returns a list of mode [Category]
   Future<List<Category>> getAllCategories() async {
     List<Category> categories = [];

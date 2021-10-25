@@ -76,7 +76,7 @@ class _InventoryState extends State<Inventory> {
             _productCategories[value[i].category!.name!] = value[i].currentQty!;
           }
         }
-        _productsLength = _categories.length;
+        _productsLength = _products.length;
       });
     }).catchError((e){
       print(e);

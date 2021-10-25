@@ -111,8 +111,8 @@ class _TransactionsState extends State<Transactions> {
             DataCell(Text(purchase.product!.productName!)),
             DataCell(Text(purchase.product!.category!.name!)),
             DataCell(Text(purchase.quantity!.toString())),
-            DataCell(Text(Functions.money(purchase.product!.costPrice!, 'N'))),
-            DataCell(Text(Functions.money(purchase.product!.costPrice!, 'N'))),
+            DataCell(Text(Functions.money(purchase.costPrice!, 'N'))),
+            DataCell(Text(Functions.money(purchase.costPrice!, 'N'))),
             DataCell(Text(Functions.money(purchase.product!.costPrice! * purchase.quantity!, 'N'))),
             DataCell(GestureDetector(
               onTap: () {

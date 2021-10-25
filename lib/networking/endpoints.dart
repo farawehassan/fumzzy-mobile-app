@@ -35,3 +35,9 @@ const GET_ALL_PURCHASES_PAGINATED = BASE_URL + 'purchase/fetchAll';
 const GET_ALL_PURCHASES = BASE_URL + 'purchase/fetchAllPurchases';
 const GET_PURCHASES_BY_PRODUCT = BASE_URL + 'purchase/fetchAllPurchasesByProduct/617567feac6b4cded24da39d?page=1&limit=15';
 const DELETE_PURCHASE = BASE_URL + 'purchase/delete';
+
+/// Endpoints regarding sales
+const ADD_SALES = BASE_URL + 'sales/addNew';
+const GET_ALL_SALES = BASE_URL + 'sales/fetchAll';
+const UPDATE_SALE_PRODUCT_NAME = BASE_URL + 'sales/updateSalesName';
+const DELETE_SALE = BASE_URL + 'sales/delete';
