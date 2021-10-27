@@ -62,7 +62,7 @@ class _SettingsState extends State<Settings> {
         _nameController.text = value.name!;
         _phoneController.text = value.phone!;
       });
-    }).catchError((e) => print(e));
+    }).catchError((e) => Functions.showErrorMessage(e.toString()));
   }
 
   @override
@@ -315,7 +315,7 @@ class _SettingsState extends State<Settings> {
                     if(_securityFormKey.currentState!.validate()){
                       if(_currentPin.length == 4 && _newPin.length == 4){
                         if(_currentPin != _newPin) _changeUserPin();
-                        else print("You cannot use this pin because it is your current PIN");
+                        Functions.showErrorMessage("You cannot use this pin because it is your current PIN");
                       }
                     }
                   }

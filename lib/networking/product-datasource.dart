@@ -134,4 +134,42 @@ class ProductDataSource{
     });
   }
 
+  /// A function that sends request for adding a category with [body] as details
+  /// A post request to use the [CREATE_PRODUCT] endpoint
+  /// It returns a [String]
+  Future<dynamic> createPurchase(Map<String, String> body) async {
+    Map<String, String>? header;
+    Future<User> user = _futureValue.getCurrentUser();
+    await user.then((value) {
+      if(value.token == null) throw('You\'re not authorized, log out and log in back and try again!');
+      header = {'Authorization': 'Bearer ${value.token}'};
+    });
+    return _netUtil.post(CREATE_PRODUCT, headers: header, body: body).then((dynamic res) {
+      if (res['error']) throw res['message'];
+      return res['message'];
+    }).catchError((e) {
+      errorHandler.handleError(e);
+    });
+  }
+
+  /// A function that sends request for adding a product with [body] as details
+  /// A post request to use the [ADD_PRODUCT] endpoint
+  /// It returns a [String]
+  Future<dynamic> addProduct(Map<String, String> body) async {
+    Map<String, String>? header;
+    Future<User> user = _futureValue.getCurrentUser();
+    await user.then((value) {
+      if(value.token == null) throw('You\'re not authorized, log out and log in back and try again!');
+      header = {'Authorization': 'Bearer ${value.token}'};
+    });
+    return _netUtil.post(CREATE_PRODUCT, headers: header, body: body).then((dynamic res) {
+      if (res['error']) throw res['message'];
+      return res['message'];
+    }).catchError((e) {
+      errorHandler.handleError(e);
+    });
+  }
+
+
+
 }

@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:fumzy/bloc/future-values.dart';
+import 'package:fumzy/bloc/suggestions.dart';
 import 'package:fumzy/components/app-bar.dart';
 import 'package:fumzy/components/arrow-button.dart';
 import 'package:fumzy/components/button.dart';
 import 'package:fumzy/components/circle-indicator.dart';
+import 'package:fumzy/model/category.dart';
 import 'package:fumzy/model/product.dart';
 import 'package:fumzy/model/purchases.dart';
+import 'package:fumzy/networking/product-datasource.dart';
 import 'package:fumzy/networking/user-datasource.dart';
 import 'package:fumzy/screens/dashboard/drawer.dart';
 import 'package:fumzy/utils/constant-styles.dart';
@@ -43,12 +47,27 @@ class _TransactionsState extends State<Transactions> {
   TextEditingController _expenseDescriptionController = TextEditingController();
   TextEditingController _expenseAmountController = TextEditingController();
 
+  ///[CONTROLLERS] and [KEY] for [ADD PRODUCT DIALOG]
+  final _addPurchaseFormKey = GlobalKey<FormState>();
+  Category? selectedCategory;
+  TextEditingController _productName = TextEditingController();
+  TextEditingController _productCategory = TextEditingController();
+  TextEditingController _costPrice = TextEditingController();
+  TextEditingController _sellingPrice = TextEditingController();
+  TextEditingController _initialQuantity = TextEditingController();
+  TextEditingController _currentQuantity = TextEditingController();
+  TextEditingController _quantity = TextEditingController();
+  TextEditingController _sellersName = TextEditingController();
+
   bool _showSpinner = false;
+
+  ///A list to hold the categories
+  List<Category> _categories = [];
 
   /// A List to hold the all the purchases
   List<Purchase> _purchases = [];
 
-  /// A List to hold the all the filtered purchases
+  /// A List to hold all the filtered purchases
   List<Purchase> _filteredPurchases = [];
 
   /// An Integer variable to hold the length of [_purchases]
@@ -59,6 +78,8 @@ class _TransactionsState extends State<Transactions> {
   int _purchasePageSize = 1;
 
   bool _showPurchaseSpinner = false;
+
+
 
   void _getAllPurchases({bool? refresh}) async {
     Future<Map<String, dynamic>> products = futureValue.getAllPurchasesPaginated(
@@ -137,52 +158,55 @@ class _TransactionsState extends State<Transactions> {
           onRefresh: _refreshProducts,
           key: _refreshPurchaseKey,
           color: Color(0xFF004E92),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    physics: BouncingScrollPhysics(),
-                    child: DataTable(
-                      headingTextStyle: TextStyle(
-                        color: Color(0xFF75759E),
-                        fontSize: 14,
-                        fontWeight: FontWeight.normal,
-                      ),
-                      dataTextStyle: TextStyle(
-                        color: Color(0xFF1F1F1F),
-                        fontSize: 14,
-                        //fontWeight: FontWeight.w400,
-                      ),
-                      columnSpacing: 15.0,
-                      dataRowHeight: 65.0,
-                      columns: const [
-                        DataColumn(label: Text('Date')),
-                        DataColumn(label: Text('Product Name')),
-                        DataColumn(label: Text('Category')),
-                        DataColumn(label: Text('Quantity')),
-                        DataColumn(label: Text('Cost Price')),
-                        DataColumn(label: Text('Selling Price')),
-                        DataColumn(label: Text('Amount')),
-                        DataColumn(label: Text('')),
-                      ],
-                      rows: itemRow,
-                    )
-                ),
-                const SizedBox(height: 80),
-                _showPurchaseSpinner
-                    ? Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(24.0),
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0A459F)),
-                    ),
+          child: Container(
+            decoration: kTableContainer,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      physics: BouncingScrollPhysics(),
+                      child: DataTable(
+                        headingTextStyle: TextStyle(
+                          color: Color(0xFF75759E),
+                          fontSize: 14,
+                          fontWeight: FontWeight.normal,
+                        ),
+                        dataTextStyle: TextStyle(
+                          color: Color(0xFF1F1F1F),
+                          fontSize: 14,
+                          //fontWeight: FontWeight.w400,
+                        ),
+                        columnSpacing: 15.0,
+                        dataRowHeight: 65.0,
+                        columns: const [
+                          DataColumn(label: Text('Date')),
+                          DataColumn(label: Text('Product Name')),
+                          DataColumn(label: Text('Category')),
+                          DataColumn(label: Text('Quantity')),
+                          DataColumn(label: Text('Cost Price')),
+                          DataColumn(label: Text('Selling Price')),
+                          DataColumn(label: Text('Amount')),
+                          DataColumn(label: Text('')),
+                        ],
+                        rows: itemRow,
+                      )
                   ),
-                )
-                    : Container(),
-                const SizedBox(height: 100),
-              ],
+                  const SizedBox(height: 80),
+                  _showPurchaseSpinner
+                      ? Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(24.0),
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0A459F)),
+                      ),
+                    ),
+                  )
+                      : Container(),
+                  const SizedBox(height: 100),
+                ],
+              ),
             ),
           ),
         ),
@@ -191,6 +215,20 @@ class _TransactionsState extends State<Transactions> {
     else if(_purchasesLength == 0) return Container();
     return _shimmerLoader();
   }
+
+  ///A function to get all the available categories and store them in list[_categories]
+  void _getAllCategories() async {
+    Future<List<Category>> categories = futureValue.getAllCategories();
+    await categories.then((value){
+      if (!mounted)return;
+      setState((){
+        _categories.addAll(value);
+      });
+    }).catchError((e){
+      Functions.showErrorMessage(e.toString());
+    });
+  }
+
 
   /// Function to refresh list of products from page 1 similar to [_getAllProducts()]
   Future<Null> _refreshProducts() {
@@ -243,6 +281,7 @@ class _TransactionsState extends State<Transactions> {
   void initState() {
     super.initState();
     _getAllPurchases(refresh: true);
+    _getAllCategories();
   }
 
   @override
@@ -325,7 +364,7 @@ class _TransactionsState extends State<Transactions> {
                             ),
                             Button(
                               onTap: (){
-                                _addNewPurchase(constraints);
+                                _addPurchase(constraints);
                               },
                               buttonColor: Color(0xFFF28301),
                               width: 160,
@@ -470,453 +509,7 @@ class _TransactionsState extends State<Transactions> {
       ),
     );
   }
-
-  ///widget to show the dialog to add [PURCHASE]
-  List<String> categories = ["Drinks", "Sweet", "Furniture", "Wine"];
-
-  Future<void> _addNewPurchase(BoxConstraints constraints) {
-    final formKey = GlobalKey<FormState>();
-    TextEditingController productName = TextEditingController();
-    TextEditingController costPrice = TextEditingController();
-    TextEditingController sellingPrice = TextEditingController();
-    TextEditingController quantity = TextEditingController();
-    TextEditingController amount = TextEditingController();
-    TextEditingController sellersName = TextEditingController();
-
-    String? selectedCategory = "Drinks";
-
-    return showDialog(
-      context: context,
-      barrierColor: Color(0xFF000428).withOpacity(0.86),
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: Color(0xFFFFFFFF),
-        ),
-        margin: EdgeInsets.all(40),
-        child: Material(
-          borderRadius: BorderRadius.circular(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                padding: EdgeInsets.fromLTRB(24, 30, 24, 27),
-                decoration: BoxDecoration(
-                  color: Color(0xFFF5F8FF),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(15.0),
-                    topRight: Radius.circular(15.0),
-                  ),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'NEW PURCHASE',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 15,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Icon(
-                        IconlyBold.closeSquare,
-                        color: Colors.black.withOpacity(0.7),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(top: 42),
-                        child: Text(
-                          'Add a New Purchase',
-                          style: TextStyle(
-                            color: Color(0xFF00509A),
-                            fontSize: 19,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding:
-                        const EdgeInsets.symmetric(horizontal: 35, vertical: 15.0),
-                        child: Text(
-                          'You have made a new purchase. Please fill the fields to record your purchase.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Color(0xFF000428).withOpacity(0.6),
-                            fontWeight: FontWeight.w400,
-                            fontSize: 15.0,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.only(left: 20, right: 20),
-                        child: Form(
-                          key: formKey,
-                          child: Column(
-                            children: [
-                              //product name
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Product Name',
-                                  ),
-                                  SizedBox(height: 10),
-                                  Container(
-                                    width: constraints.maxWidth,
-                                    child: TextFormField(
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                      textInputAction: TextInputAction.next,
-                                      keyboardType: TextInputType.text,
-                                      autofocus: true,
-                                      controller: productName,
-                                      validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return 'Enter product name';
-                                        }
-                                        return null;
-                                      },
-                                      decoration: kTextFieldBorderDecoration.copyWith(
-                                        hintText: 'Enter product',
-                                        hintStyle: TextStyle(
-                                          color: Colors.black.withOpacity(0.5),
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.normal,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 20),
-                              //product category
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Product Category',
-                                  ),
-                                  SizedBox(height: 10),
-                                  Container(
-                                    width: constraints.maxWidth,
-                                    child: DropdownButtonFormField<String>(
-                                      value: selectedCategory,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          selectedCategory = value;
-                                        });
-                                      },
-                                      style: TextStyle(
-                                          color: Color(0xFF171725),
-                                          fontWeight: FontWeight.normal,
-                                          fontSize: 14
-                                      ),
-                                      iconEnabledColor: Color(0xFF000000),
-                                      icon: Icon(
-                                        Icons.arrow_drop_down_sharp,
-                                        color: Colors.black,
-                                        size: 20,
-                                      ),
-                                      decoration: kTextFieldBorderDecoration.copyWith(
-                                        contentPadding: EdgeInsets.all(12),
-                                      ),
-                                      items: categories.map((value) {
-                                        return DropdownMenuItem(
-                                          child: Text(
-                                            value,
-                                            style: TextStyle(
-                                                color: Color(0xFF171725),
-                                                fontWeight: FontWeight.normal,
-                                                fontSize: 14
-                                            ),
-                                          ),
-                                          value: value,
-                                        );
-                                      }).toList(),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 20),
-                              //unit cost and selling price
-                              Row(
-                                children: [
-                                  // Cost Price
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Unit Cost Price',
-                                        ),
-                                        SizedBox(height: 10),
-                                        Container(
-                                          width: constraints.maxWidth,
-                                          child: TextFormField(
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.normal,
-                                            ),
-                                            textInputAction: TextInputAction.next,
-                                            keyboardType: TextInputType.number,
-                                            inputFormatters: [
-                                              FilteringTextInputFormatter.allow(RegExp('[0-9]')),
-                                            ],
-                                            controller: costPrice,
-                                            validator: (value) {
-                                              if (value!.isEmpty) {
-                                                return 'Enter amount';
-                                              }
-                                              return null;
-                                            },
-                                            decoration: kTextFieldBorderDecoration.copyWith(
-                                              hintText: 'Enter amount',
-                                              hintStyle: TextStyle(
-                                                color: Colors.black.withOpacity(0.5),
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.normal,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  SizedBox(width: 10),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Unit Selling Price',
-                                        ),
-                                        SizedBox(height: 10),
-                                        Container(
-                                          width: constraints.maxWidth,
-                                          child: TextFormField(
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.normal,
-                                            ),
-                                            textInputAction: TextInputAction.next,
-                                            keyboardType: TextInputType.number,
-                                            inputFormatters: [
-                                              FilteringTextInputFormatter.allow(RegExp('[0-9]')),
-                                            ],
-                                            controller: sellingPrice,
-                                            validator: (value) {
-                                              if (value!.isEmpty) {
-                                                return 'Enter amount';
-                                              }
-                                              return null;
-                                            },
-                                            decoration: kTextFieldBorderDecoration.copyWith(
-                                              hintText: 'Enter amount',
-                                              hintStyle: TextStyle(
-                                                color: Colors.black.withOpacity(0.5),
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.normal,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ]
-                              ),
-                              SizedBox(height: 20),
-                              // Quantity
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Quantity',
-                                  ),
-                                  SizedBox(height: 10),
-                                  Container(
-                                    width: constraints.maxWidth,
-                                    child: TextFormField(
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                      textInputAction: TextInputAction.next,
-                                      keyboardType: TextInputType.number,
-                                      inputFormatters: [
-                                        FilteringTextInputFormatter.allow(RegExp('[0-9]')),
-                                      ],
-                                      controller: quantity,
-                                      validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return 'Enter quantity';
-                                        }
-                                        return null;
-                                      },
-                                      decoration: kTextFieldBorderDecoration.copyWith(
-                                        hintText: 'Enter quantity',
-                                        hintStyle: TextStyle(
-                                          color: Colors.black.withOpacity(0.5),
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.normal,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 20),
-                              // Amount
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Amount',
-                                  ),
-                                  SizedBox(height: 10),
-                                  Container(
-                                    width: constraints.maxWidth,
-                                    child: TextFormField(
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                      textInputAction: TextInputAction.next,
-                                      keyboardType: TextInputType.number,
-                                      inputFormatters: [
-                                        FilteringTextInputFormatter.allow(RegExp('[0-9]')),
-                                      ],
-                                      controller: amount,
-                                      validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return 'Enter amount';
-                                        }
-                                        return null;
-                                      },
-                                      decoration: kTextFieldBorderDecoration.copyWith(
-                                        hintText: 'N',
-                                        hintStyle: TextStyle(
-                                          color: Colors.black.withOpacity(0.5),
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.normal,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 20),
-                              // Sellers name
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Seller\'s Name',
-                                  ),
-                                  SizedBox(height: 10),
-                                  Container(
-                                    width: constraints.maxWidth,
-                                    child: TextFormField(
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                      textInputAction: TextInputAction.done,
-                                      keyboardType: TextInputType.text,
-                                      controller: sellersName,
-                                      validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return 'Enter seller\'s name';
-                                        }
-                                        return null;
-                                      },
-                                      decoration: kTextFieldBorderDecoration.copyWith(
-                                        hintText: 'Enter seller\'s name',
-                                        hintStyle: TextStyle(
-                                          color: Colors.black.withOpacity(0.5),
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.normal,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 40),
-                      Button(
-                        onTap: (){
-                          print("Record Purchase");
-                        },
-                        buttonColor: Color(0xFF00509A),
-                        child: Center(
-                          child: Text(
-                            'Record Purchase',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Color(0xFFFFFFFF),
-                              fontSize: 14,
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      Container(
-                        width: 100,
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: Center(
-                            child: Text(
-                              'No, Cancel',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 50),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  /**[EXPENSE] SECTION **/
 
   ///widget to show the dialog to add [EXPENSES]
   Future<void> _addExpense (BoxConstraints constraints, Widget circleProgressIndicator) {
@@ -1161,11 +754,495 @@ class _TransactionsState extends State<Transactions> {
         _showSpinner = false;
         Navigator.pop(context);
       });
-      print(message);
+      Functions.showSuccessMessage(message);
     }).catchError((e){
       if(!mounted)return;
       setDialogState(()=> _showSpinner = false);
-      print(e);
+      Functions.showErrorMessage(e.toString());
+    });
+  }
+
+  /**[PURCHASE] SECTION **/
+
+  ////widget to show the dialog [ADD_NEW_PRODUCT]
+  Future<void> _addPurchase(BoxConstraints constraints) {
+    return showDialog(
+      context: context,
+      barrierColor: Color(0xFF000428).withOpacity(0.86),
+      builder: (context) => GestureDetector(
+        onTap: (){
+          FocusScopeNode currentFocus = FocusScope.of(context);
+          if(!currentFocus.hasPrimaryFocus) currentFocus.unfocus();
+        },
+        child: StatefulBuilder(
+          builder: (BuildContext context, StateSetter setDialogState) => AbsorbPointer(
+            absorbing: _showSpinner,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: Color(0xFFFFFFFF),
+              ),
+              margin: EdgeInsets.all(40),
+              child: Material(
+                borderRadius: BorderRadius.circular(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.fromLTRB(24, 30, 24, 27),
+                      decoration: BoxDecoration(
+                        color: Color(0xFFF5F8FF),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(15.0),
+                          topRight: Radius.circular(15.0),
+                        ),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'NEW PURCHASE',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 15,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: Icon(
+                              IconlyBold.closeSquare,
+                              color: Colors.black.withOpacity(0.7),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(top: 42),
+                              child: Text(
+                                'Add a New Purchase',
+                                style: TextStyle(
+                                  color: Color(0xFF00509A),
+                                  fontSize: 19,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding:
+                              const EdgeInsets.symmetric(horizontal: 35, vertical: 15.0),
+                              child: Text(
+                                'You have made a new purchase. Please fill the fields below to record your purhchase',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Color(0xFF000428).withOpacity(0.6),
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 15.0,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.only(left: 20, right: 20),
+                              child: Form(
+                                key: _addPurchaseFormKey,
+                                child: Column(
+                                  children: [
+                                    //product name
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text('Product Name'),
+                                        SizedBox(height: 10),
+                                        Container(
+                                          width: constraints.maxWidth,
+                                          child: TextFormField(
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.normal,
+                                            ),
+                                            textInputAction: TextInputAction.next,
+                                            keyboardType: TextInputType.text,
+                                            controller: _productName,
+                                            validator: (value) {
+                                              if (value!.isEmpty) return 'Enter product name';
+                                              return null;
+                                            },
+                                            decoration: kTextFieldBorderDecoration.copyWith(
+                                              hintText: 'Enter product name',
+                                              hintStyle: TextStyle(
+                                                color: Colors.black.withOpacity(0.5),
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 20),
+                                    //product category
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text('Product Category'),
+                                        SizedBox(height: 10),
+                                        Container(
+                                          width: constraints.maxWidth,
+                                          child: TypeAheadFormField(
+                                            textFieldConfiguration: TextFieldConfiguration(
+                                              controller: _productCategory,
+                                              decoration: kTextFieldBorderDecoration.copyWith(
+                                                hintText: 'Category',
+                                                contentPadding: EdgeInsets.all(10),
+                                              ),
+                                            ),
+                                            suggestionsCallback: (pattern) async {
+                                              return await Suggestions.getCategorySuggestions(pattern, _categories);
+                                            },
+                                            itemBuilder: (context, Category suggestion) {
+                                              return ListTile(title: Text(suggestion.name!));
+                                            },
+                                            transitionBuilder: (context, suggestionsBox, controller) {
+                                              return suggestionsBox;
+                                            },
+                                            onSuggestionSelected: (Category suggestion) {
+                                              if (!mounted) return;
+                                              setState(() {
+                                                selectedCategory = suggestion;
+                                                _productCategory.text = suggestion.name!;
+                                              });
+                                            },
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 20),
+                                    //cost and selling price
+                                    Row(
+                                        children: [
+                                          // Cost Price
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text('Cost Price'),
+                                                SizedBox(height: 10),
+                                                Container(
+                                                  width: constraints.maxWidth,
+                                                  child: TextFormField(
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.normal,
+                                                    ),
+                                                    textInputAction: TextInputAction.next,
+                                                    keyboardType: TextInputType.number,
+                                                    inputFormatters: [
+                                                      FilteringTextInputFormatter.allow(RegExp('[0-9]')),
+                                                    ],
+                                                    controller: _costPrice,
+                                                    validator: (value) {
+                                                      if (value!.isEmpty) return 'Enter amount';
+                                                      return null;
+                                                    },
+                                                    decoration: kTextFieldBorderDecoration.copyWith(
+                                                      hintText: 'Enter amount',
+                                                      hintStyle: TextStyle(
+                                                        color: Colors.black.withOpacity(0.5),
+                                                        fontSize: 14,
+                                                        fontWeight: FontWeight.normal,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          SizedBox(width: 10),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text('Selling Price'),
+                                                SizedBox(height: 10),
+                                                Container(
+                                                  width: constraints.maxWidth,
+                                                  child: TextFormField(
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.normal,
+                                                    ),
+                                                    textInputAction: TextInputAction.next,
+                                                    keyboardType: TextInputType.number,
+                                                    inputFormatters: [
+                                                      FilteringTextInputFormatter.allow(RegExp('[0-9]')),
+                                                    ],
+                                                    controller: _sellingPrice,
+                                                    validator: (value) {
+                                                      if (value!.isEmpty) return 'Enter amount';
+                                                      return null;
+                                                    },
+                                                    decoration: kTextFieldBorderDecoration.copyWith(
+                                                      hintText: 'Enter amount',
+                                                      hintStyle: TextStyle(
+                                                        color: Colors.black.withOpacity(0.5),
+                                                        fontSize: 14,
+                                                        fontWeight: FontWeight.normal,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ]
+                                    ),
+                                    SizedBox(height: 20),
+                                    // initial quantity
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text('Initial Quantity'),
+                                        SizedBox(height: 10),
+                                        Container(
+                                          width: constraints.maxWidth,
+                                          child: TextFormField(
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.normal,
+                                            ),
+                                            textInputAction: TextInputAction.next,
+                                            keyboardType: TextInputType.number,
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.allow(RegExp('[0-9]')),
+                                            ],
+                                            controller: _initialQuantity,
+                                            validator: (value) {
+                                              if (value!.isEmpty) return 'Enter initial quantity';
+                                              return null;
+                                            },
+                                            decoration: kTextFieldBorderDecoration.copyWith(
+                                              hintText: 'Enter initial quantity',
+                                              hintStyle: TextStyle(
+                                                color: Colors.black.withOpacity(0.5),
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 20),
+                                    // current quantity
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text('Current Quantity'),
+                                        SizedBox(height: 10),
+                                        Container(
+                                          width: constraints.maxWidth,
+                                          child: TextFormField(
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.normal,
+                                            ),
+                                            textInputAction: TextInputAction.next,
+                                            keyboardType: TextInputType.number,
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.allow(RegExp('[0-9]')),
+                                            ],
+                                            controller: _currentQuantity,
+                                            validator: (value) {
+                                              if (value!.isEmpty) return 'Enter current quantity';
+                                              return null;
+                                            },
+                                            decoration: kTextFieldBorderDecoration.copyWith(
+                                              hintText: 'Enter current quantity',
+                                              hintStyle: TextStyle(
+                                                color: Colors.black.withOpacity(0.5),
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 20),
+                                    // Quantity
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text('Quantity'),
+                                        SizedBox(height: 10),
+                                        Container(
+                                          width: constraints.maxWidth,
+                                          child: TextFormField(
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.normal,
+                                            ),
+                                            textInputAction: TextInputAction.next,
+                                            keyboardType: TextInputType.number,
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.allow(RegExp('[0-9]')),
+                                            ],
+                                            controller: _quantity,
+                                            validator: (value) {
+                                              if (value!.isEmpty) return 'Enter quantity';
+                                              return null;
+                                            },
+                                            decoration: kTextFieldBorderDecoration.copyWith(
+                                              hintText: 'Enter quantity',
+                                              hintStyle: TextStyle(
+                                                color: Colors.black.withOpacity(0.5),
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 20),
+                                    // Sellers name
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text('Seller\'s Name',),
+                                        SizedBox(height: 10),
+                                        Container(
+                                          width: constraints.maxWidth,
+                                          child: TextFormField(
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.normal,
+                                            ),
+                                            textInputAction: TextInputAction.done,
+                                            keyboardType: TextInputType.text,
+                                            controller: _sellersName,
+                                            validator: (value) {
+                                              if (value!.isEmpty) return 'Enter seller\'s name';
+                                              return null;
+                                            },
+                                            decoration: kTextFieldBorderDecoration.copyWith(
+                                              hintText: 'Enter seller\'s name',
+                                              hintStyle: TextStyle(
+                                                color: Colors.black.withOpacity(0.5),
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 40),
+                            Button(
+                              onTap: (){
+                                if(!_showSpinner){
+                                  if(_addPurchaseFormKey.currentState!.validate()){
+                                    if(_productCategory.text != '') return _addProduct(setDialogState);
+                                    Functions.showErrorMessage("Enter a valid Category name and try again");
+                                  }
+                                }
+                              },
+                              buttonColor: Color(0xFF00509A),
+                              child: Center(
+                                child: _showSpinner ?
+                                CircleProgressIndicator() :
+                                const Text(
+                                  'Add Purchase',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Color(0xFFFFFFFF),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Container(
+                              width: 100,
+                              child: TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Center(
+                                  child: Text(
+                                    'No, Cancel',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 50),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  ///function to make api call to [ADD_PRODUCT]
+  void _addProduct(StateSetter setDialogState) async{
+    if(!mounted)return;
+    setDialogState(() => _showSpinner = true);
+    var api = ProductDataSource();
+    Map<String, String> body = {
+      "productName": _productName.text,
+      "category": _productCategory.text,
+      "costPrice": _costPrice.text,
+      "sellingPrice": _sellingPrice.text,
+      "initialQty": _quantity.text,
+      "currentQty": _quantity.text,
+      "quantity": _quantity.text,
+      "sellersName": _sellersName.text,
+    };
+    await api.addProduct(body).then((message) async{
+      if(!mounted)return;
+      setDialogState((){
+        _showSpinner = false;
+        Navigator.pop(context);
+      });
+      Functions.showSuccessMessage(message);
+    }).catchError((e){
+      if(!mounted)return;
+      setDialogState(()=> _showSpinner = false);
+      Functions.showErrorMessage(e.toString());
     });
   }
 }
