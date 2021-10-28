@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:fumzy/bloc/future-values.dart';
-import 'package:fumzy/model/category.dart';
-import 'package:fumzy/model/product.dart';
 import 'package:fumzy/model/purchases.dart';
 import 'package:fumzy/model/user.dart';
 import 'package:path_provider/path_provider.dart';

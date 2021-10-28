@@ -11,8 +11,8 @@ import 'package:fumzy/components/circle-indicator.dart';
 import 'package:fumzy/model/category.dart';
 import 'package:fumzy/model/product.dart';
 import 'package:fumzy/model/purchases.dart';
+import 'package:fumzy/networking/expense-datasource.dart';
 import 'package:fumzy/networking/product-datasource.dart';
-import 'package:fumzy/networking/user-datasource.dart';
 import 'package:fumzy/screens/dashboard/drawer.dart';
 import 'package:fumzy/utils/constant-styles.dart';
 import 'package:fumzy/utils/functions.dart';
@@ -743,7 +743,7 @@ class _TransactionsState extends State<Transactions> {
   void _createOneExpense(StateSetter setDialogState) async{
     if(!mounted)return;
     setDialogState(() => _showSpinner = true);
-    var api = UserDataSource();
+    var api = ExpenseDataSource();
     Map<String, String> body = {
       "description": _expenseDescriptionController.text,
       "amount": _expenseAmountController.text,
