@@ -64,7 +64,7 @@ class SalesDataSource{
   /// A function that sends request for adding a sale with [body] as details
   /// A post request to use the [ADD_SALES] endpoint
   /// It returns a [String]
-  Future<dynamic> addSales(Map<String, String> body) async {
+  Future<dynamic> addSales(Map<String, dynamic> body) async {
     Map<String, String>? header;
     Future<User> user = _futureValue.getCurrentUser();
     await user.then((value) {

@@ -41,3 +41,17 @@ const ADD_SALES = BASE_URL + 'sales/addNew';
 const GET_ALL_SALES = BASE_URL + 'sales/fetchAll';
 const UPDATE_SALE_PRODUCT_NAME = BASE_URL + 'sales/updateSalesName';
 const DELETE_SALE = BASE_URL + 'sales/delete';
+
+/// Endpoints regarding customer
+const ADD_NEW_CUSTOMER = BASE_URL + 'customer/addNew';
+const ADD_NEW_REPORTS_TO_CUSTOMER = BASE_URL + 'customer/addNewCustomerReports';
+const ADD_PREVIOUS_CUSTOMER = BASE_URL + 'customer/addPrevious';
+const ADD_PREVIOUS_CUSTOMER_REPORTS = BASE_URL + 'customer/addNewPreviousCustomerReports';
+const GET_ALL_CUSTOMERS = BASE_URL + 'customer/fetchAll';
+const GET_ALL_CUSTOMERS_NAME = BASE_URL + 'customer/fetchCustomersName';
+const GET_A_CUSTOMER = BASE_URL + 'customer/fetchCustomer';
+const UPDATE_CUSTOMER_REPORT = BASE_URL + 'customer/updateCustomerReport';
+const UPDATE_PAYMENT_MADE_REPORT = BASE_URL + 'customer/updatePaymentMadeReport';
+const SETTLE_PAYMENT = BASE_URL + 'customer/settlePaymentReport';
+const REMOVE_CUSTOMER_REPORT = BASE_URL + 'customer/removeCustomerReport';
+const DELETE_CUSTOMER = BASE_URL + 'customer/delete/6173fabe55b76e7ae3952cac';

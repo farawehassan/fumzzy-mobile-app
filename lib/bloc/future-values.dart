@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:fumzy/database/user-db-helper.dart';
 import 'package:fumzy/model/category.dart';
+import 'package:fumzy/model/customer-names.dart';
 import 'package:fumzy/model/product.dart';
 import 'package:fumzy/model/user.dart';
+import 'package:fumzy/networking/customer-datasource.dart';
 import 'package:fumzy/networking/product-datasource.dart';
 import 'package:fumzy/networking/user-datasource.dart';
 
@@ -53,6 +55,15 @@ class FutureValues{
     var data = ProductDataSource();
     Future<List<Category>> categories = data.getAllCategories();
     return categories;
+  }
+
+  /// A function that fetches all customers name in the database with the help of
+  /// [CustomerDataSource]
+  /// It returns list of model [CustomerName]
+  Future<List<CustomerName>> getAllCustomerNames() async{
+    var data = CustomerDataSource();
+    Future<List<CustomerName>> names = data.getAllCustomerNames();
+    return names;
   }
 
 }

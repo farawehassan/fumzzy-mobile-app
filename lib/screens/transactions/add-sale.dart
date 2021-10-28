@@ -6,12 +6,20 @@ import 'package:fumzy/bloc/future-values.dart';
 import 'package:fumzy/bloc/suggestions.dart';
 import 'package:fumzy/components/app-bar.dart';
 import 'package:fumzy/components/button.dart';
+import 'package:fumzy/components/circle-indicator.dart';
 import 'package:fumzy/components/info-table.dart';
 import 'package:fumzy/components/reusable-card.dart';
+import 'package:fumzy/model/customer-names.dart';
 import 'package:fumzy/model/product.dart';
+import 'package:fumzy/networking/customer-datasource.dart';
+import 'package:fumzy/networking/sales-datasource.dart';
 import 'package:fumzy/screens/dashboard/drawer.dart';
 import 'package:fumzy/utils/constant-styles.dart';
 import 'package:fumzy/utils/functions.dart';
+
+enum PaymentMode { cash, transfer }
+
+PaymentMode? _paymentMode = PaymentMode.cash;
 
 class AddSale extends StatefulWidget {
 
@@ -28,20 +36,9 @@ class _AddSaleState extends State<AddSale> {
 
   final _formKey = GlobalKey<FormState>();
 
-  List<String> _productName = [
-    "Carton of Smirnoff non-acholic drink 100cl",
-    "Carton of Smirnoff non-acholic drink 200cl",
-    "Carton of Smirnoff non-acholic drink 300cl",
-    "Carton of Smirnoff non-acholic drink 400cl",
-    "Carton of Smirnoff non-acholic drink 500cl",
-    "Carton of Smirnoff non-acholic drink 600cl",
-  ];
+  bool _showSpinner = false;
 
-  //String? _selectedProduct = "Carton of Smirnoff non-acholic drink 300cl";
-
-  TextEditingController quantity = TextEditingController();
-
-  /// Extra co-owners to add
+  /// All sales container added
   int _sales = 0;
 
   List<Widget> _salesContainers = [];
@@ -55,25 +52,34 @@ class _AddSaleState extends State<AddSale> {
   /// A List to hold the all the products
   List<Product> _products = [];
 
-  /// An Integer variable to hold the length of [_products]
-  int? _productsLength;
-
   void _getAllProducts({bool? refresh}) async {
     Future<List<Product>> allProducts = futureValue.getAllProducts(refresh: refresh);
     allProducts.then((value) {
       _products.addAll(value);
-      _productsLength = value.length;
     }).catchError((e){
       print(e);
       Functions.showErrorMessage(e);
     });
   }
 
-  /// Calls [_getCurrentUser()] before the class builds its widgets
+  /// A List to hold the all the customer names
+  List<CustomerName> _customerNames = [];
+
+  void _getAllCustomerNames() async {
+    Future<List<CustomerName>> allCustomerNames = futureValue.getAllCustomerNames();
+    allCustomerNames.then((value) {
+      _customerNames.addAll(value);
+    }).catchError((e){
+      print(e);
+      Functions.showErrorMessage(e);
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     _getAllProducts(refresh: true);
+    _getAllCustomerNames();
   }
 
   @override
@@ -135,7 +141,8 @@ class _AddSaleState extends State<AddSale> {
                               ),
                             ),
                             SizedBox(height: 60),
-                            Button(
+                            _salesContainers.length > 0
+                                ? Button(
                               onTap: (){
                                 if(_formKey.currentState!.validate()){
                                   setState(() {
@@ -146,9 +153,6 @@ class _AddSaleState extends State<AddSale> {
                                         _realSalesData.add(_salesData[i]);
                                       }
                                     }
-                                    print(_salesContainers);
-                                    print(_salesData);
-                                    print(_realSalesData);
                                     if(_realSalesData.isNotEmpty){
                                       _realSalesData.forEach((element) {
                                         _totalPrice += element['total'];
@@ -169,7 +173,8 @@ class _AddSaleState extends State<AddSale> {
                                   ),
                                 ),
                               ),
-                            ),
+                            )
+                                : Container()
                           ],
                         ),
                       ),
@@ -226,13 +231,19 @@ class _AddSaleState extends State<AddSale> {
                       ),
                     ),
                     suggestionsCallback: (pattern) async {
-                      return await Suggestions.getSuggestions(pattern, _products);
+                      return await Suggestions.getProductSuggestions(pattern, _products);
                     },
                     itemBuilder: (context, Product suggestion) {
                       return ListTile(title: Text(suggestion.productName!));
                     },
                     transitionBuilder: (context, suggestionsBox, controller) {
                       return suggestionsBox;
+                    },
+                    validator: (value) {
+                      if (value!.isEmpty && selectedProduct == null) {
+                        return 'Select Product';
+                      }
+                      return null;
                     },
                     onSuggestionSelected: (Product suggestion) {
                       if (!mounted) return;
@@ -241,6 +252,7 @@ class _AddSaleState extends State<AddSale> {
                         product.text = suggestion.productName!;
                         _salesData[index - 1]['product'] = suggestion;
                         sellingPrice.text = suggestion.sellingPrice!.toString();
+                        _salesData[index - 1]['sellingPrice'] = sellingPrice.text;
                       });
                     },
                   ),
@@ -320,6 +332,11 @@ class _AddSaleState extends State<AddSale> {
                     },
                     validator: (value) {
                       if (value!.isEmpty) return 'Enter quantity';
+                      if(selectedProduct != null) {
+                        if(selectedProduct!.currentQty! < double.parse(value)){
+                          return 'You don\'t have up to $value ${selectedProduct!.productName}';
+                        }
+                      }
                       return null;
                     },
                     decoration: kTextFieldBorderDecoration.copyWith(
@@ -395,25 +412,28 @@ class _AddSaleState extends State<AddSale> {
     "Credit",
   ];
 
-  Future<void> _checkout (BoxConstraints constraints) {
+  Future<void> _checkout(BoxConstraints constraints) {
     final formKey = GlobalKey<FormState>();
     TextEditingController discount = TextEditingController();
+    CustomerName? selectedCustomer;
     TextEditingController customer = TextEditingController();
     TextEditingController amountPaid = TextEditingController();
+    amountPaid.text = _totalPrice.toString();
     TextEditingController dueDate = TextEditingController();
+    DateTime? dueDateTime;
 
-    String? selectedPaymentStatus = "Fully Paid";
-
-    bool cash = true;
-    bool transfer = false;
-
+    String? selectedPaymentStatus = 'Fully Paid';
 
     double totalPayableAmount = _totalPrice;
+
     double balance = 0;
+
+    setState(() => _showSpinner = false);
 
     return showDialog(
       context: context,
       barrierColor: Color(0xFF000428).withOpacity(0.86),
+      barrierDismissible: false,
       builder: (context) => GestureDetector(
         onTap: (){
           FocusScopeNode currentFocus = FocusScope.of(context);
@@ -551,6 +571,7 @@ class _AddSaleState extends State<AddSale> {
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.normal,
                                               ),
+                                              contentPadding: EdgeInsets.all(10),
                                             ),
                                           ),
                                         ),
@@ -581,29 +602,36 @@ class _AddSaleState extends State<AddSale> {
                                         SizedBox(height: 10),
                                         Container(
                                           width: constraints.maxWidth,
-                                          child: TextFormField(
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.normal,
+                                          child: TypeAheadFormField(
+                                            textFieldConfiguration: TextFieldConfiguration(
+                                              controller: customer,
+                                              decoration: kTextFieldBorderDecoration.copyWith(
+                                                hintText: 'Customer name',
+                                                contentPadding: EdgeInsets.all(10),
+                                              ),
                                             ),
-                                            textInputAction: TextInputAction.next,
-                                            keyboardType: TextInputType.text,
-                                            controller: customer,
+                                            suggestionsCallback: (pattern) async {
+                                              return await Suggestions.getCustomerSuggestions(pattern, _customerNames);
+                                            },
+                                            itemBuilder: (context, CustomerName suggestion) {
+                                              return ListTile(title: Text(suggestion.name!));
+                                            },
+                                            transitionBuilder: (context, suggestionsBox, controller) {
+                                              return suggestionsBox;
+                                            },
                                             validator: (value) {
                                               if (value!.isEmpty) {
-                                                return 'Enter customer name';
+                                                return 'Select or type customer';
                                               }
                                               return null;
                                             },
-                                            decoration: kTextFieldBorderDecoration.copyWith(
-                                              hintText: 'Enter customer name',
-                                              hintStyle: TextStyle(
-                                                color: Colors.black.withOpacity(0.5),
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.normal,
-                                              ),
-                                            ),
+                                            onSuggestionSelected: (CustomerName suggestion) {
+                                              if (!mounted) return;
+                                              setState(() {
+                                                selectedCustomer = suggestion;
+                                                customer.text = suggestion.name!;
+                                              });
+                                            },
                                           ),
                                         ),
                                       ],
@@ -656,7 +684,7 @@ class _AddSaleState extends State<AddSale> {
                                               ),
                                             ),
                                             decoration: kTextFieldBorderDecoration.copyWith(
-                                              contentPadding: EdgeInsets.all(15),
+                                              contentPadding: EdgeInsets.all(10),
                                             ),
                                             items: paymentStatus.map((value) {
                                               return DropdownMenuItem(
@@ -705,8 +733,13 @@ class _AddSaleState extends State<AddSale> {
                                                     onChanged: (value) {
                                                       setDialogState(() {
                                                         if(value != 'Fully Paid'){
-                                                          balance = _totalPrice - double.parse(value);
-                                                        } else {
+                                                          try{
+                                                            balance = _totalPrice - double.parse(value);
+                                                          } catch(e){
+                                                            balance = 0;
+                                                          }
+                                                        }
+                                                        else {
                                                           balance = 0;
                                                         }
                                                       });
@@ -724,6 +757,7 @@ class _AddSaleState extends State<AddSale> {
                                                         fontSize: 14,
                                                         fontWeight: FontWeight.normal,
                                                       ),
+                                                      contentPadding: EdgeInsets.all(10),
                                                     ),
                                                   ),
                                                 ),
@@ -754,7 +788,8 @@ class _AddSaleState extends State<AddSale> {
                                     ),
                                     SizedBox(height: 20),
                                     // Balance due date
-                                    Column(
+                                    selectedPaymentStatus != 'Fully Paid'
+                                        ? Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text('Balance Due Date'),
@@ -767,28 +802,56 @@ class _AddSaleState extends State<AddSale> {
                                               fontSize: 14,
                                               fontWeight: FontWeight.normal,
                                             ),
-                                            textInputAction: TextInputAction.done,
                                             keyboardType: TextInputType.text,
                                             controller: dueDate,
+                                            readOnly: true,
+                                            onTap: () async {
+                                              DateTime now = DateTime.now();
+                                              final DateTime? picked = await showDatePicker(
+                                                  context: context,
+                                                  initialDate: now,
+                                                  firstDate: now,
+                                                  lastDate: DateTime(2030),
+                                                  builder: (BuildContext context, Widget? child) {
+                                                    return Theme(
+                                                      data: ThemeData.light().copyWith(
+                                                        colorScheme: ColorScheme.light().copyWith(
+                                                          primary: Color(0xFF00509A),
+                                                        ),
+                                                      ),
+                                                      child: child!,
+                                                    );
+                                                  }
+                                              );
+                                              if (picked != null && picked != now) {
+                                                if (!mounted) return;
+                                                setDialogState(() {
+                                                  dueDateTime = picked;
+                                                  dueDate.text = Functions.getFormattedDate(picked);
+                                                });
+                                              }
+                                            },
                                             validator: (value) {
-                                              if (value!.isEmpty) {
+                                              if (value!.isEmpty && selectedPaymentStatus != 'Fully Paid') {
                                                 return 'Enter due date';
                                               }
                                               return null;
                                             },
                                             decoration: kTextFieldBorderDecoration.copyWith(
-                                              hintText: 'Enter due date',
+                                              hintText: 'Select due date',
                                               hintStyle: TextStyle(
                                                 color: Colors.black.withOpacity(0.5),
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.normal,
                                               ),
+                                              contentPadding: EdgeInsets.all(10),
                                             ),
                                           ),
                                         ),
+                                        SizedBox(height: 20),
                                       ],
-                                    ),
-                                    SizedBox(height: 20),
+                                    )
+                                        : Container(),
                                     // Mode of payment
                                     Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -800,58 +863,50 @@ class _AddSaleState extends State<AddSale> {
                                             // Cash
                                             Row(
                                               mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment: CrossAxisAlignment.center,
                                               children: [
-                                                Radio(
-                                                  value: cash,
-                                                  groupValue: cash,
+                                                Radio<PaymentMode>(
+                                                  value: PaymentMode.cash,
                                                   activeColor: Color(0xFF00509A),
+                                                  groupValue: _paymentMode,
                                                   visualDensity: VisualDensity(
                                                     horizontal: -4,
                                                   ),
-                                                  onChanged: (value) {
-                                                    setDialogState (() {
-                                                      cash = true;
-                                                      transfer = false;
-                                                    });
+                                                  onChanged: (PaymentMode? value) {
+                                                    setDialogState(() { _paymentMode = value; });
                                                   },
                                                 ),
                                                 Padding(
-                                                  padding: const EdgeInsets.only(top: 2.0, left: 2.0),
+                                                  padding: const EdgeInsets.only(top: 2.0),
                                                   child: Text(
                                                     'Cash',
-                                                    style: TextStyle(
-                                                        fontSize: 16
-                                                    ),
+                                                    style: TextStyle(fontSize: 16),
                                                   ),
                                                 ),
                                               ],
                                             ),
                                             SizedBox(width: 15),
-                                            // Card
+                                            // Transfer
                                             Row(
                                               mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment: CrossAxisAlignment.center,
                                               children: [
-                                                Radio(
-                                                  value: transfer,
-                                                  groupValue: transfer,
+                                                Radio<PaymentMode>(
+                                                  value: PaymentMode.transfer,
                                                   activeColor: Color(0xFF00509A),
+                                                  groupValue: _paymentMode,
                                                   visualDensity: VisualDensity(
                                                     horizontal: -4,
                                                   ),
-                                                  onChanged: (value) {
-                                                    setDialogState (() {
-                                                      cash = false;
-                                                      transfer = true;
-                                                    });
+                                                  onChanged: (PaymentMode? value) {
+                                                    setDialogState(() { _paymentMode = value; });
                                                   },
                                                 ),
                                                 Padding(
-                                                  padding: const EdgeInsets.only(top: 2.0, left: 2.0),
+                                                  padding: const EdgeInsets.only(top: 2.0),
                                                   child: Text(
                                                     'Transfer',
-                                                    style: TextStyle(
-                                                        fontSize: 16
-                                                    ),
+                                                    style: TextStyle(fontSize: 16),
                                                   ),
                                                 ),
                                               ],
@@ -867,12 +922,56 @@ class _AddSaleState extends State<AddSale> {
                             SizedBox(height: 40),
                             Button(
                               onTap: (){
-                                Navigator.pop(context);
-                                _generateInvoice();
+                                if(formKey.currentState!.validate()){
+                                  Map<String, dynamic> body = {};
+                                  if(selectedCustomer == null){
+                                    body['name'] = customer.text;
+                                  }
+                                  else {
+                                    body['id'] = selectedCustomer!.id;
+                                    body['name'] = selectedCustomer!.name;
+                                  }
+
+                                  List<dynamic> reports = [];
+                                  for(int i = 0; i < _realSalesData.length; i++){
+                                    reports.add(
+                                        {
+                                          'quantity': _realSalesData[i]['quantity'],
+                                          'productName': _realSalesData[i]['product'].productName,
+                                          'costPrice': _realSalesData[i]['product'].costPrice,
+                                          'unitPrice': _realSalesData[i]['sellingPrice'],
+                                          'totalPrice': _realSalesData[i]['total']
+                                        }
+                                    );
+                                  }
+                                  body['report'] = reports;
+                                  body['totalAmount'] = _totalPrice;
+                                  body['paymentMade'] = amountPaid.text;
+                                  body['paid'] = selectedPaymentStatus == 'Fully Paid' ? true : false;
+                                  body['soldAt'] = DateTime.now().toIso8601String();
+                                  if(selectedPaymentStatus == 'Fully Paid'){
+                                    body['paymentReceivedAt'] = DateTime.now().toIso8601String();
+                                  }
+                                  else {
+                                    body['dueDate'] = dueDateTime!.toIso8601String();
+                                  }
+                                  String mode = _paymentMode == PaymentMode.cash
+                                      ? 'Cash' : 'Transfer' ;
+                                  if(!mounted)return;
+                                  setDialogState(() => _showSpinner = true);
+                                  if(selectedCustomer == null){
+                                    _addSales(mode, customer.text, ()=> _addNewCustomer(body, setDialogState));
+                                  }
+                                  else {
+                                    _addSales(mode, selectedCustomer!.name!, ()=> _addNewReportsCustomer(body, setDialogState));
+                                  }
+                                }
                               },
                               buttonColor: Color(0xFF00509A),
                               child: Center(
-                                child: Text(
+                                child: _showSpinner
+                                    ? CircleProgressIndicator()
+                                    : Text(
                                   'Generate Invoice',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
@@ -1104,6 +1203,67 @@ class _AddSaleState extends State<AddSale> {
         ),
       ),
     );
+  }
+
+  void _addSales(String paymentMode, String customer, Function next) async{
+    var api = SalesDataSource();
+    for(int i = 0; i < _realSalesData.length; i++){
+      Map<String, dynamic> body = {
+        'customerName': customer,
+        'quantity': _realSalesData[i]['quantity'],
+        'productName': _realSalesData[i]['product'].productName,
+        'costPrice': _realSalesData[i]['product'].costPrice,
+        'unitPrice': _realSalesData[i]['sellingPrice'],
+        'totalPrice': _realSalesData[i]['total'],
+        "paymentMode": paymentMode
+      };
+      await api.addSales(body).then((message) async{
+        print('saved');
+      }).catchError((e){
+        if(!mounted)return;
+        print(e);
+        Functions.showErrorMessage(e);
+      });
+    }
+    await next();
+  }
+
+  Future<void> _addNewCustomer(Map<String, dynamic> body, StateSetter setDialogState) async{
+    if(!mounted)return;
+    setDialogState(() => _showSpinner = true);
+    var api = CustomerDataSource();
+    await api.addNewCustomer(body).then((message) async{
+      if(!mounted)return;
+      setDialogState((){
+        _showSpinner = false;
+        Navigator.pop(context);
+      });
+      Functions.showSuccessMessage('Successfully added sales');
+    }).catchError((e){
+      if(!mounted)return;
+      setDialogState(()=> _showSpinner = false);
+      print(e);
+      Functions.showErrorMessage(e);
+    });
+  }
+
+  Future<void> _addNewReportsCustomer(Map<String, dynamic> body, StateSetter setDialogState) async{
+    if(!mounted)return;
+    setDialogState(() => _showSpinner = true);
+    var api = CustomerDataSource();
+    await api.addNewReportsCustomer(body).then((message) async{
+      if(!mounted)return;
+      setDialogState((){
+        _showSpinner = false;
+        Navigator.pop(context);
+      });
+      Functions.showSuccessMessage('Successfully added sales');
+    }).catchError((e){
+      if(!mounted)return;
+      setDialogState(()=> _showSpinner = false);
+      print(e);
+      Functions.showErrorMessage(e);
+    });
   }
 
 }

@@ -79,8 +79,6 @@ class _TransactionsState extends State<Transactions> {
 
   bool _showPurchaseSpinner = false;
 
-
-
   void _getAllPurchases({bool? refresh}) async {
     Future<Map<String, dynamic>> products = futureValue.getAllPurchasesPaginated(
         refresh: refresh, page: _purchasePageSize, limit: 50
@@ -228,7 +226,6 @@ class _TransactionsState extends State<Transactions> {
       Functions.showErrorMessage(e.toString());
     });
   }
-
 
   /// Function to refresh list of products from page 1 similar to [_getAllProducts()]
   Future<Null> _refreshProducts() {
@@ -884,6 +881,7 @@ class _TransactionsState extends State<Transactions> {
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.normal,
                                               ),
+                                              contentPadding: EdgeInsets.all(10),
                                             ),
                                           ),
                                         ),
@@ -914,6 +912,12 @@ class _TransactionsState extends State<Transactions> {
                                             },
                                             transitionBuilder: (context, suggestionsBox, controller) {
                                               return suggestionsBox;
+                                            },
+                                            validator: (value) {
+                                              if (value!.isEmpty) {
+                                                return 'Select or type category';
+                                              }
+                                              return null;
                                             },
                                             onSuggestionSelected: (Category suggestion) {
                                               if (!mounted) return;
@@ -962,6 +966,7 @@ class _TransactionsState extends State<Transactions> {
                                                         fontSize: 14,
                                                         fontWeight: FontWeight.normal,
                                                       ),
+                                                      contentPadding: EdgeInsets.all(10),
                                                     ),
                                                   ),
                                                 ),
@@ -1000,6 +1005,7 @@ class _TransactionsState extends State<Transactions> {
                                                         fontSize: 14,
                                                         fontWeight: FontWeight.normal,
                                                       ),
+                                                      contentPadding: EdgeInsets.all(10),
                                                     ),
                                                   ),
                                                 ),
@@ -1040,6 +1046,7 @@ class _TransactionsState extends State<Transactions> {
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.normal,
                                               ),
+                                              contentPadding: EdgeInsets.all(10),
                                             ),
                                           ),
                                         ),
@@ -1077,6 +1084,7 @@ class _TransactionsState extends State<Transactions> {
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.normal,
                                               ),
+                                              contentPadding: EdgeInsets.all(10),
                                             ),
                                           ),
                                         ),
@@ -1114,6 +1122,7 @@ class _TransactionsState extends State<Transactions> {
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.normal,
                                               ),
+                                              contentPadding: EdgeInsets.all(10),
                                             ),
                                           ),
                                         ),
@@ -1148,6 +1157,7 @@ class _TransactionsState extends State<Transactions> {
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.normal,
                                               ),
+                                              contentPadding: EdgeInsets.all(10),
                                             ),
                                           ),
                                         ),
@@ -1242,7 +1252,8 @@ class _TransactionsState extends State<Transactions> {
     }).catchError((e){
       if(!mounted)return;
       setDialogState(()=> _showSpinner = false);
-      Functions.showErrorMessage(e.toString());
+      Functions.showErrorMessage(e);
     });
   }
+
 }
