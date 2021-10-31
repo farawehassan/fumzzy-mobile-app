@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:fumzy/bloc/future-values.dart';
 import 'package:fumzy/components/app-bar.dart';
 import 'package:fumzy/components/arrow-button.dart';
 import 'package:fumzy/components/button.dart';
+import 'package:fumzy/components/shimmer-loader.dart';
+import 'package:fumzy/model/creditor.dart';
 import 'package:fumzy/screens/dashboard/drawer.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:fumzy/utils/constant-styles.dart';
+import 'package:fumzy/utils/functions.dart';
 
 class Creditors extends StatefulWidget {
 
@@ -15,6 +19,189 @@ class Creditors extends StatefulWidget {
 }
 
 class _CreditorsState extends State<Creditors> {
+
+  /// Instantiating a class of the [FutureValues]
+  var futureValue = FutureValues();
+
+  /// GlobalKey of a my RefreshIndicatorState to refresh my list items
+  final GlobalKey<RefreshIndicatorState> _refreshCustomerKey = GlobalKey<RefreshIndicatorState>();
+  final GlobalKey<RefreshIndicatorState> _refreshDebtorKey = GlobalKey<RefreshIndicatorState>();
+
+  bool _showSpinner = false;
+
+  TextEditingController search = TextEditingController();
+
+  /// A List to hold the all the creditors
+  List<Creditor> _creditors = [];
+
+  /// A List to hold all the filtered creditors
+  List<Creditor> _filteredCreditors = [];
+
+  /// An Integer variable to hold the length of [_creditors]
+  int? _creditorsLength;
+
+  int? _totalCreditorCount;
+
+  int _creditorPageSize = 1;
+
+  bool _showCreditorSpinner = false;
+
+  void _getAllCreditors({bool? refresh}) async {
+    Future<Map<String, dynamic>> customers = futureValue.getAllCustomersPaginated(
+        refresh: refresh, page: _creditorPageSize, limit: 50
+    );
+    await customers.then((value) {
+      if(!mounted)return;
+      setState(() {
+        _creditors.addAll(value['items']);
+        _filteredCreditors = _creditors;
+        _creditorsLength = _filteredCreditors.length;
+        _totalCreditorCount = value['totalCount'];
+      });
+    }).catchError((e){
+      print(e);
+      Functions.showErrorMessage(e);
+    });
+  }
+
+  Future _loadMoreCreditors() async {
+    setState(() { _creditorPageSize += 1; });
+    Future<Map<String, dynamic>> purchases = futureValue.getAllCustomersPaginated(page: _creditorPageSize, limit: 50);
+    await purchases.then((value) {
+      if (!mounted) return;
+      setState(() {
+        _creditors.addAll(value['items']);
+        _filteredCreditors = _creditors;
+        _creditorsLength = _creditors.length;
+        _totalCreditorCount = value['totalCount'];
+        _showCreditorSpinner = false;
+      });
+    }).catchError((e){
+      print(e);
+      if(!mounted)return;
+      Functions.showErrorMessage(e);
+    });
+  }
+
+  /// A function to build the list of all the creditors
+  Widget _buildCreditorList() {
+    List<DataRow> itemRow = [];
+    if(_filteredCreditors.length > 0 && _filteredCreditors.isNotEmpty){
+      for (int i = 0; i < _filteredCreditors.length; i++){
+        Creditor creditor = _filteredCreditors[i];
+        double totalSales = 0;
+        creditor.reports!.forEach((element) {
+          totalSales += element.amount!;
+        });
+        itemRow.add(
+          DataRow(cells: [
+            DataCell(Text(creditor.name!)),
+            DataCell(Text(Functions.money(totalSales, 'N'))),
+            DataCell(Text('-')),
+            DataCell(TableArrowButton()),
+          ],
+          onSelectChanged: (value){
+
+          }),
+        );
+      }
+      return NotificationListener<ScrollNotification>(
+        onNotification: (ScrollNotification scrollInfo) {
+          if (!_showCreditorSpinner && scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
+            if(_totalCreditorCount! > (_creditorPageSize * 50)){
+              setState(() { _showCreditorSpinner = true; });
+              _loadMoreCreditors();
+            }
+          }
+          return true;
+        },
+        child: RefreshIndicator(
+          onRefresh: _refreshCreditors,
+          key: _refreshCustomerKey,
+          color: Color(0xFF004E92),
+          child: Container(
+            decoration: kTableContainer,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      physics: BouncingScrollPhysics(),
+                      child: DataTable(
+                        headingTextStyle: TextStyle(
+                          color: Color(0xFF75759E),
+                          fontSize: 14,
+                          fontWeight: FontWeight.normal,
+                        ),
+                        dataTextStyle: TextStyle(
+                          color: Color(0xFF1F1F1F),
+                          fontSize: 14,
+                          //fontWeight: FontWeight.w400,
+                        ),
+                        columnSpacing: 15.0,
+                        dataRowHeight: 65.0,
+                        showCheckboxColumn: false,
+                        columns: [
+                          DataColumn(label: Text('Name')),
+                          DataColumn(label: Text('Total Sales')),
+                          DataColumn(label: Text('Volume')),
+                          DataColumn(label: Text('Onboard Date')),
+                          DataColumn(label: Text('')),
+                        ],
+                        rows: itemRow,
+                      )
+                  ),
+                  const SizedBox(height: 80),
+                  _showCreditorSpinner
+                      ? Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(24.0),
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0A459F)),
+                      ),
+                    ),
+                  )
+                      : Container(),
+                  const SizedBox(height: 100),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+    else if(_creditorsLength == 0) return Container();
+    return ShimmerLoader();
+  }
+
+  /// Function to refresh list of creditors from page 1 similar to [_getAllCreditors()]
+  Future<Null> _refreshCreditors() {
+    Future<Map<String, dynamic>> customers = futureValue.getAllCustomersPaginated(page: 1, limit: 50);
+    return customers.then((value) {
+      _creditorsLength = null;
+      _creditors.clear();
+      _filteredCreditors.clear();
+      _totalCreditorCount = null;
+      if(!mounted)return;
+      setState(() {
+        _creditors.addAll(value['items']);
+        _filteredCreditors = _creditors;
+        _creditorsLength = _creditors.length;
+        _totalCreditorCount = value['totalCount'];
+      });
+    }).catchError((e){
+      print(e);
+      if(!mounted)return;
+      Functions.showErrorMessage(e);
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getAllCreditors();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -155,6 +342,7 @@ class _CreditorsState extends State<Creditors> {
       )),
     );
   }
+
 }
 
 class ReusableDataTable extends StatelessWidget {

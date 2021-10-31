@@ -42,14 +42,14 @@ class _TotalSalesState extends State<TotalSales> {
                 ],
                 rows: [
                   DataRow(cells: [
-                    DataCell(ReusableDownloadPdf(invoiceNo: 022341)),
+                    DataCell(ReusableDownloadPdf(invoiceNo: '022341')),
                     DataCell(Text('Fully Paid')),
                     DataCell(Text('N120,000')),
                     DataCell(Text('23, May\n12:13pm')),
                   ]
                   ),
                   DataRow(cells: [
-                    DataCell(ReusableDownloadPdf(invoiceNo: 022341)),
+                    DataCell(ReusableDownloadPdf(invoiceNo: '022341')),
                     DataCell(Row(
                       children: [
                         Text('Part-Paid'),
@@ -62,7 +62,7 @@ class _TotalSalesState extends State<TotalSales> {
                   ]
                   ),
                   DataRow(cells: [
-                    DataCell(ReusableDownloadPdf(invoiceNo: 022341)),
+                    DataCell(ReusableDownloadPdf(invoiceNo: '022341')),
                     DataCell(Row(
                       children: [
                         Text('Credit'),

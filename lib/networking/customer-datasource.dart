@@ -24,7 +24,7 @@ class CustomerDataSource{
   /// It returns a Map of [<String, dynamic>]
   Future<Map<String, dynamic>> getAllCustomersPaginated({bool? refresh, int? page, int? limit}) async {
     Map<String, dynamic> result = {};
-    String fileName = 'customers.json';
+    String fileName = 'customers-p.json';
     var dir = await getTemporaryDirectory();
     File file = File(dir.path + '/' + fileName);
     if(refresh == false && file.existsSync()){
@@ -47,6 +47,48 @@ class CustomerDataSource{
       });
       String GET_ALL_CUSTOMERS_URL = GET_ALL_CUSTOMERS + '?page=$page&limit=$limit';
       return _netUtil.get(GET_ALL_CUSTOMERS_URL, headers: header).then((dynamic res) {
+        if (res['error']) throw res['message'];
+        file.writeAsStringSync(jsonEncode(res), flush: true, mode: FileMode.write);
+        List<AllCustomers> allCustomers = [];
+        var rest = res['data']['items'] as List;
+        allCustomers = rest.map<AllCustomers>((json) => AllCustomers.fromJson(json)).toList();
+        result['totalCount'] = res['data']['totalCount'];
+        result['page'] = res['data']['page'];
+        result['items'] = allCustomers;
+        return result;
+      }).catchError((e) {
+        errorHandler.handleError(e);
+      });
+    }
+  }
+
+  /// A function that fetches all debtors in the database GET
+  /// It returns a Map of [<String, dynamic>]
+  Future<Map<String, dynamic>> getAllDebtorsPaginated({bool? refresh, int? page, int? limit}) async {
+    Map<String, dynamic> result = {};
+    String fileName = 'debtors-p.json';
+    var dir = await getTemporaryDirectory();
+    File file = File(dir.path + '/' + fileName);
+    if(refresh == false && file.existsSync()){
+      final fileData = file.readAsStringSync();
+      final res = jsonDecode(fileData);
+      List<AllCustomers> allCustomers = [];
+      var rest = res['data']['items'] as List;
+      allCustomers = rest.map<AllCustomers>((json) => AllCustomers.fromJson(json)).toList();
+      result['totalCount'] = res['data']['totalCount'];
+      result['page'] = res['data']['page'];
+      result['items'] = allCustomers;
+      return result;
+    }
+    else {
+      late Map<String, String> header;
+      Future<User> user = _futureValue.getCurrentUser();
+      await user.then((value) {
+        if(value.token == null) throw('You\'re not authorized, log out and log in back and try again!');
+        header = {'Authorization': 'Bearer ${value.token}'};
+      });
+      String GET_ALL_DEBTORS_URL = GET_ALL_DEBTORS + '?page=$page&limit=$limit';
+      return _netUtil.get(GET_ALL_DEBTORS_URL, headers: header).then((dynamic res) {
         if (res['error']) throw res['message'];
         file.writeAsStringSync(jsonEncode(res), flush: true, mode: FileMode.write);
         List<AllCustomers> allCustomers = [];

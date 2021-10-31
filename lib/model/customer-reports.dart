@@ -87,27 +87,27 @@ class Report {
   });
 
   /// This variable holds the reports quantity
-  String? quantity;
+  double? quantity;
 
   /// This variable holds the reports product name
   String? productName;
 
   /// This variable holds the reports cost price
-  String? costPrice;
+  double? costPrice;
 
   /// This variable holds the reports unit price
-  String? unitPrice;
+  double? unitPrice;
 
   /// This variable holds the reports total price
-  String? totalPrice;
+  double? totalPrice;
 
   /// Function to map customer report's details from a JSON object
   factory Report.fromJson(Map<String, dynamic> json) => Report(
-    quantity: json["quantity"],
+    quantity: double.parse(json["quantity"].toString()),
     productName: json["productName"],
-    costPrice: json["costPrice"],
-    unitPrice: json["unitPrice"],
-    totalPrice: json["totalPrice"],
+    costPrice: double.parse(json["costPrice"].toString()),
+    unitPrice: double.parse(json["unitPrice"].toString()),
+    totalPrice: double.parse(json["totalPrice"].toString()),
   );
 
   /// Function to map customer report's details to a [Map<String, dynamic>] object

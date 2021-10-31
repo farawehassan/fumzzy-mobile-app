@@ -42,7 +42,7 @@ class _DebtHistoryState extends State<DebtHistory> {
                 rows: [
                   DataRow(cells: [
                     DataCell(Text('N120,000')),
-                    DataCell(ReusableDownloadPdf(invoiceNo: 022341)),
+                    DataCell(ReusableDownloadPdf(invoiceNo: '022341')),
                     DataCell(Text('23, May\n12:13pm')),
                     DataCell(Text(
                       '23, May 2021',
@@ -64,7 +64,7 @@ class _DebtHistoryState extends State<DebtHistory> {
                   ]),
                   DataRow(cells: [
                     DataCell(Text('N12,000')),
-                    DataCell(ReusableDownloadPdf(invoiceNo: 022341)),
+                    DataCell(ReusableDownloadPdf(invoiceNo: '022341')),
                     DataCell(Text('23, May\n12:13pm')),
                     DataCell(Text(
                       '23, May 2021',

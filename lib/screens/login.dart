@@ -234,6 +234,11 @@ class _LoginState extends State<Login> {
                       color: Color(0xFF004E92),
                       fontWeight: FontWeight.w500,
                     ),
+                    validator: (value) {
+                      if (value!.isEmpty) return 'Enter your pin';
+                      if (_pin.length != 4) return 'Enter a valid 4 digit pin';
+                      return null;
+                    },
                     pinTheme: PinTheme(
                         shape: PinCodeFieldShape.box,
                         borderWidth: 1,

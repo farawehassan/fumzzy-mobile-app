@@ -119,13 +119,15 @@ class UserDataSource{
   /// It returns a [Message]
   Future<dynamic> resetStaffPin() async {
     Map<String, String>? header;
+    String? userId;
     Future<User> user = _futureValue.getCurrentUser();
     await user.then((value) {
       if(value.token == null) throw('You\'re not authorized, log out and log in back and try again!');
       header = {'Authorization': 'Bearer ${value.token}'};
+      userId = value.id;
     });
-    print(header);
-    return _netUtil.put(RESET_PIN, headers: header).then((dynamic res) {
+    String RESET_PIN_URL = RESET_PIN + '/$userId';
+    return _netUtil.put(RESET_PIN_URL, headers: header).then((dynamic res) {
       if (res['error']) throw res['message'];
       return res['message'];
     }).catchError((e) {

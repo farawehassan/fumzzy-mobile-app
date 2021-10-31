@@ -4,7 +4,8 @@ class ReusableDownloadPdf extends StatelessWidget {
 
   ReusableDownloadPdf({required this.invoiceNo});
 
-  final int invoiceNo;
+  final String invoiceNo;
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -22,7 +23,7 @@ class ReusableDownloadPdf extends StatelessWidget {
           ),
         ),
         Text(
-          invoiceNo.toString(),
+          invoiceNo,
           style: TextStyle(
             decoration: TextDecoration.underline,
             color: Color(0xFF75759E),

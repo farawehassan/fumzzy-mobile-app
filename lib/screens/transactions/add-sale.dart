@@ -80,6 +80,11 @@ class _AddSaleState extends State<AddSale> {
     super.initState();
     _getAllProducts(refresh: true);
     _getAllCustomerNames();
+    setState(() {
+      _sales += 1;
+      _salesData.add({});
+      _buildExtraProduct(_sales);
+    });
   }
 
   @override
@@ -91,8 +96,7 @@ class _AddSaleState extends State<AddSale> {
       },
       child: LayoutBuilder(
         builder: (context, constraints) => (Scaffold(
-          appBar: buildAppBar(constraints, 'TRANSACTIONS'),
-          drawer: RefactoredDrawer(title: 'TRANSACTIONS'),
+          appBar: buildAppBarWithBackButton(context, 'TRANSACTIONS'),
           body: Padding(
               padding: EdgeInsets.fromLTRB(20, 30, 20, 0),
               child: SingleChildScrollView(
@@ -101,6 +105,7 @@ class _AddSaleState extends State<AddSale> {
                   children: [
                     Row(
                       mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         InkWell(
                           onTap: () => Navigator.pop(context),
@@ -110,73 +115,68 @@ class _AddSaleState extends State<AddSale> {
                             color: Color(0xFF004E92).withOpacity(0.5),
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 5.0),
-                          child: Text(
-                            ' Add a new Sale',
-                            style: TextStyle(
-                              color: Color(0xFF75759E),
-                              fontWeight: FontWeight.w600,
-                              fontSize: 15.7,
-                            ),
+                        Text(
+                          ' Add a new Sale',
+                          style: TextStyle(
+                            color: Color(0xFF75759E),
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15.7,
                           ),
                         ),
                       ],
                     ),
                     SizedBox(height: 35),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Container(
-                        width: constraints.maxWidth,
-                        decoration: kTableContainer,
-                        padding: EdgeInsets.fromLTRB(30, 24, 20, 24),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Form(
-                              key: _formKey,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: _salesContainers
-                              ),
+                    Container(
+                      width: constraints.maxWidth,
+                      //decoration: kTableContainer,
+                      padding: EdgeInsets.fromLTRB(15, 24, 15, 24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Form(
+                            key: _formKey,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: _salesContainers
                             ),
-                            SizedBox(height: 60),
-                            _salesContainers.length > 0
-                                ? Button(
-                              onTap: (){
-                                if(_formKey.currentState!.validate()){
-                                  setState(() {
-                                    _realSalesData.clear();
-                                    _totalPrice = 0;
-                                    for(int i = 0; i < _salesData.length; i++){
-                                      if(_salesContainers[i].runtimeType != Container){
-                                        _realSalesData.add(_salesData[i]);
-                                      }
+                          ),
+                          SizedBox(height: 60),
+                          _salesContainers.length > 0
+                              ? Button(
+                            onTap: (){
+                              if(_formKey.currentState!.validate()){
+                                setState(() {
+                                  _realSalesData.clear();
+                                  _totalPrice = 0;
+                                  for(int i = 0; i < _salesData.length; i++){
+                                    if(_salesContainers[i].runtimeType != Container){
+                                      _realSalesData.add(_salesData[i]);
                                     }
-                                    if(_realSalesData.isNotEmpty){
-                                      _realSalesData.forEach((element) {
-                                        _totalPrice += element['total'];
-                                      });
-                                      _checkout(constraints);
-                                    }
-                                  });
-                                }
-                              },
-                              buttonColor: Color(0xFF00509A),
-                              child: Center(
-                                child: Text(
-                                  'Continue to Checkout',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Color(0xFFFFFFFF),
-                                    fontWeight: FontWeight.normal,
-                                  ),
+                                  }
+                                  if(_realSalesData.isNotEmpty){
+                                    _realSalesData.forEach((element) {
+                                      _totalPrice += element['total'];
+                                    });
+                                    _checkout(constraints);
+                                  }
+                                });
+                              }
+                            },
+                            buttonColor: Color(0xFF00509A),
+                            child: Center(
+                              child: Text(
+                                'Continue to Checkout',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Color(0xFFFFFFFF),
+                                  fontWeight: FontWeight.normal,
                                 ),
                               ),
-                            )
-                                : Container()
-                          ],
-                        ),
+                            ),
+                          )
+                              : Container(),
+                          SizedBox(height: 150),
+                        ],
                       ),
                     ),
                   ],

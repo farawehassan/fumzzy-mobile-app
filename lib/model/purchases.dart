@@ -14,7 +14,7 @@ class Purchase {
     this.updatedAt,
   });
 
-  /// This variable holds the purchase id
+  /// This variable holds the purchasepurchases id
   String? id;
 
   /// This variable holds the purchase product model

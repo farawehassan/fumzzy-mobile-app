@@ -4,6 +4,7 @@ import 'package:fumzy/bloc/future-values.dart';
 import 'package:fumzy/model/category.dart';
 import 'package:fumzy/model/product.dart';
 import 'package:fumzy/model/purchases.dart';
+import 'package:fumzy/model/sales.dart';
 import 'package:fumzy/model/user.dart';
 import 'package:path_provider/path_provider.dart';
 import 'endpoints.dart';
@@ -31,12 +32,12 @@ class SalesDataSource{
     if(refresh == false && file.existsSync()){
       final fileData = file.readAsStringSync();
       final res = jsonDecode(fileData);
-      List<Purchase> allPurchases = [];
+      List<Sale> sales = [];
       var rest = res['data']['items'] as List;
-      allPurchases = rest.map<Purchase>((json) => Purchase.fromJson(json)).toList();
+      sales = rest.map<Sale>((json) => Sale.fromJson(json)).toList();
       result['totalCount'] = res['data']['totalCount'];
       result['page'] = res['data']['page'];
-      result['items'] = allPurchases;
+      result['items'] = sales;
       return result;
     }
     else {
@@ -50,12 +51,12 @@ class SalesDataSource{
       return _netUtil.get(GET_ALL_SALES_URL, headers: header).then((dynamic res) {
         if (res['error']) throw res['message'];
         file.writeAsStringSync(jsonEncode(res), flush: true, mode: FileMode.write);
-        List<Purchase> allPurchases = [];
+        List<Sale> sales = [];
         var rest = res['data']['items'] as List;
-        allPurchases = rest.map<Purchase>((json) => Purchase.fromJson(json)).toList();
+        sales = rest.map<Sale>((json) => Sale.fromJson(json)).toList();
         result['totalCount'] = res['data']['totalCount'];
         result['page'] = res['data']['page'];
-        result['items'] = allPurchases;
+        result['items'] = sales;
         return result;
       }).catchError((e) {
         errorHandler.handleError(e);

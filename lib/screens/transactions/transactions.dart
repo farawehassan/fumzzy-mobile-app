@@ -8,20 +8,17 @@ import 'package:fumzy/components/app-bar.dart';
 import 'package:fumzy/components/arrow-button.dart';
 import 'package:fumzy/components/button.dart';
 import 'package:fumzy/components/circle-indicator.dart';
+import 'package:fumzy/components/shimmer-loader.dart';
 import 'package:fumzy/model/category.dart';
-import 'package:fumzy/model/product.dart';
 import 'package:fumzy/model/purchases.dart';
+import 'package:fumzy/model/sales.dart';
 import 'package:fumzy/networking/product-datasource.dart';
 import 'package:fumzy/networking/user-datasource.dart';
 import 'package:fumzy/screens/dashboard/drawer.dart';
 import 'package:fumzy/utils/constant-styles.dart';
 import 'package:fumzy/utils/functions.dart';
-import 'package:fumzy/utils/size-config.dart';
-import 'package:shimmer/shimmer.dart';
 import 'expenses.dart';
-import 'purchase-info.dart';
-import 'purchases.dart';
-import 'sales.dart';
+import 'sales-info.dart';
 import 'add-sale.dart';
 
 class Transactions extends StatefulWidget {
@@ -39,11 +36,13 @@ class _TransactionsState extends State<Transactions> {
 
   /// GlobalKey of a my RefreshIndicatorState to refresh my list items
   final GlobalKey<RefreshIndicatorState> _refreshPurchaseKey = GlobalKey<RefreshIndicatorState>();
+  final GlobalKey<RefreshIndicatorState> _refreshSalesKey = GlobalKey<RefreshIndicatorState>();
 
   TextEditingController search = TextEditingController();
 
   ///[CONTROLLERS] and [KEY] for [EXPENSE DIALOG]
   final _expenseFormKey = GlobalKey<FormState>();
+
   TextEditingController _expenseDescriptionController = TextEditingController();
   TextEditingController _expenseAmountController = TextEditingController();
 
@@ -54,8 +53,6 @@ class _TransactionsState extends State<Transactions> {
   TextEditingController _productCategory = TextEditingController();
   TextEditingController _costPrice = TextEditingController();
   TextEditingController _sellingPrice = TextEditingController();
-  TextEditingController _initialQuantity = TextEditingController();
-  TextEditingController _currentQuantity = TextEditingController();
   TextEditingController _quantity = TextEditingController();
   TextEditingController _sellersName = TextEditingController();
 
@@ -94,15 +91,13 @@ class _TransactionsState extends State<Transactions> {
     }).catchError((e){
       print(e);
       Functions.showErrorMessage(e);
-      if(!mounted)return;
-      //_getAllProducts(refresh: false);
     });
   }
 
   Future _loadMorePurchases() async {
     setState(() { _purchasePageSize += 1; });
-    Future<Map<String, dynamic>> deliveries = futureValue.getAllPurchasesPaginated(page: _purchasePageSize, limit: 50);
-    await deliveries.then((value) {
+    Future<Map<String, dynamic>> purchases = futureValue.getAllPurchasesPaginated(page: _purchasePageSize, limit: 50);
+    await purchases.then((value) {
       if (!mounted) return;
       setState(() {
         _purchases.addAll(value['items']);
@@ -133,12 +128,6 @@ class _TransactionsState extends State<Transactions> {
             DataCell(Text(Functions.money(purchase.costPrice!, 'N'))),
             DataCell(Text(Functions.money(purchase.costPrice!, 'N'))),
             DataCell(Text(Functions.money(purchase.product!.costPrice! * purchase.quantity!, 'N'))),
-            DataCell(GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(context, PurchaseInfo.id);
-              },
-              child: TableArrowButton(),
-            )),
           ]),
         );
       }
@@ -153,7 +142,7 @@ class _TransactionsState extends State<Transactions> {
           return true;
         },
         child: RefreshIndicator(
-          onRefresh: _refreshProducts,
+          onRefresh: _refreshPurchases,
           key: _refreshPurchaseKey,
           color: Color(0xFF004E92),
           child: Container(
@@ -186,7 +175,6 @@ class _TransactionsState extends State<Transactions> {
                           DataColumn(label: Text('Cost Price')),
                           DataColumn(label: Text('Selling Price')),
                           DataColumn(label: Text('Amount')),
-                          DataColumn(label: Text('')),
                         ],
                         rows: itemRow,
                       )
@@ -211,24 +199,11 @@ class _TransactionsState extends State<Transactions> {
       );
     }
     else if(_purchasesLength == 0) return Container();
-    return _shimmerLoader();
-  }
-
-  ///A function to get all the available categories and store them in list[_categories]
-  void _getAllCategories() async {
-    Future<List<Category>> categories = futureValue.getAllCategories();
-    await categories.then((value){
-      if (!mounted)return;
-      setState((){
-        _categories.addAll(value);
-      });
-    }).catchError((e){
-      Functions.showErrorMessage(e.toString());
-    });
+    return ShimmerLoader();
   }
 
   /// Function to refresh list of products from page 1 similar to [_getAllProducts()]
-  Future<Null> _refreshProducts() {
+  Future<Null> _refreshPurchases() {
     Future<Map<String, dynamic>> products = futureValue.getAllPurchasesPaginated(page: 1, limit: 50);
     return products.then((value) {
       _purchasesLength = null;
@@ -249,35 +224,181 @@ class _TransactionsState extends State<Transactions> {
     });
   }
 
-  Widget _shimmerLoader(){
-    List<Widget> containers = [];
-    for(int i = 0; i < 20; i++){
-      containers.add(
-          Container(
-              width: SizeConfig.screenWidth,
-              height: 40,
-              margin: EdgeInsets.only(bottom: 10),
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(3)),
-                  color: Color(0xFFF6F6F6)
-              )
-          )
+
+  /** SALES SECTION ***/
+
+  /// A List to hold the all the sales
+  List<Sale> _sales = [];
+
+  /// A List to hold all the filtered sales
+  List<Sale> _filteredSales = [];
+
+  /// An Integer variable to hold the length of [_sales]
+  int? _saleLength;
+
+  int? _totalSaleCount;
+
+  int _salePageSize = 1;
+
+  bool _showSaleSpinner = false;
+
+  void _getAllSales({bool? refresh}) async {
+    Future<Map<String, dynamic>> products = futureValue.getAllSalesPaginated(
+        refresh: refresh, page: _salePageSize, limit: 50
+    );
+    await products.then((value) {
+      if(!mounted)return;
+      setState(() {
+        _sales.addAll(value['items']);
+        _filteredSales = _sales;
+        _saleLength = _filteredSales.length;
+        _totalSaleCount = value['totalCount'];
+      });
+    }).catchError((e){
+      print(e);
+      Functions.showErrorMessage(e);
+    });
+  }
+
+  Future _loadMoreSales() async {
+    setState(() { _salePageSize += 1; });
+    Future<Map<String, dynamic>> sales = futureValue.getAllSalesPaginated(page: _salePageSize, limit: 50);
+    await sales.then((value) {
+      if (!mounted) return;
+      setState(() {
+        _sales.addAll(value['items']);
+        _filteredSales = _sales;
+        _saleLength = _sales.length;
+        _totalSaleCount = value['totalCount'];
+        _showSaleSpinner = false;
+      });
+    }).catchError((e){
+      print(e);
+      if(!mounted)return;
+      Functions.showErrorMessage(e);
+    });
+  }
+
+  /// A function to build the list of all the sales
+  Widget _buildSaleList() {
+    List<DataRow> itemRow = [];
+    if(_filteredSales.length > 0 && _filteredSales.isNotEmpty){
+      for (int i = 0; i < _filteredSales.length; i++){
+        Sale sale = _filteredSales[i];
+        itemRow.add(
+          DataRow(cells: [
+            DataCell(Text(Functions.getFormattedDateTime(sale.createdAt!))),
+            DataCell(Text(sale.productName!)),
+            DataCell(Text(sale.quantity!.toString())),
+            DataCell(Text(sale.paymentMode!)),
+            DataCell(Text(
+              Functions.money(sale.totalPrice!, 'N'),
+              style: TextStyle(fontWeight: FontWeight.bold),
+            )),
+            DataCell(TableArrowButton()),
+          ],
+          onSelectChanged: (value){
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SalesInfo(
+                  sale: sale,
+                ),
+              ),
+            );
+          }),
+        );
+      }
+      return NotificationListener<ScrollNotification>(
+        onNotification: (ScrollNotification scrollInfo) {
+          if (!_showSaleSpinner && scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
+            if(_totalSaleCount! > (_salePageSize * 50)){
+              setState(() { _showSaleSpinner = true; });
+              _loadMoreSales();
+            }
+          }
+          return true;
+        },
+        child: RefreshIndicator(
+          onRefresh: _refreshSales,
+          key: _refreshSalesKey,
+          color: Color(0xFF004E92),
+          child: Container(
+              decoration: kTableContainer,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: DataTable(
+                  headingTextStyle: TextStyle(
+                    color: Color(0xFF75759E),
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                  ),
+                  dataTextStyle: TextStyle(
+                    color: Color(0xFF1F1F1F),
+                    fontSize: 14,
+                    //fontWeight: FontWeight.w400,
+                  ),
+                  columnSpacing: 15.0,
+                  dataRowHeight: 65.0,
+                  showCheckboxColumn: false,
+                  columns: [
+                    DataColumn(label: Text('Date')),
+                    DataColumn(label: Text('Product Name')),
+                    DataColumn(label: Text('Quantity')),
+                    DataColumn(label: Text('Payment Mode')),
+                    DataColumn(label: Text('Amount')),
+                    DataColumn(label: Text('')),
+                  ],
+                  rows: itemRow,
+                ),
+              )),
+        ),
       );
     }
-    return SingleChildScrollView(
-      physics: BouncingScrollPhysics(),
-      child: Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
-          child: Column(children: containers)
-      ),
-    );
+    else if(_saleLength == 0) return Container();
+    return ShimmerLoader();
+  }
+
+  /// Function to refresh list of sales from page 1 similar to [_getAllSales()]
+  Future<Null> _refreshSales() {
+    Future<Map<String, dynamic>> products = futureValue.getAllSalesPaginated(page: 1, limit: 50);
+    return products.then((value) {
+      _saleLength = null;
+      _sales.clear();
+      _filteredSales.clear();
+      _totalSaleCount = null;
+      if(!mounted)return;
+      setState(() {
+        _sales.addAll(value['items']);
+        _filteredSales = _sales;
+        _saleLength = _sales.length;
+        _totalSaleCount = value['totalCount'];
+      });
+    }).catchError((e){
+      print(e);
+      if(!mounted)return;
+      Functions.showErrorMessage(e);
+    });
+  }
+
+  ///A function to get all the available categories and store them in list[_categories]
+  void _getAllCategories() async {
+    Future<List<Category>> categories = futureValue.getAllCategories();
+    await categories.then((value){
+      if (!mounted)return;
+      setState((){
+        _categories.addAll(value);
+      });
+    }).catchError((e){
+      Functions.showErrorMessage(e);
+    });
   }
 
   @override
   void initState() {
     super.initState();
     _getAllPurchases(refresh: true);
+    _getAllSales(refresh: true);
     _getAllCategories();
   }
 
@@ -467,24 +588,9 @@ class _TransactionsState extends State<Transactions> {
                       indicatorColor: Color(0xFF004E92),
                       indicatorWeight: 3,
                       tabs: [
-                        Tab(
-                          child: Text(
-                            'Sales',
-                            style: kTabBarTextStyle,
-                          ),
-                        ),
-                        Tab(
-                          child: Text(
-                            'Purchases',
-                            style: kTabBarTextStyle,
-                          ),
-                        ),
-                        Tab(
-                          child: Text(
-                            'Expenses',
-                            style: kTabBarTextStyle,
-                          ),
-                        ),
+                        Tab(child: Text('Sales', style: kTabBarTextStyle)),
+                        Tab(child: Text('Purchases', style: kTabBarTextStyle)),
+                        Tab(child: Text('Expenses', style: kTabBarTextStyle)),
                       ],
                     ),
                   ),
@@ -492,7 +598,7 @@ class _TransactionsState extends State<Transactions> {
                   Expanded(
                     child: TabBarView(
                       children: [
-                        Sales(),
+                        _buildSaleList(),
                         _buildPurchaseList(),
                         Expenses(),
                       ],
@@ -755,7 +861,7 @@ class _TransactionsState extends State<Transactions> {
     }).catchError((e){
       if(!mounted)return;
       setDialogState(()=> _showSpinner = false);
-      Functions.showErrorMessage(e.toString());
+      Functions.showErrorMessage(e);
     });
   }
 
@@ -826,7 +932,7 @@ class _TransactionsState extends State<Transactions> {
                             Padding(
                               padding: EdgeInsets.only(top: 42),
                               child: Text(
-                                'Add a New Purchase',
+                                'Add a New Product',
                                 style: TextStyle(
                                   color: Color(0xFF00509A),
                                   fontSize: 19,
@@ -838,7 +944,7 @@ class _TransactionsState extends State<Transactions> {
                               padding:
                               const EdgeInsets.symmetric(horizontal: 35, vertical: 15.0),
                               child: Text(
-                                'You have made a new purchase. Please fill the fields below to record your purhchase',
+                                'You wish to add a new product. Please fill the fields to record this product.',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: Color(0xFF000428).withOpacity(0.6),
@@ -881,7 +987,6 @@ class _TransactionsState extends State<Transactions> {
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.normal,
                                               ),
-                                              contentPadding: EdgeInsets.all(10),
                                             ),
                                           ),
                                         ),
@@ -904,6 +1009,10 @@ class _TransactionsState extends State<Transactions> {
                                                 contentPadding: EdgeInsets.all(10),
                                               ),
                                             ),
+                                            validator: (value) {
+                                              if (value!.isEmpty) return 'Select category';
+                                              return null;
+                                            },
                                             suggestionsCallback: (pattern) async {
                                               return await Suggestions.getCategorySuggestions(pattern, _categories);
                                             },
@@ -912,12 +1021,6 @@ class _TransactionsState extends State<Transactions> {
                                             },
                                             transitionBuilder: (context, suggestionsBox, controller) {
                                               return suggestionsBox;
-                                            },
-                                            validator: (value) {
-                                              if (value!.isEmpty) {
-                                                return 'Select or type category';
-                                              }
-                                              return null;
                                             },
                                             onSuggestionSelected: (Category suggestion) {
                                               if (!mounted) return;
@@ -952,7 +1055,7 @@ class _TransactionsState extends State<Transactions> {
                                                     textInputAction: TextInputAction.next,
                                                     keyboardType: TextInputType.number,
                                                     inputFormatters: [
-                                                      FilteringTextInputFormatter.allow(RegExp('[0-9]')),
+                                                      FilteringTextInputFormatter.allow(RegExp('[0-9.]')),
                                                     ],
                                                     controller: _costPrice,
                                                     validator: (value) {
@@ -966,7 +1069,6 @@ class _TransactionsState extends State<Transactions> {
                                                         fontSize: 14,
                                                         fontWeight: FontWeight.normal,
                                                       ),
-                                                      contentPadding: EdgeInsets.all(10),
                                                     ),
                                                   ),
                                                 ),
@@ -991,7 +1093,7 @@ class _TransactionsState extends State<Transactions> {
                                                     textInputAction: TextInputAction.next,
                                                     keyboardType: TextInputType.number,
                                                     inputFormatters: [
-                                                      FilteringTextInputFormatter.allow(RegExp('[0-9]')),
+                                                      FilteringTextInputFormatter.allow(RegExp('[0-9.]')),
                                                     ],
                                                     controller: _sellingPrice,
                                                     validator: (value) {
@@ -1005,7 +1107,6 @@ class _TransactionsState extends State<Transactions> {
                                                         fontSize: 14,
                                                         fontWeight: FontWeight.normal,
                                                       ),
-                                                      contentPadding: EdgeInsets.all(10),
                                                     ),
                                                   ),
                                                 ),
@@ -1013,82 +1114,6 @@ class _TransactionsState extends State<Transactions> {
                                             ),
                                           ),
                                         ]
-                                    ),
-                                    SizedBox(height: 20),
-                                    // initial quantity
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text('Initial Quantity'),
-                                        SizedBox(height: 10),
-                                        Container(
-                                          width: constraints.maxWidth,
-                                          child: TextFormField(
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.normal,
-                                            ),
-                                            textInputAction: TextInputAction.next,
-                                            keyboardType: TextInputType.number,
-                                            inputFormatters: [
-                                              FilteringTextInputFormatter.allow(RegExp('[0-9]')),
-                                            ],
-                                            controller: _initialQuantity,
-                                            validator: (value) {
-                                              if (value!.isEmpty) return 'Enter initial quantity';
-                                              return null;
-                                            },
-                                            decoration: kTextFieldBorderDecoration.copyWith(
-                                              hintText: 'Enter initial quantity',
-                                              hintStyle: TextStyle(
-                                                color: Colors.black.withOpacity(0.5),
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.normal,
-                                              ),
-                                              contentPadding: EdgeInsets.all(10),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 20),
-                                    // current quantity
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text('Current Quantity'),
-                                        SizedBox(height: 10),
-                                        Container(
-                                          width: constraints.maxWidth,
-                                          child: TextFormField(
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.normal,
-                                            ),
-                                            textInputAction: TextInputAction.next,
-                                            keyboardType: TextInputType.number,
-                                            inputFormatters: [
-                                              FilteringTextInputFormatter.allow(RegExp('[0-9]')),
-                                            ],
-                                            controller: _currentQuantity,
-                                            validator: (value) {
-                                              if (value!.isEmpty) return 'Enter current quantity';
-                                              return null;
-                                            },
-                                            decoration: kTextFieldBorderDecoration.copyWith(
-                                              hintText: 'Enter current quantity',
-                                              hintStyle: TextStyle(
-                                                color: Colors.black.withOpacity(0.5),
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.normal,
-                                              ),
-                                              contentPadding: EdgeInsets.all(10),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
                                     ),
                                     SizedBox(height: 20),
                                     // Quantity
@@ -1108,7 +1133,7 @@ class _TransactionsState extends State<Transactions> {
                                             textInputAction: TextInputAction.next,
                                             keyboardType: TextInputType.number,
                                             inputFormatters: [
-                                              FilteringTextInputFormatter.allow(RegExp('[0-9]')),
+                                              FilteringTextInputFormatter.allow(RegExp('[0-9.]')),
                                             ],
                                             controller: _quantity,
                                             validator: (value) {
@@ -1122,7 +1147,6 @@ class _TransactionsState extends State<Transactions> {
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.normal,
                                               ),
-                                              contentPadding: EdgeInsets.all(10),
                                             ),
                                           ),
                                         ),
@@ -1157,7 +1181,6 @@ class _TransactionsState extends State<Transactions> {
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.normal,
                                               ),
-                                              contentPadding: EdgeInsets.all(10),
                                             ),
                                           ),
                                         ),
@@ -1172,8 +1195,7 @@ class _TransactionsState extends State<Transactions> {
                               onTap: (){
                                 if(!_showSpinner){
                                   if(_addPurchaseFormKey.currentState!.validate()){
-                                    if(_productCategory.text != '') return _addProduct(setDialogState);
-                                    Functions.showErrorMessage("Enter a valid Category name and try again");
+                                    _addProduct(setDialogState);
                                   }
                                 }
                               },
@@ -1182,7 +1204,7 @@ class _TransactionsState extends State<Transactions> {
                                 child: _showSpinner ?
                                 CircleProgressIndicator() :
                                 const Text(
-                                  'Add Purchase',
+                                  'Add Product',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     color: Color(0xFFFFFFFF),
@@ -1216,7 +1238,7 @@ class _TransactionsState extends State<Transactions> {
                           ],
                         ),
                       ),
-                    ),
+                    )
                   ],
                 ),
               ),
