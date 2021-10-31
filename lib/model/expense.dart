@@ -1,3 +1,4 @@
+
 import 'package:fumzy/model/staff.dart';
 
 ///A class to hold [Expense] model
@@ -17,7 +18,7 @@ class Expense {
   String? description;
 
   ///This variable holds the amount
-  int? amount;
+  double? amount;
 
   ///This variable holds the staff details
   Staff? staff;

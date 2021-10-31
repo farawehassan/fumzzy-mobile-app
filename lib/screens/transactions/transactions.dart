@@ -9,6 +9,7 @@ import 'package:fumzy/components/arrow-button.dart';
 import 'package:fumzy/components/button.dart';
 import 'package:fumzy/components/circle-indicator.dart';
 import 'package:fumzy/model/category.dart';
+import 'package:fumzy/model/expense.dart';
 import 'package:fumzy/model/product.dart';
 import 'package:fumzy/model/purchases.dart';
 import 'package:fumzy/networking/expense-datasource.dart';
@@ -18,6 +19,7 @@ import 'package:fumzy/utils/constant-styles.dart';
 import 'package:fumzy/utils/functions.dart';
 import 'package:fumzy/utils/size-config.dart';
 import 'package:shimmer/shimmer.dart';
+import 'expense-info.dart';
 import 'expenses.dart';
 import 'purchase-info.dart';
 import 'purchases.dart';
@@ -63,6 +65,91 @@ class _TransactionsState extends State<Transactions> {
 
   ///A list to hold the categories
   List<Category> _categories = [];
+
+  /**Expense Section**/
+  ///A list to hold expenses
+  List<Expense> _expense = [];
+
+  ///A list to hold filtered expenses
+  List<Expense> _filteredExpense = [];
+
+  ///A variable to hold expense length
+  int? _expenseLength;
+
+  void _getAllExpense({bool? refresh}) async{
+    Future<Map<String, dynamic>> expenses = futureValue.getAllExpense(refresh: refresh);
+    await expenses.then((value){
+      if(!mounted)return;
+      setState(() {
+        _expense.addAll(value['_id']);
+        _filteredExpense = _expense;
+        _expenseLength = _filteredExpense.length;
+      });
+    }).catchError((e){
+      print(e);
+      Functions.showErrorMessage(e);
+      if(!mounted)return;
+    });
+  }
+
+  ///A function to build expense list
+  Widget _buildExpenseList(){
+    List<DataRow> itemRow = [];
+    if(_filteredExpense.length > 0 && _filteredExpense.isNotEmpty){
+      for (int i = 0; i < _filteredExpense.length; i++){
+        Expense expense = _filteredExpense[i];
+        itemRow.add(
+          DataRow(cells: [
+            DataCell(Text(Functions.getFormattedDateTime(expense.createdAt!))),
+            DataCell(Text(expense.description!.toString())),
+            DataCell(Text(Functions.money(expense.amount!, 'N'))),
+            DataCell(Text(expense.staff!.name!.toString())),
+            DataCell(
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, ExpenseInfo.id);
+                },
+                child: TableArrowButton(),
+              ),
+            ),
+          ]),
+        );
+      }
+      return SingleChildScrollView(
+        child: Container(
+          decoration: kTableContainer,
+          child: SingleChildScrollView(
+            physics: BouncingScrollPhysics(),
+            scrollDirection: Axis.horizontal,
+            child: DataTable(
+              headingTextStyle: TextStyle(
+                color: Color(0xFF75759E),
+                fontSize: 14,
+                fontWeight: FontWeight.normal,
+              ),
+              dataTextStyle: TextStyle(
+                color: Color(0xFF1F1F1F),
+                fontSize: 14,
+                //fontWeight: FontWeight.w400,
+              ),
+              columnSpacing: 15.0,
+              dataRowHeight: 65.0,
+              columns: [
+                DataColumn(label: Text('Date')),
+                DataColumn(label: Text('Description')),
+                DataColumn(label: Text('Amount')),
+                DataColumn(label: Text('Staff')),
+                DataColumn(label: Text('')),
+              ],
+              rows: itemRow,
+            ),
+          ),
+        ),
+      );
+    }
+    else if(_filteredExpense.length == 0) return Container();
+    return _shimmerLoader();
+  }
 
   /// A List to hold the all the purchases
   List<Purchase> _purchases = [];
@@ -279,6 +366,7 @@ class _TransactionsState extends State<Transactions> {
     super.initState();
     _getAllPurchases(refresh: true);
     _getAllCategories();
+    _getAllExpense(refresh: true);
   }
 
   @override
@@ -494,7 +582,7 @@ class _TransactionsState extends State<Transactions> {
                       children: [
                         Sales(),
                         _buildPurchaseList(),
-                        Expenses(),
+                        _buildExpenseList(),
                       ],
                     ),
                   ),
@@ -506,6 +594,7 @@ class _TransactionsState extends State<Transactions> {
       ),
     );
   }
+
   /**[EXPENSE] SECTION **/
 
   ///widget to show the dialog to add [EXPENSES]
@@ -761,7 +850,7 @@ class _TransactionsState extends State<Transactions> {
 
   /**[PURCHASE] SECTION **/
 
-  ////widget to show the dialog [ADD_NEW_PRODUCT]
+  ///widget to show the dialog [ADD_NEW_PRODUCT]
   Future<void> _addPurchase(BoxConstraints constraints) {
     return showDialog(
       context: context,

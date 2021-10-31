@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:fumzy/bloc/future-values.dart';
+import 'package:fumzy/model/expense.dart';
 import 'package:fumzy/model/staff.dart';
 import 'package:fumzy/model/user.dart';
 import 'package:path_provider/path_provider.dart';
@@ -20,15 +21,25 @@ class ExpenseDataSource{
   var _futureValue = FutureValues();
 
   ///A function that fetches all expenses in the database GET
-  ///
+  ///It returns a list of [Expense]
   Future<Map<String, dynamic>> getAllExpenses({bool? refresh}) async {
-    Map<String, dynamic> result;
+    Map<String, dynamic> result = {};
     String fileName = 'expense.json';
     var dir = await getTemporaryDirectory();
     File file = File(dir.path + '/' + fileName);
     if(refresh == false && file.existsSync()){
       final fileData = file.readAsStringSync();
       final res = jsonDecode(fileData);
+      List<Staff> allStaff = [];
+      var rest = res['data']['staff'] as List;
+      allStaff = rest.map<Staff>((json) => Staff.fromJson(json)).toList();
+      result['_id'] = res['data']['_id'];
+      result['description'] = res['data']['description'];
+      result['amount'] = res['data']['amount'];
+      result['staff']= allStaff;
+      result['createdAt'] = res['data']['createdAt'];
+      result['updatedAt'] = res['data']['updatedAt'];
+      print(result);
       return result;
     }
     late Map<String, String> header;
@@ -39,11 +50,21 @@ class ExpenseDataSource{
     });
     return _netUtil.get(GET_ALL_EXPENSES, headers: header).then((dynamic res) {
       if (res['error']) throw res['message'];
-      //file.writeAsStringSync(jsonEncode(res), flush: true, mode: FileMode.write);
-      List<Staff> allstaff = [];
+      file.writeAsStringSync(jsonEncode(res), flush: true, mode: FileMode.write);
+      List<Staff> allStaff = [];
       var rest = res['data']['staff'] as List;
-      allstaff = rest.map<Staff>((json) => Staff.fromJson(json)).toList();
-    })
+      allStaff = rest.map<Staff>((json) => Staff.fromJson(json)).toList();
+      result['_id'] = res['data']['_id'];
+      result['description'] = res['data']['description'];
+      result['amount'] = res['data']['amount'];
+      result['staff']= allStaff;
+      result['createdAt'] = res['data']['createdAt'];
+      result['updatedAt'] = res['data']['updatedAt'];
+      print(result);
+      return result;
+    }).catchError((e){
+      errorHandler.handleError(e);
+    });
   }
 
   /// A function that sends request for creating an expense with [body] as details

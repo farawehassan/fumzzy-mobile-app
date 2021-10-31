@@ -2,9 +2,11 @@ import 'dart:async';
 import 'package:fumzy/database/user-db-helper.dart';
 import 'package:fumzy/model/category.dart';
 import 'package:fumzy/model/customer-names.dart';
+import 'package:fumzy/model/expense.dart';
 import 'package:fumzy/model/product.dart';
 import 'package:fumzy/model/user.dart';
 import 'package:fumzy/networking/customer-datasource.dart';
+import 'package:fumzy/networking/expense-datasource.dart';
 import 'package:fumzy/networking/product-datasource.dart';
 import 'package:fumzy/networking/user-datasource.dart';
 
@@ -66,4 +68,12 @@ class FutureValues{
     return names;
   }
 
+  ///A function that fetches all expenses in the database with the help of
+  ///[ExpenseDataSource]
+  ///It returns a list of model[Expense]
+  Future<Map<String, dynamic>> getAllExpense({bool? refresh}) async{
+    var data = ExpenseDataSource();
+    Future<Map<String, dynamic>> expenses = data.getAllExpenses(refresh: refresh);
+    return expenses;
+  }
 }
