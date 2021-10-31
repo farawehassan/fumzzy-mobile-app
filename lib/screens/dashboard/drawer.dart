@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:fumzy/database/user-db-helper.dart';
 import 'package:fumzy/screens/notification/notifications.dart';
 import 'package:fumzy/screens/settings/settings.dart';
 import 'package:fumzy/screens/creditors/creditors.dart';
@@ -7,6 +8,8 @@ import 'package:fumzy/screens/staff/staff.dart';
 import 'package:fumzy/screens/inventory/inventory.dart';
 import 'package:fumzy/screens/invoices/invoices.dart';
 import 'package:fumzy/screens/transactions/transactions.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../splash-screen.dart';
 import 'dashboard.dart';
 import 'package:fumzy/screens/customers/customers.dart';
 
@@ -320,17 +323,17 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                           }
                         },
                       ),
-                      // Collapse
+                      // Logout
                       Padding(
                         padding: const EdgeInsets.only(top: 34.0, bottom: 40),
                         child: ListTile(
                           leading: Icon(
-                            IconlyBold.arrowLeft,
+                            IconlyBold.logout,
                             color: Colors.white,
                             size: 20,
                           ),
                           title: Text(
-                            'Collapse',
+                            'Logout',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 17,
@@ -338,7 +341,7 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                             ),
                           ),
                           onTap: () {
-                            Navigator.pop(context);
+                            _logOut();
                           },
                         ),
                       ),
@@ -351,6 +354,23 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
         ),
       ),
     );
+  }
+
+  /// Function to log user out
+  void _logOut() async{
+    var db = DatabaseHelper();
+    await db.deleteUsers();
+    _getBoolValuesSF();
+  }
+
+  /// Function to get the 'LoggedIn' in your SharedPreference
+  _getBoolValuesSF() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool? loggedIn = prefs.getBool('loggedIn');
+    if(loggedIn == true){
+      await prefs.setBool('loggedIn', false);
+      Navigator.pushReplacementNamed(context, SplashScreen.id);
+    }
   }
 
 }

@@ -100,7 +100,7 @@ class _LoginState extends State<Login> {
                   ),
                 ),
                 Text(
-                  'Welcome back, Admin',
+                  'Welcome back,',
                   style: TextStyle(
                     color: Color(0xFF004E92),
                     fontSize: 30,
