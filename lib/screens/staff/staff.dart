@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:fumzy/bloc/future-values.dart';
 import 'package:fumzy/components/app-bar.dart';
 import 'package:fumzy/components/button.dart';
 import 'package:fumzy/components/circle-indicator.dart';
+import 'package:fumzy/model/staffs.dart';
 import 'package:fumzy/networking/user-datasource.dart';
 import 'package:fumzy/screens/dashboard/drawer.dart';
 import 'package:fumzy/utils/functions.dart';
+import 'package:fumzy/utils/size-config.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:fumzy/utils/constant-styles.dart';
+import 'package:shimmer/shimmer.dart';
 import 'pop-up.dart';
 
 class Staff extends StatefulWidget {
@@ -20,6 +24,9 @@ class Staff extends StatefulWidget {
 }
 
 class _StaffState extends State<Staff> {
+
+  /// Instantiating a class of the [FutureValues]
+  var futureValue = FutureValues();
 
   TextEditingController _search = TextEditingController();
 
@@ -34,6 +41,113 @@ class _StaffState extends State<Staff> {
   final _formKey = GlobalKey<FormState>();
 
   bool _showSpinner = false;
+
+  Map<String, Color> _statusColor = {
+    'Active Status Color' : Color(0xFF00AF27),
+    'Blocked Status Color' : Color(0xFF4B545A)
+  };
+
+  /// A list to hold staff
+  List<Staffs> _staff = [];
+
+  /// A list to hold filtered staff
+  List<Staffs> _filteredStaff = [];
+
+  ///A variable to hold length of filtered staff
+  int? _staffLength;
+
+  ///A function to get all staffs
+  void _getAllStaff({bool? refresh}) async{
+    Future<List<Staffs>> staffs = futureValue.getAllStaff(refresh: refresh);
+    await staffs.then((value){
+      if(!mounted)return;
+      setState((){
+        for(int i = 0; i < value.length; i++){
+          _staff.add(value[i]);
+        }
+        _filteredStaff = _staff;
+        _staffLength = _filteredStaff.length;
+      });
+    }).catchError((e){
+      print(e);
+      Functions.showErrorMessage(e);
+      if(!mounted)return;
+    });
+  }
+
+  ///A widget to build staff table
+  Widget _buildAllStaffList() {
+    List<DataRow> itemRow = [];
+    if(_staffLength! > 0 && _filteredStaff.isNotEmpty){
+      for(int i = 0; i < _filteredStaff.length; i++){
+        Staffs staff = _filteredStaff[i];
+        String status = '';
+        staff.status! == 'active' ? status = 'Active Status Color' :  status = 'Blocked Status Color';
+        itemRow.add(
+          DataRow(cells: [
+            DataCell(Text(staff.name!)),
+            DataCell(Text(staff.status!,style: TextStyle(color: _statusColor[status]))),
+            DataCell(Text(Functions.getFormattedDateTime(staff.createdAt!))),
+            DataCell(ReusablePopMenu()),
+          ]),
+        );
+      }
+      return DataTable(
+        headingTextStyle: TextStyle(
+          color: Color(0xFF75759E),
+          fontSize: 14,
+          fontWeight: FontWeight.normal,
+        ),
+        dataTextStyle: TextStyle(
+          color: Color(0xFF1F1F1F),
+          fontSize: 14,
+          //fontWeight: FontWeight.w400,
+        ),
+        columnSpacing: 3.0,
+        dataRowHeight: 65.0,
+        columns: [
+          DataColumn(label: Text('Username')),
+          DataColumn(label: Text('Status')),
+          DataColumn(label: Text('Date')),
+          DataColumn(label: Text('Actions')),
+        ],
+        rows: itemRow,
+      );
+    }
+    else if(_staffLength == 0) return Container();
+    return _shimmerLoader();
+  }
+
+  Widget _shimmerLoader(){
+    List<Widget> containers = [];
+    for(int i = 0; i < 20; i++){
+      containers.add(
+          Container(
+              width: SizeConfig.screenWidth,
+              height: 40,
+              margin: EdgeInsets.only(bottom: 10),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(3)),
+                  color: Color(0xFFF6F6F6)
+              )
+          )
+      );
+    }
+    return SingleChildScrollView(
+      physics: BouncingScrollPhysics(),
+      child: Shimmer.fromColors(
+          baseColor: Colors.grey[300]!,
+          highlightColor: Colors.grey[100]!,
+          child: Column(children: containers)
+      ),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getAllStaff(refresh: true);
+}
 
   @override
   Widget build(BuildContext context) {
@@ -165,7 +279,7 @@ class _StaffState extends State<Staff> {
                         Container(
                             width: constraints.maxWidth,
                             decoration: kTableContainer,
-                            child: StaffTableContents()),
+                            child: _buildAllStaffList()),
                       ],
                     ),
                   ),
@@ -533,119 +647,4 @@ class _StaffState extends State<Staff> {
 
 }
 
-class StaffTableContents extends StatelessWidget {
-
-  final Color activeStatusColor = Color(0xFF00AF27);
-
-  final Color blockedStatusColor = Color(0xFF4B545A);
-
-  @override
-  Widget build(BuildContext context) {
-    return DataTable(
-      headingTextStyle: TextStyle(
-        color: Color(0xFF75759E),
-        fontSize: 14,
-        fontWeight: FontWeight.normal,
-      ),
-      dataTextStyle: TextStyle(
-        color: Color(0xFF1F1F1F),
-        fontSize: 14,
-        //fontWeight: FontWeight.w400,
-      ),
-      columnSpacing: 3.0,
-      dataRowHeight: 65.0,
-      columns: [
-        DataColumn(label: Text('Username')),
-        DataColumn(label: Text('Status')),
-        DataColumn(label: Text('Date')),
-        DataColumn(label: Text('Actions')),
-      ],
-      rows: [
-        DataRow(cells: [
-          DataCell(Text('Jeremy')),
-          DataCell(Text('Active', style: TextStyle(color: activeStatusColor))),
-          DataCell(Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('23, May 2021'),
-              Text(
-                '12:30pm',
-                style: TextStyle(fontWeight: FontWeight.w300),
-              ),
-            ],
-          )),
-          DataCell(ReusablePopMenu()),
-        ]),
-        DataRow(cells: [
-          DataCell(Text('Bisolapere')),
-          DataCell(
-              Text('Blocked', style: TextStyle(color: blockedStatusColor))),
-          DataCell(Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('23, May 2021'),
-              Text(
-                '12:30pm',
-                style: TextStyle(fontWeight: FontWeight.w300),
-              ),
-            ],
-          )),
-          DataCell(ReusablePopMenu()),
-        ]),
-        DataRow(cells: [
-          DataCell(Text('ObiCubana')),
-          DataCell(Text('Active', style: TextStyle(color: activeStatusColor))),
-          DataCell(Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('23, May 2021'),
-              Text(
-                '12:30pm',
-                style: TextStyle(fontWeight: FontWeight.w300),
-              ),
-            ],
-          )),
-          DataCell(ReusablePopMenu()),
-        ]),
-        DataRow(cells: [
-          DataCell(Text('Paulo')),
-          DataCell(Text('Active', style: TextStyle(color: activeStatusColor))),
-          DataCell(Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('23, May 2021'),
-              Text(
-                '12:30pm',
-                style: TextStyle(fontWeight: FontWeight.w300),
-              ),
-            ],
-          )),
-          DataCell(ReusablePopMenu()),
-        ]),
-        DataRow(cells: [
-          DataCell(Text('Korede')),
-          DataCell(
-              Text('Blocked', style: TextStyle(color: blockedStatusColor))),
-          DataCell(Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('23, May 2021'),
-              Text(
-                '12:30pm',
-                style: TextStyle(fontWeight: FontWeight.w300),
-              ),
-            ],
-          )),
-          DataCell(ReusablePopMenu()),
-        ]),
-      ],
-    );
-  }
-
-}
 

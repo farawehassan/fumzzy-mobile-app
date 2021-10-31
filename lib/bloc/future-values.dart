@@ -4,10 +4,12 @@ import 'package:fumzy/model/category.dart';
 import 'package:fumzy/model/customer-names.dart';
 import 'package:fumzy/model/expense.dart';
 import 'package:fumzy/model/product.dart';
+import 'package:fumzy/model/staffs.dart';
 import 'package:fumzy/model/user.dart';
 import 'package:fumzy/networking/customer-datasource.dart';
 import 'package:fumzy/networking/expense-datasource.dart';
 import 'package:fumzy/networking/product-datasource.dart';
+import 'package:fumzy/networking/staff-datasource.dart';
 import 'package:fumzy/networking/user-datasource.dart';
 
 class FutureValues{
@@ -75,5 +77,14 @@ class FutureValues{
     var data = ExpenseDataSource();
     Future<Map<String, dynamic>> expenses = data.getAllExpenses(refresh: refresh);
     return expenses;
+  }
+
+  ///A function that fetches all staff in the database with the help of
+  ///[StaffDataSource]
+  ///It returns a list of model[Staffs]
+  Future<List<Staffs>> getAllStaff({bool? refresh}) async{
+    var data = StaffDataSource();
+    Future<List<Staffs>> staffs = data.getAllStaff(refresh: refresh);
+    return staffs;
   }
 }

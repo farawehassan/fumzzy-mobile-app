@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:fumzy/bloc/future-values.dart';
 import 'package:fumzy/model/expense.dart';
-import 'package:fumzy/model/staff.dart';
+import 'package:fumzy/model/staffs.dart';
 import 'package:fumzy/model/user.dart';
 import 'package:path_provider/path_provider.dart';
 import 'endpoints.dart';
@@ -30,9 +30,9 @@ class ExpenseDataSource{
     if(refresh == false && file.existsSync()){
       final fileData = file.readAsStringSync();
       final res = jsonDecode(fileData);
-      List<Staff> allStaff = [];
+      List<Staffs> allStaff = [];
       var rest = res['data']['staff'] as List;
-      allStaff = rest.map<Staff>((json) => Staff.fromJson(json)).toList();
+      allStaff = rest.map<Staffs>((json) => Staffs.fromJson(json)).toList();
       result['_id'] = res['data']['_id'];
       result['description'] = res['data']['description'];
       result['amount'] = res['data']['amount'];
@@ -51,9 +51,9 @@ class ExpenseDataSource{
     return _netUtil.get(GET_ALL_EXPENSES, headers: header).then((dynamic res) {
       if (res['error']) throw res['message'];
       file.writeAsStringSync(jsonEncode(res), flush: true, mode: FileMode.write);
-      List<Staff> allStaff = [];
+      List<Staffs> allStaff = [];
       var rest = res['data']['staff'] as List;
-      allStaff = rest.map<Staff>((json) => Staff.fromJson(json)).toList();
+      allStaff = rest.map<Staffs>((json) => Staffs.fromJson(json)).toList();
       result['_id'] = res['data']['_id'];
       result['description'] = res['data']['description'];
       result['amount'] = res['data']['amount'];

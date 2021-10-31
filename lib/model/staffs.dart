@@ -1,7 +1,7 @@
 ///A class to hold my [STAFF] model
 
-class Staff {
-  Staff({
+class Staffs {
+  Staffs({
     this.id,
     this.name,
     this.phone,
@@ -32,7 +32,7 @@ class Staff {
   ///A variable to hold staff updatedAt
   DateTime? updatedAt;
 
-  factory Staff.fromJson(Map<String, dynamic> json) => Staff(
+  factory Staffs.fromJson(Map<String, dynamic> json) => Staffs(
     id: json["_id"],
     name: json["name"],
     phone: json["phone"],
