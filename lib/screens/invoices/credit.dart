@@ -35,7 +35,7 @@ class CreditInvoicesDetail extends StatelessWidget {
             ],
             rows: [
               DataRow(cells: [
-                DataCell(ReusableDownloadPdf(invoiceNo: 022341)),
+                DataCell(ReusableDownloadPdf(invoiceNo: '022341')),
                 DataCell(Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -60,7 +60,7 @@ class CreditInvoicesDetail extends StatelessWidget {
                     style: TextStyle(color: Color(0xFFF64932)))),
               ]),
               DataRow(cells: [
-                DataCell(ReusableDownloadPdf(invoiceNo: 022341)),
+                DataCell(ReusableDownloadPdf(invoiceNo: '022341')),
                 DataCell(Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -85,7 +85,7 @@ class CreditInvoicesDetail extends StatelessWidget {
                     style: TextStyle(color: Color(0xFFF64932)))),
               ]),
               DataRow(cells: [
-                DataCell(ReusableDownloadPdf(invoiceNo: 022341)),
+                DataCell(ReusableDownloadPdf(invoiceNo: '022341')),
                 DataCell(Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [

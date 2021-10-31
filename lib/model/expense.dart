@@ -1,4 +1,3 @@
-
 import 'package:fumzy/model/staff.dart';
 
 ///A class to hold [Expense] model
@@ -34,8 +33,8 @@ class Expense {
 
   factory Expense.fromJson(Map<String, dynamic> json) => Expense(
     description: json["description"],
-    amount: json["amount"],
-    staff: json["staff"],
+    amount: double.parse(json["amount"].toString()),
+    staff: Staff.fromJson(json["staff"]),
     id: json["_id"],
     createdAt: DateTime.parse(json["createdAt"]),
     updatedAt: DateTime.parse(json["updatedAt"]),

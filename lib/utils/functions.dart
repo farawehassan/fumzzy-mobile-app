@@ -39,6 +39,12 @@ class Functions{
   }
 
   /// Converting [dateTime] to return a formatted time
+  /// of weekday, day, month and year
+  static String getFormattedShortDate(DateTime dateTime) {
+    return DateFormat('EEE, d MMM, y').format(dateTime).toString();
+  }
+
+  /// Converting [dateTime] to return a formatted time
   /// hour with am or pm
   static String getFormattedTime(DateTime dateTime) {
     return DateFormat('h:mm a').format(dateTime).toString();

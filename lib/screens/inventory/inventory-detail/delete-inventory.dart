@@ -15,6 +15,7 @@ class ReusableDeleteText extends StatefulWidget {
 }
 
 class _ReusableDeleteTextState extends State<ReusableDeleteText> {
+
   @override
   Widget build(BuildContext context) {
     return InkWell(

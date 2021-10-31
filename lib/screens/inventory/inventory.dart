@@ -8,6 +8,7 @@ import 'package:fumzy/components/app-bar.dart';
 import 'package:fumzy/components/arrow-button.dart';
 import 'package:fumzy/components/button.dart';
 import 'package:fumzy/components/circle-indicator.dart';
+import 'package:fumzy/components/shimmer-loader.dart';
 import 'package:fumzy/networking/product-datasource.dart';
 import 'package:fumzy/model/category.dart';
 import 'package:fumzy/model/product.dart';
@@ -15,8 +16,7 @@ import 'package:fumzy/screens/dashboard/drawer.dart';
 import 'package:fumzy/utils/constant-styles.dart';
 import 'package:fumzy/utils/functions.dart';
 import 'package:fumzy/utils/size-config.dart';
-import 'package:shimmer/shimmer.dart';
-import 'delete-product.dart';
+import 'inventory-detail/inventory-detail.dart';
 
 class Inventory extends StatefulWidget {
 
@@ -52,8 +52,6 @@ class _InventoryState extends State<Inventory> {
   TextEditingController _productCategory = TextEditingController();
   TextEditingController _costPrice = TextEditingController();
   TextEditingController _sellingPrice = TextEditingController();
-  TextEditingController _initialQuantity = TextEditingController();
-  TextEditingController _currentQuantity = TextEditingController();
   TextEditingController _quantity = TextEditingController();
   TextEditingController _sellersName = TextEditingController();
 
@@ -96,7 +94,7 @@ class _InventoryState extends State<Inventory> {
       print(e);
       Functions.showErrorMessage(e);
     });
-  }//TODO:1 i don't understand here
+  }
 
   /// A function to build the list of all the products
   Widget _buildProductList() {
@@ -116,13 +114,20 @@ class _InventoryState extends State<Inventory> {
             DataCell(Text(Functions.money(product.costPrice!, 'N'))),
             DataCell(Text(Functions.money(product.sellingPrice!, 'N'))),
             DataCell(Text(stock, style: TextStyle(color: _stockColor[stock]))),
-            DataCell(GestureDetector(
-              onTap: () {
-                // Navigator.pushNamed(context, InventoryDetail.id);
-              },
-              child: TableArrowButton(),
-            )),
-          ]),
+            DataCell(TableArrowButton()),
+          ],
+            onSelectChanged: (value){
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => InventoryDetail(
+                      product: _products[i],
+                      allCategories: _categories
+                  ),
+                ),
+              ).then((value) => _refreshProducts());
+            },
+          ),
         );
       }
       return RefreshIndicator(
@@ -149,6 +154,7 @@ class _InventoryState extends State<Inventory> {
                     ),
                     columnSpacing: 15.0,
                     dataRowHeight: 65.0,
+                    showCheckboxColumn: false,
                     columns: const [
                       DataColumn(label: Text('Product Name')),
                       DataColumn(label: Text('Category')),
@@ -167,10 +173,8 @@ class _InventoryState extends State<Inventory> {
         ),
       );
     }
-    else if(_productsLength == 0){
-      return Container();
-    }
-    return _shimmerLoader();
+    else if(_productsLength == 0) return Container();
+    return ShimmerLoader();
   }
 
   /// Function to refresh list of products from page 1 similar to [_getAllProducts()]
@@ -226,7 +230,29 @@ class _InventoryState extends State<Inventory> {
             DataCell(Text(_productCategories.containsKey(category.name!)
                 ? _productCategories[category.name!].toString()
                 : '0')),
-            DataCell(ReusableDeleteText()),
+            DataCell(
+                InkWell(
+                  onTap: () {
+                    _updateCategory(category);
+                  },
+                  child: Row(
+                    children: [
+                      Text(
+                        'Edit ',
+                        style: TextStyle(
+                          color: Color(0xFF004E92).withOpacity(0.5),
+                          fontSize: 14,
+                        ),
+                      ),
+                      Icon(
+                        Icons.info,
+                        color: Color(0xFF004E92).withOpacity(0.5),
+                        size: 15,
+                      ),
+                    ],
+                  ),
+                ),
+            ),
           ]),
         );
       }
@@ -256,12 +282,9 @@ class _InventoryState extends State<Inventory> {
         ),
       );
     }
-    else if(_categoriesLength == 0){
-      return Container();
-    }
-    return _shimmerLoader();
+    else if(_categoriesLength == 0) return Container();
+    return ShimmerLoader();
   }
-
 
   /// Function to refresh list of categories similar to [_getAllCategories()]
   Future<Null> _refreshCategories() {
@@ -279,31 +302,6 @@ class _InventoryState extends State<Inventory> {
       if(!mounted)return;
       Functions.showErrorMessage(e);
     });
-  }
-
-  Widget _shimmerLoader(){
-    List<Widget> containers = [];
-    for(int i = 0; i < 20; i++){
-      containers.add(
-          Container(
-              width: SizeConfig.screenWidth,
-              height: 40,
-              margin: EdgeInsets.only(bottom: 10),
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(3)),
-                  color: Color(0xFFF6F6F6)
-              )
-          )
-      );
-    }
-    return SingleChildScrollView(
-      physics: BouncingScrollPhysics(),
-      child: Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
-          child: Column(children: containers)
-      ),
-    );
   }
 
   @override
@@ -359,7 +357,7 @@ class _InventoryState extends State<Inventory> {
                           children: [
                             TextButton(
                               onPressed: () {
-                                _addNewCategory(constraints,CircleProgressIndicator());
+                                _addNewCategory(constraints);
                               },
                               child: Container(
                                 color: Colors.transparent,
@@ -507,7 +505,7 @@ class _InventoryState extends State<Inventory> {
   }
 
   Widget _productView(){
-    return  Container(
+    return Container(
         decoration: kTableContainer,
         child: _buildProductList()
     );
@@ -548,10 +546,11 @@ class _InventoryState extends State<Inventory> {
   }
 
   /// Widget to show the dialog to add [CATEGORY]
-  Future<void> _addNewCategory(BoxConstraints constraints, Widget circleSpinnerIndicator) {
+  Future<void> _addNewCategory(BoxConstraints constraints) {
     return showDialog(
       context: context,
       barrierColor: Color(0xFF000428).withOpacity(0.86),
+      barrierDismissible: false,
       builder: (context) => GestureDetector(
         onTap: (){
           FocusScopeNode currentFocus = FocusScope.of(context);
@@ -685,9 +684,9 @@ class _InventoryState extends State<Inventory> {
                                 },
                                 buttonColor: Color(0xFF00509A),
                                 child: Center(
-                                  child: _showSpinner ?
-                                  circleSpinnerIndicator :
-                                  const Text(
+                                  child: _showSpinner
+                                      ? CircleProgressIndicator()
+                                      : const Text(
                                     'Add Category',
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
@@ -756,10 +755,223 @@ class _InventoryState extends State<Inventory> {
     });
   }
 
+  /// Widget to show the dialog to add [CATEGORY]
+  Future<void> _updateCategory(Category category) {
+    final formKey = GlobalKey<FormState>();
+    TextEditingController editCategoryController = TextEditingController();
+    editCategoryController.text = category.name!;
+
+    return showDialog(
+      context: context,
+      barrierColor: Color(0xFF000428).withOpacity(0.86),
+      barrierDismissible: false,
+      builder: (context) => GestureDetector(
+        onTap: (){
+          FocusScopeNode currentFocus = FocusScope.of(context);
+          if(!currentFocus.hasPrimaryFocus) currentFocus.unfocus();
+        },
+        child: StatefulBuilder(
+          builder: (BuildContext context, StateSetter setDialogState) {
+            return AbsorbPointer(
+              absorbing: _showSpinner,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Color(0xFFFFFFFF),
+                ),
+                margin: EdgeInsets.all(50),
+                child: Material(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.fromLTRB(24, 30, 24, 27),
+                        decoration: BoxDecoration(
+                          color: Color(0xFFF5F8FF),
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(15.0),
+                            topRight: Radius.circular(15.0),
+                          ),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                                'UPDATE PRODUCT CATEGORY',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 15,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: Icon(
+                                IconlyBold.closeSquare,
+                                color: Colors.black.withOpacity(0.7),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ), //new category header with cancel icon
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(top: 42),
+                                child: Text(
+                                  'Add New Category',
+                                  style: TextStyle(
+                                    color: Color(0xFF00509A),
+                                    fontSize: 19,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding:
+                                const EdgeInsets.symmetric(horizontal: 35, vertical: 15.0),
+                                child: Text(
+                                  '',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Color(0xFF000428).withOpacity(0.6),
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 15.0,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.only(left: 20, right: 20),
+                                child: Form(
+                                  key: formKey,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text('Category'),
+                                      SizedBox(height: 10),
+                                      Container(
+                                        width: SizeConfig.screenWidth,
+                                        child: TextFormField(
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.normal,
+                                          ),
+                                          textInputAction: TextInputAction.done,
+                                          keyboardType: TextInputType.name,
+                                          controller: editCategoryController,
+                                          validator: (value) {
+                                            if (value!.isEmpty) return 'Enter category name';
+                                            return null;
+                                          },
+                                          decoration: kTextFieldBorderDecoration.copyWith(
+                                            hintText: 'Enter category name',
+                                            hintStyle: TextStyle(
+                                              color: Colors.black.withOpacity(0.5),
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.normal,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 40),
+                              Button(
+                                onTap: (){
+                                  if(!_showSpinner){
+                                    if(formKey.currentState!.validate()){
+                                      _editCategory(setDialogState, editCategoryController.text, category.id!);
+                                    }
+                                  }
+                                },
+                                buttonColor: Color(0xFF00509A),
+                                child: Center(
+                                  child: _showSpinner 
+                                      ? CircleProgressIndicator() 
+                                      : const Text(
+                                    'Update Category',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Color(0xFFFFFFFF),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              Container(
+                                width: 100,
+                                child: TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Center(
+                                    child: Text(
+                                      'No, Cancel',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 50),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  /// function to make api call to [createCategory]
+  void _editCategory(StateSetter setDialogState, String name, String id) async{
+    if(!mounted)return;
+    setDialogState(() => _showSpinner = true);
+    var api = ProductDataSource();
+    Map<String, String> body = {'id': id, 'name': name };
+    await api.updateCategory(body).then((message) async{
+      if(!mounted)return;
+      setDialogState((){
+        _showSpinner = false;
+        Navigator.pop(context);
+      });
+      Functions.showSuccessMessage('Successfully updated category');
+      _refreshCategories();
+    }).catchError((e){
+      if(!mounted)return;
+      setDialogState(()=> _showSpinner = false);
+      print(e);
+      Functions.showErrorMessage(e);
+    });
+  }
+
   ///widget to show the dialog [ADD_NEW_PRODUCT]
   Future<void> _addNewProduct(BoxConstraints constraints) {
     return showDialog(
       context: context,
+      barrierDismissible: false,
       barrierColor: Color(0xFF000428).withOpacity(0.86),
       builder: (context) => GestureDetector(
         onTap: (){
@@ -898,6 +1110,10 @@ class _InventoryState extends State<Inventory> {
                                                 contentPadding: EdgeInsets.all(10),
                                               ),
                                             ),
+                                            validator: (value) {
+                                              if (value!.isEmpty) return 'Select category';
+                                              return null;
+                                            },
                                             suggestionsCallback: (pattern) async {
                                               return await Suggestions.getCategorySuggestions(pattern, _categories);
                                             },
@@ -940,7 +1156,7 @@ class _InventoryState extends State<Inventory> {
                                                     textInputAction: TextInputAction.next,
                                                     keyboardType: TextInputType.number,
                                                     inputFormatters: [
-                                                      FilteringTextInputFormatter.allow(RegExp('[0-9]')),
+                                                      FilteringTextInputFormatter.allow(RegExp('[0-9.]')),
                                                     ],
                                                     controller: _costPrice,
                                                     validator: (value) {
@@ -978,7 +1194,7 @@ class _InventoryState extends State<Inventory> {
                                                     textInputAction: TextInputAction.next,
                                                     keyboardType: TextInputType.number,
                                                     inputFormatters: [
-                                                      FilteringTextInputFormatter.allow(RegExp('[0-9]')),
+                                                      FilteringTextInputFormatter.allow(RegExp('[0-9.]')),
                                                     ],
                                                     controller: _sellingPrice,
                                                     validator: (value) {
@@ -1001,80 +1217,6 @@ class _InventoryState extends State<Inventory> {
                                         ]
                                     ),
                                     SizedBox(height: 20),
-                                    // initial quantity
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text('Initial Quantity'),
-                                        SizedBox(height: 10),
-                                        Container(
-                                          width: constraints.maxWidth,
-                                          child: TextFormField(
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.normal,
-                                            ),
-                                            textInputAction: TextInputAction.next,
-                                            keyboardType: TextInputType.number,
-                                            inputFormatters: [
-                                              FilteringTextInputFormatter.allow(RegExp('[0-9]')),
-                                            ],
-                                            controller: _initialQuantity,
-                                            validator: (value) {
-                                              if (value!.isEmpty) return 'Enter initial quantity';
-                                              return null;
-                                            },
-                                            decoration: kTextFieldBorderDecoration.copyWith(
-                                              hintText: 'Enter initial quantity',
-                                              hintStyle: TextStyle(
-                                                color: Colors.black.withOpacity(0.5),
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.normal,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 20),
-                                    // current quantity
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text('Current Quantity'),
-                                        SizedBox(height: 10),
-                                        Container(
-                                          width: constraints.maxWidth,
-                                          child: TextFormField(
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.normal,
-                                            ),
-                                            textInputAction: TextInputAction.next,
-                                            keyboardType: TextInputType.number,
-                                            inputFormatters: [
-                                              FilteringTextInputFormatter.allow(RegExp('[0-9]')),
-                                            ],
-                                            controller: _currentQuantity,
-                                            validator: (value) {
-                                              if (value!.isEmpty) return 'Enter current quantity';
-                                              return null;
-                                            },
-                                            decoration: kTextFieldBorderDecoration.copyWith(
-                                              hintText: 'Enter current quantity',
-                                              hintStyle: TextStyle(
-                                                color: Colors.black.withOpacity(0.5),
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.normal,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 20),
                                     // Quantity
                                     Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1092,7 +1234,7 @@ class _InventoryState extends State<Inventory> {
                                             textInputAction: TextInputAction.next,
                                             keyboardType: TextInputType.number,
                                             inputFormatters: [
-                                              FilteringTextInputFormatter.allow(RegExp('[0-9]')),
+                                              FilteringTextInputFormatter.allow(RegExp('[0-9.]')),
                                             ],
                                             controller: _quantity,
                                             validator: (value) {
@@ -1154,8 +1296,7 @@ class _InventoryState extends State<Inventory> {
                               onTap: (){
                                 if(!_showSpinner){
                                   if(_addProductFormKey.currentState!.validate()){
-                                    if(_productCategory.text != '') return _addProduct(setDialogState);
-                                    Functions.showErrorMessage("Enter a valid Category name and try again");
+                                    _addProduct(setDialogState);
                                   }
                                 }
                               },
@@ -1215,14 +1356,14 @@ class _InventoryState extends State<Inventory> {
     setDialogState(() => _showSpinner = true);
     var api = ProductDataSource();
     Map<String, String> body = {
-      "productName": _productName.text,
-      "category": _productCategory.text,
-      "costPrice": _costPrice.text,
-      "sellingPrice": _sellingPrice.text,
-      "initialQty": _quantity.text,
-      "currentQty": _quantity.text,
-      "quantity": _quantity.text,
-      "sellersName": _sellersName.text,
+      'productName': _productName.text,
+      'category': _productCategory.text,
+      'costPrice': _costPrice.text,
+      'sellingPrice': _sellingPrice.text,
+      'initialQty': _quantity.text,
+      'currentQty': _quantity.text,
+      'quantity': _quantity.text,
+      'sellersName': _sellersName.text,
     };
     await api.addProduct(body).then((message) async{
       if(!mounted)return;
@@ -1231,10 +1372,12 @@ class _InventoryState extends State<Inventory> {
         Navigator.pop(context);
       });
       Functions.showSuccessMessage(message);
+      _refreshProducts();
     }).catchError((e){
       if(!mounted)return;
       setDialogState(()=> _showSpinner = false);
-      Functions.showErrorMessage(e.toString());
+      Functions.showErrorMessage(e);
     });
   }
+
 }

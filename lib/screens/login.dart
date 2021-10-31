@@ -123,8 +123,7 @@ class _LoginState extends State<Login> {
                   onTap: (){
                     if(!_showSpinner){
                       if(_formKey.currentState!.validate()){
-                        if(_pin.length == 4) _signIn();
-                        else print('Enter a 4 digit valid pin');
+                        _signIn();
                       }
                     }
                   },
@@ -234,6 +233,11 @@ class _LoginState extends State<Login> {
                       color: Color(0xFF004E92),
                       fontWeight: FontWeight.w500,
                     ),
+                    validator: (value) {
+                      if (value!.isEmpty) return 'Enter your pin';
+                      if (_pin.length != 4) return 'Enter a valid 4 digit pin';
+                      return null;
+                    },
                     pinTheme: PinTheme(
                         shape: PinCodeFieldShape.box,
                         borderWidth: 1,

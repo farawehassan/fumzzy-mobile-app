@@ -5,6 +5,7 @@ import 'package:fumzy/utils/constant-styles.dart';
 import 'sales-info.dart';
 
 class Sales extends StatefulWidget {
+
   const Sales({Key? key}) : super(key: key);
 
   @override
@@ -12,6 +13,7 @@ class Sales extends StatefulWidget {
 }
 
 class _SalesState extends State<Sales> {
+
   final Color partPaidColor = Color(0xFFF28301);
 
   final Color creditColor = Color(0xFFF64932);

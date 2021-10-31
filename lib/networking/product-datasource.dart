@@ -63,6 +63,32 @@ class ProductDataSource{
     }
   }
 
+  /// A function that fetches all products purchases in the database -paginated GET
+  /// It returns a [Map]
+  Future<Map<String, dynamic>> getProductPurchases(String productId, {int? page, int? limit}) async {
+    Map<String, dynamic> result = {};
+    late Map<String, String> header;
+    Future<User> user = _futureValue.getCurrentUser();
+    await user.then((value) {
+      if(value.token == null) throw('You\'re not authorized, log out and log in back and try again!');
+      header = {'Authorization': 'Bearer ${value.token}'};
+    });
+    String GET_PRODUCT_PURCHASES = GET_PURCHASES_BY_PRODUCT + '/$productId?page=$page&limit=$limit';
+    return _netUtil.get(GET_PRODUCT_PURCHASES, headers: header).then((dynamic res) {
+      print(res);
+      if (res['error']) throw res['message'];
+      List<Purchase> allPurchases = [];
+      var rest = res['data']['items'] as List;
+      allPurchases = rest.map<Purchase>((json) => Purchase.fromJson(json)).toList();
+      result['totalCount'] = res['data']['totalCount'];
+      result['page'] = res['data']['page'];
+      result['items'] = allPurchases;
+      return result;
+    }).catchError((e) {
+      errorHandler.handleError(e);
+    });
+  }
+
   /// A function that fetches all products in the database GET
   /// It returns a list of [Product]
   Future<List<Product>> getAllProducts({bool? refresh}) async {
@@ -134,17 +160,17 @@ class ProductDataSource{
     });
   }
 
-  /// A function that sends request for adding a category with [body] as details
-  /// A post request to use the [CREATE_PRODUCT] endpoint
+  /// A function that sends request for editing a category with [body] as details
+  /// A post request to use the [EDIT_CATEGORY] endpoint
   /// It returns a [String]
-  Future<dynamic> createPurchase(Map<String, String> body) async {
+  Future<dynamic> updateCategory(Map<String, String> body) async {
     Map<String, String>? header;
     Future<User> user = _futureValue.getCurrentUser();
     await user.then((value) {
       if(value.token == null) throw('You\'re not authorized, log out and log in back and try again!');
       header = {'Authorization': 'Bearer ${value.token}'};
     });
-    return _netUtil.post(CREATE_PRODUCT, headers: header, body: body).then((dynamic res) {
+    return _netUtil.put(EDIT_CATEGORY, headers: header, body: body).then((dynamic res) {
       if (res['error']) throw res['message'];
       return res['message'];
     }).catchError((e) {
@@ -163,6 +189,44 @@ class ProductDataSource{
       header = {'Authorization': 'Bearer ${value.token}'};
     });
     return _netUtil.post(CREATE_PRODUCT, headers: header, body: body).then((dynamic res) {
+      if (res['error']) throw res['message'];
+      return res['message'];
+    }).catchError((e) {
+      errorHandler.handleError(e);
+    });
+  }
+
+  /// A function that sends request for updating a product with [body] as details
+  /// A post request to use the [UPDATE_A_PRODUCT] endpoint
+  /// It returns a [String]
+  Future<dynamic> updateProduct(Map<String, dynamic> body, String productId) async {
+    Map<String, String>? header;
+    Future<User> user = _futureValue.getCurrentUser();
+    await user.then((value) {
+      if(value.token == null) throw('You\'re not authorized, log out and log in back and try again!');
+      header = {'Authorization': 'Bearer ${value.token}'};
+    });
+    String UPDATE_A_PRODUCT_URL = UPDATE_A_PRODUCT + '/$productId';
+    return _netUtil.put(UPDATE_A_PRODUCT_URL, headers: header, body: body).then((dynamic res) {
+      if (res['error']) throw res['message'];
+      return res['message'];
+    }).catchError((e) {
+      errorHandler.handleError(e);
+    });
+  }
+
+  /// A function that sends request for updating a product with [body] as details
+  /// A post request to use the [UPDATE_A_PRODUCT] endpoint
+  /// It returns a [String]
+  Future<dynamic> deletePurchase(Map<String, dynamic> body, String purchaseId) async {
+    Map<String, String>? header;
+    Future<User> user = _futureValue.getCurrentUser();
+    await user.then((value) {
+      if(value.token == null) throw('You\'re not authorized, log out and log in back and try again!');
+      header = {'Authorization': 'Bearer ${value.token}'};
+    });
+    String DELETE_PURCHASE_URL = DELETE_PURCHASE + '/$purchaseId';
+    return _netUtil.delete(DELETE_PURCHASE_URL, headers: header, body: {}).then((dynamic res) {
       if (res['error']) throw res['message'];
       return res['message'];
     }).catchError((e) {

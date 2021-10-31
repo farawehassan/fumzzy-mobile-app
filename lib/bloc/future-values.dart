@@ -1,13 +1,16 @@
 import 'dart:async';
 import 'package:fumzy/database/user-db-helper.dart';
 import 'package:fumzy/model/category.dart';
+import 'package:fumzy/model/creditor.dart';
 import 'package:fumzy/model/customer-names.dart';
 import 'package:fumzy/model/expense.dart';
 import 'package:fumzy/model/product.dart';
 import 'package:fumzy/model/user.dart';
+import 'package:fumzy/networking/creditor-datasource.dart';
 import 'package:fumzy/networking/customer-datasource.dart';
 import 'package:fumzy/networking/expense-datasource.dart';
 import 'package:fumzy/networking/product-datasource.dart';
+import 'package:fumzy/networking/sales-datasource.dart';
 import 'package:fumzy/networking/user-datasource.dart';
 
 class FutureValues{
@@ -32,12 +35,30 @@ class FutureValues{
     });
   }
 
+  /// A function that fetches all sales in the database with the help of
+  /// [SalesDataSource] - paginated
+  /// It returns a Map of [<String, dynamic>]
+  Future<Map<String, dynamic>> getAllSalesPaginated({bool? refresh, int? page, limit}) async{
+    var data = SalesDataSource();
+    Future<Map<String, dynamic>> sales = data.getAllSales(refresh: refresh, page: page, limit: limit);
+    return sales;
+  }
+
   /// A function that fetches all purchases in the database with the help of
   /// [ProductDataSource] - paginated
   /// It returns a Map of [<String, dynamic>]
   Future<Map<String, dynamic>> getAllPurchasesPaginated({bool? refresh, int? page, limit}) async{
     var data = ProductDataSource();
     Future<Map<String, dynamic>> purchases = data.getAllPurchasesPaginated(refresh: refresh, page: page, limit: limit);
+    return purchases;
+  }
+
+  /// A function that fetches all product purchases in the database with the help of
+  /// [ProductDataSource] - paginated
+  /// It returns a [Map]
+  Future<Map<String, dynamic>> getProductPurchases(String productId, {int? page, limit}) async{
+    var data = ProductDataSource();
+    Future<Map<String, dynamic>> purchases = data.getProductPurchases(productId, page: page, limit: limit);
     return purchases;
   }
 
@@ -71,9 +92,46 @@ class FutureValues{
   ///A function that fetches all expenses in the database with the help of
   ///[ExpenseDataSource]
   ///It returns a list of model[Expense]
-  Future<Map<String, dynamic>> getAllExpense({bool? refresh}) async{
+  Future<Map<String, dynamic>> getAllExpense({bool? refresh, int? page, limit}) async{
     var data = ExpenseDataSource();
-    Future<Map<String, dynamic>> expenses = data.getAllExpenses(refresh: refresh);
+    Future<Map<String, dynamic>> expenses = data.getAllExpenses(refresh: refresh, page: page, limit: limit);
     return expenses;
   }
+
+  /// A function that fetches all customers in the database with the help of
+  /// [ProductDataSource] - paginated
+  /// It returns a [Map]
+  Future<Map<String, dynamic>> getAllCustomersPaginated({bool? refresh, int? page, limit}) async{
+    var data = CustomerDataSource();
+    Future<Map<String, dynamic>> customers = data.getAllCustomersPaginated(refresh: refresh, page: page, limit: limit);
+    return customers;
+  }
+
+  /// A function that fetches all debtors in the database with the help of
+  /// [ProductDataSource] - paginated
+  /// It returns a [Map]
+  Future<Map<String, dynamic>> getAllDebtorsPaginated({bool? refresh, int? page, limit}) async{
+    var data = CustomerDataSource();
+    Future<Map<String, dynamic>> customers = data.getAllDebtorsPaginated(refresh: refresh, page: page, limit: limit);
+    return customers;
+  }
+
+  /// A function that fetches all creditors in the database with the help of
+  /// [CreditorDataSource] - paginated
+  /// It returns a [Map]
+  Future<Map<String, dynamic>> getAllCreditorsPaginated({bool? refresh, int? page, limit}) async{
+    var data = CreditorDataSource();
+    Future<Map<String, dynamic>> creditors = data.getAllCreditorsPaginated(refresh: refresh, page: page, limit: limit);
+    return creditors;
+  }
+
+  /// A function that fetches all customers name in the database with the help of
+  /// [CustomerDataSource]
+  /// It returns list of model [Creditor]
+  Future<List<Creditor>> getAllCreditors() async{
+    var data = CreditorDataSource();
+    Future<List<Creditor>> creditors = data.getAllCreditors();
+    return creditors;
+  }
+
 }

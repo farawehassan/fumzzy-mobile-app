@@ -37,7 +37,7 @@ class FullyPaidInvoicesDetail extends StatelessWidget {
             ],
             rows: [
               DataRow(cells: [
-                DataCell(ReusableDownloadPdf(invoiceNo: 022341)),
+                DataCell(ReusableDownloadPdf(invoiceNo: '022341')),
                 DataCell(Text('Fully Paid')),
                 DataCell(Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -55,7 +55,7 @@ class FullyPaidInvoicesDetail extends StatelessWidget {
                 DataCell(Text('-')),
               ]),
               DataRow(cells: [
-                DataCell(ReusableDownloadPdf(invoiceNo: 022341)),
+                DataCell(ReusableDownloadPdf(invoiceNo: '022341')),
                 DataCell(Text('Fully Paid')),
                 DataCell(Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -73,7 +73,7 @@ class FullyPaidInvoicesDetail extends StatelessWidget {
                 DataCell(Text('-')),
               ]),
               DataRow(cells: [
-                DataCell(ReusableDownloadPdf(invoiceNo: 022341)),
+                DataCell(ReusableDownloadPdf(invoiceNo: '022341')),
                 DataCell(Text('Fully Paid')),
                 DataCell(Column(
                   mainAxisAlignment: MainAxisAlignment.center,
