@@ -96,20 +96,75 @@ class UserDataSource{
     });
   }
 
-  /// A function that sends request to reset staff [body] as details
-  /// A post request to use the [RESET_PIN]
+  /// A function that sends request to reset staff
   /// It returns a [Message]
-  Future<dynamic> resetStaffPin() async {
+  Future<dynamic> resetStaffPin(String usersId) async {
     Map<String, String>? header;
-    String? userId;
+    String? userId = usersId;
     Future<User> user = _futureValue.getCurrentUser();
     await user.then((value) {
       if(value.token == null) throw('You\'re not authorized, log out and log in back and try again!');
       header = {'Authorization': 'Bearer ${value.token}'};
-      userId = value.id;
     });
     String RESET_PIN_URL = RESET_PIN + '/$userId';
-    return _netUtil.put(RESET_PIN_URL, headers: header).then((dynamic res) {
+    return _netUtil.put(RESET_PIN_URL, headers: header, body: {}).then((dynamic res) {
+      if (res['error']) throw res['message'];
+      return res['message'];
+    }).catchError((e) {
+      errorHandler.handleError(e);
+    });
+  }
+
+  /// A function that sends request to block staff
+  /// It returns a [Message]
+  Future<dynamic> blockStaff(String usersId) async {
+    Map<String, String>? header;
+    String? userId = usersId;
+    Future<User> user = _futureValue.getCurrentUser();
+    await user.then((value) {
+      if(value.token == null) throw('You\'re not authorized, log out and log in back and try again!');
+      header = {'Authorization': 'Bearer ${value.token}'};
+    });
+    String BLOCK_STAFF = USER_ACTION + '/$userId/block';
+    return _netUtil.put(BLOCK_STAFF, headers: header, body: {}).then((dynamic res) {
+      if (res['error']) throw res['message'];
+      return res['message'];
+    }).catchError((e) {
+      errorHandler.handleError(e);
+    });
+  }
+
+  /// A function that sends request to activate staff
+  /// It returns a [Message]
+  Future<dynamic> activateStaff(String usersId) async {
+    Map<String, String>? header;
+    String? userId = usersId;
+    Future<User> user = _futureValue.getCurrentUser();
+    await user.then((value) {
+      if(value.token == null) throw('You\'re not authorized, log out and log in back and try again!');
+      header = {'Authorization': 'Bearer ${value.token}'};
+    });
+    String ACTIVATE_STAFF = USER_ACTION + '/$userId/active';
+    return _netUtil.put(ACTIVATE_STAFF, headers: header, body: {}).then((dynamic res) {
+      if (res['error']) throw res['message'];
+      return res['message'];
+    }).catchError((e) {
+      errorHandler.handleError(e);
+    });
+  }
+
+  /// A function that sends request to delete staff
+  /// It returns a [Message]
+  Future<dynamic> deleteStaff(String usersId) async {
+    Map<String, String>? header;
+    String? userId = usersId;
+    Future<User> user = _futureValue.getCurrentUser();
+    await user.then((value) {
+      if(value.token == null) throw('You\'re not authorized, log out and log in back and try again!');
+      header = {'Authorization': 'Bearer ${value.token}'};
+    });
+    String DELETE_STAFF = USER_ACTION + '/$userId/delete';
+    return _netUtil.put(DELETE_STAFF, headers: header, body: {}).then((dynamic res) {
       if (res['error']) throw res['message'];
       return res['message'];
     }).catchError((e) {
