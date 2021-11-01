@@ -795,6 +795,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                   ),
                                 ),
                                 SizedBox(height: 50),
+                                SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
                               ],
                             ),
                           ),

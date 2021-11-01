@@ -606,6 +606,7 @@ class _StaffState extends State<Staff> {
                               ),
                             ),
                             SizedBox(height: 50),
+                            SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
                           ]),
                         ),
                       ),
