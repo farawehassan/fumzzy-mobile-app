@@ -1003,6 +1003,7 @@ class _AddSaleState extends State<AddSale> {
                               ),
                             ),
                             SizedBox(height: 50),
+                            SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
                           ],
                         ),
                       ),
