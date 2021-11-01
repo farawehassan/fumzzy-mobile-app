@@ -1336,6 +1336,7 @@ class _InventoryState extends State<Inventory> {
                               ),
                             ),
                             const SizedBox(height: 50),
+                            SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
                           ],
                         ),
                       ),

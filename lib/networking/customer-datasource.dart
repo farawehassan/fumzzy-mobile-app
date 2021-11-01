@@ -286,7 +286,7 @@ class CustomerDataSource{
       if(value.token == null) throw('You\'re not authorized, log out and log in back and try again!');
       header = {'Authorization': 'Bearer ${value.token}'};
     });
-    return _netUtil.post(SETTLE_PAYMENT, headers: header, body: body).then((dynamic res) {
+    return _netUtil.put(SETTLE_PAYMENT, headers: header, body: body).then((dynamic res) {
       if (res['error']) throw res['message'];
       return res['message'];
     }).catchError((e) {

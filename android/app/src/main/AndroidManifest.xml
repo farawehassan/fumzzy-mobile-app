@@ -1,5 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.fumzy">
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+
    <application
         android:label="Fumzzy"
         android:icon="@mipmap/ic_launcher">

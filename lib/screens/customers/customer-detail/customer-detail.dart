@@ -14,6 +14,7 @@ import 'package:fumzy/utils/constant-styles.dart';
 import 'package:fumzy/utils/functions.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'delete-customer.dart';
+import 'sales-report.dart';
 import 'total-sales.dart';
 import 'debt-history.dart';
 import 'repayment-history.dart';
@@ -91,7 +92,18 @@ class _CustomersDetailState extends State<CustomersDetail> {
           )),
           DataCell(Text(Functions.money(report.totalAmount!, 'N'))),
           DataCell(Text(Functions.getFormattedDateTime(report.soldAt!))),
-        ]),
+        ],
+        onSelectChanged: (value){
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SalesReport(
+                customer: widget.customer,
+                reports: report,
+              ),
+            ),
+          );
+        }),
       );
     }
     return SingleChildScrollView(
@@ -149,7 +161,18 @@ class _CustomersDetailState extends State<CustomersDetail> {
                 color: Color(0xFFF64932),
               ),
             )),
-          ]),
+          ],
+          onSelectChanged: (value){
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SalesReport(
+                  customer: widget.customer,
+                  reports: report,
+                ),
+              ),
+            );
+          }),
         );
       }
     }
@@ -175,6 +198,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                   ),
                   columnSpacing: 15.0,
                   dataRowHeight: 65.0,
+                  showCheckboxColumn: false,
                   columns: [
                     DataColumn(label: Text('Total Sales')),
                     DataColumn(label: Text('Invoice/Reference')),
@@ -205,7 +229,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
         body: Padding(
           padding: EdgeInsets.fromLTRB(20, 30, 20, 0),
           child: DefaultTabController(
-            length: 3,
+            length: 2,
             initialIndex: 0,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -216,10 +240,9 @@ class _CustomersDetailState extends State<CustomersDetail> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Wrap(
-                          alignment: WrapAlignment.start,
-                          spacing: constraints.maxWidth / 1.95,
-                          runSpacing: 18.0,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             // Customer detail
                             Row(
@@ -250,8 +273,8 @@ class _CustomersDetailState extends State<CustomersDetail> {
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                ReusableDeleteText(textSize: 16),
-                                Container(
+                                //ReusableDeleteText(textSize: 16),
+                                /*Container(
                                   height: 25,
                                   margin: EdgeInsets.symmetric(horizontal: 9.0),
                                   child: VerticalDivider(
@@ -259,8 +282,8 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                     thickness: 0.6,
                                     width: 1,
                                   ),
-                                ),
-                                Container(
+                                ),*/
+                                /*Container(
                                   height: 15,
                                   width: 30,
                                   child: Checkbox(
@@ -284,13 +307,13 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                     fontSize: 15,
                                     fontWeight: FontWeight.w400,
                                   ),
-                                ),
+                                ),*/
                               ],
                             ),
                           ],
                         ),
                         SizedBox(height: 35),
-                        //customers info
+                        // customers info
                         Container(
                           width: constraints.maxWidth,
                           decoration: kTableContainer,
@@ -377,7 +400,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                         tabs: [
                           Tab(child: Text('Total Sales', style: kTabBarTextStyle)),
                           Tab(child: Text('Debt History', style: kTabBarTextStyle)),
-                          Tab(child: Text('Re-payment History', style: kTabBarTextStyle)),
+                          // Tab(child: Text('Re-payment History', style: kTabBarTextStyle)),
                         ],
                       ),
                     ),
@@ -415,7 +438,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                               ),
                             ),
                           ),
-                          Button(
+                          /*Button(
                             onTap: () {
                               _recordRepayment(constraints);
                             },
@@ -432,7 +455,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                 ),
                               ),
                             ),
-                          ),
+                          ),*/
                         ],
                       ),
                     ),
@@ -444,7 +467,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                     children: [
                       _buildTotalSales(),
                       _buildDebtHistory(),
-                      RepaymentHistory(),
+                      //RepaymentHistory(),
                     ],
                   ),
                 ),
