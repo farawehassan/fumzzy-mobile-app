@@ -640,9 +640,7 @@ class _InventoryState extends State<Inventory> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        'Category',
-                                      ),
+                                      Text('Category',),
                                       SizedBox(height: 10),
                                       Container(
                                         width: constraints.maxWidth,
@@ -718,6 +716,7 @@ class _InventoryState extends State<Inventory> {
                                 ),
                               ),
                               SizedBox(height: 50),
+                              SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
                             ],
                           ),
                         ),
@@ -930,6 +929,7 @@ class _InventoryState extends State<Inventory> {
                                 ),
                               ),
                               SizedBox(height: 50),
+                              SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
                             ],
                           ),
                         ),

@@ -88,7 +88,7 @@ class _StaffState extends State<Staff> {
             DataCell(Text(staff.name!)),
             DataCell(Text(staff.status!,style: TextStyle(color: _statusColor[status]))),
             DataCell(Text(Functions.getFormattedDateTime(staff.createdAt!))),
-            DataCell(ReusablePopMenu()),
+            DataCell(ReusablePopMenu(userId: staff.id!,)),
           ]),
         );
       }
@@ -606,6 +606,7 @@ class _StaffState extends State<Staff> {
                               ),
                             ),
                             SizedBox(height: 50),
+                            SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
                           ]),
                         ),
                       ),

@@ -13,6 +13,8 @@ import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:fumzy/utils/constant-styles.dart';
 import 'package:fumzy/utils/functions.dart';
 
+import 'creditors-detail/creditor-detail.dart';
+
 class Creditors extends StatefulWidget {
 
   static const String id = 'creditors';
@@ -105,7 +107,14 @@ class _CreditorsState extends State<Creditors> {
             DataCell(TableArrowButton()),
           ],
           onSelectChanged: (value){
-
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CreditorsDetail(
+                  creditor: creditor,
+                ),
+              ),
+            ).then((value) => _refreshCreditors());
           }),
         );
       }

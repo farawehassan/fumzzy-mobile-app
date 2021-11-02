@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fumzy/screens/creditors/creditors-detail/creditor-detail.dart';
 import 'package:fumzy/screens/notification/mobile-notification-content.dart';
 import 'screens/inventory/inventory.dart';
 import 'screens/invoices/invoices.dart';
@@ -74,6 +75,7 @@ class _MyAppState extends State<MyApp> {
         Staff.id: (context) => Staff(),
         Settings.id: (context) => Settings(),
         Creditors.id: (context) => Creditors(),
+        CreditorsDetail.id: (context) => CreditorsDetail(),
         Transactions.id: (context) => Transactions(),
         Inventory.id: (context) => Inventory(),
         Invoices.id: (context) => Invoices(),

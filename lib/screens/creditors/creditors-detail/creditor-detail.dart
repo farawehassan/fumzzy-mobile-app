@@ -2,108 +2,69 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:fumzy/components/app-bar.dart';
-import 'package:fumzy/components/bubble-color-indicator.dart';
 import 'package:fumzy/components/button.dart';
 import 'package:fumzy/components/circle-indicator.dart';
-import 'package:fumzy/components/invoice-pdf-download.dart';
-import 'package:fumzy/model/all-customers.dart';
-import 'package:fumzy/model/customer-reports.dart';
-import 'package:fumzy/networking/customer-datasource.dart';
-import 'package:fumzy/screens/dashboard/drawer.dart';
+import 'package:fumzy/model/creditor-report.dart';
+import 'package:fumzy/model/creditor.dart';
+import 'package:fumzy/networking/creditor-datasource.dart';
 import 'package:fumzy/utils/constant-styles.dart';
 import 'package:fumzy/utils/functions.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'delete-customer.dart';
-import 'sales-report.dart';
 import 'total-sales.dart';
 import 'debt-history.dart';
 import 'repayment-history.dart';
 import 'package:fumzy/components/info-table.dart';
 
-class CustomersDetail extends StatefulWidget {
+class CreditorsDetail extends StatefulWidget {
 
-  static const String id = 'customerDetail';
+  static const String id = 'creditorDetail';
 
-  final AllCustomers? customer;
+  final Creditor? creditor;
 
-  const CustomersDetail({
+  const CreditorsDetail({
     Key? key,
-    @required this.customer,
+    @required this.creditor,
   }) : super(key: key);
 
   @override
-  _CustomersDetailState createState() => _CustomersDetailState();
+  _CreditorsDetailState createState() => _CreditorsDetailState();
 }
 
-class _CustomersDetailState extends State<CustomersDetail> {
+class _CreditorsDetailState extends State<CreditorsDetail> {
 
   bool checkBoxValue = false;
 
   bool _showSpinner = false;
 
-  Map<String, Color> _statusColor = {
-    'Part Paid': Color(0xFFF28301),
-    'Fully Paid': Color(0xFF00AF27),
-    'Credit': Color(0xFFF64932),
-    '': Colors.transparent
-  };
-
-  double _totalSales = 0;
-
-  double _totalDebts = 0;
+  double _totalCredits = 0;
 
   DateTime? _lastRepaymentDate;
 
-  void _calculateTotalSales(){
-    if(!mounted)return;
-    setState(() {
-      widget.customer!.reports!.forEach((element) {
-        _totalSales += element.totalAmount!;
-        if(!element.paid!){
-          _totalDebts += element.totalAmount! - element.paymentMade!;
-          if(_lastRepaymentDate == null) _lastRepaymentDate = element.dueDate!;
-        }
-      });
-    });
-  }
+  // void _calculateTotalSales(){
+  //   if(!mounted)return;
+  //   setState(() {
+  //     widget.creditor!.reports!.forEach((element) {
+  //       _totalCredits += element.totalAmount!;
+  //       if(!element.paid!){
+  //         _totalDebts += element.totalAmount! - element.paymentMade!;
+  //         if(_lastRepaymentDate == null) _lastRepaymentDate = element.dueDate!;
+  //       }
+  //     });
+  //   });
+  // }
 
-  Widget _buildTotalSales(){
+  Widget _buildCreditHistory(){
     List<DataRow> itemRow = [];
-    for (int i = 0; i < widget.customer!.reports!.length; i++){
-      AllCustomerReport report = widget.customer!.reports![i];
-      String paymentStatus = '';
-      if(report.paid!) paymentStatus = 'Fully Paid';
-      else {
-        if(report.paymentMade == 0) paymentStatus = 'Credit';
-        else paymentStatus = 'Part Paid';
-      }
+    for (int i = 0; i < widget.creditor!.reports!.length; i++){
+      CreditorReport report = widget.creditor!.reports![i];
       itemRow.add(
         DataRow(cells: [
-          DataCell(ReusableDownloadPdf(invoiceNo: report.id!.substring(0, 8))),
-          DataCell(Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Indicator(
-                indicatorColor: _statusColor[paymentStatus]!,
-              ),
-              SizedBox(width: 4),
-              Text(paymentStatus, style: TextStyle(color: _statusColor[paymentStatus])),
-            ],
-          )),
-          DataCell(Text(Functions.money(report.totalAmount!, 'N'))),
-          DataCell(Text(Functions.getFormattedDateTime(report.soldAt!))),
+          DataCell(Text(Functions.money(report.amount!, 'N'))),
+          DataCell(Text(report.description!)),
+          DataCell(Text(Functions.money(report.paymentMade!, 'N'))),
         ],
-        onSelectChanged: (value){
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => SalesReport(
-                customer: widget.customer,
-                reports: report,
-              ),
-            ),
-          );
-        }),
+        ),
       );
     }
     return SingleChildScrollView(
@@ -130,10 +91,9 @@ class _CustomersDetailState extends State<CustomersDetail> {
                   dataRowHeight: 65.0,
                   showCheckboxColumn: false,
                   columns: [
-                    DataColumn(label: Text('Name')),
-                    DataColumn(label: Text('Status')),
                     DataColumn(label: Text('Amount')),
-                    DataColumn(label: Text('Date')),
+                    DataColumn(label: Text('Description')),
+                    DataColumn(label: Text('Payment Made')),
                   ],
                   rows: itemRow,
                 )
@@ -145,36 +105,18 @@ class _CustomersDetailState extends State<CustomersDetail> {
     );
   }
 
-  Widget _buildDebtHistory(){
+  Widget _buildRepaymentHistory(){
     List<DataRow> itemRow = [];
-    for (int i = 0; i < widget.customer!.reports!.length; i++){
-      if(!widget.customer!.reports![i].paid!){
-        AllCustomerReport report = widget.customer!.reports![i];
-        itemRow.add(
-          DataRow(cells: [
-            DataCell(Text(Functions.money((report.totalAmount! - report.paymentMade!), 'N'))),
-            DataCell(ReusableDownloadPdf(invoiceNo: report.id!.substring(0, 8))),
-            DataCell(Text(Functions.getFormattedDateTime(report.soldAt!))),
-            DataCell(Text(
-              Functions.getFormattedDateTime(report.dueDate!),
-              style: TextStyle(
-                color: Color(0xFFF64932),
-              ),
-            )),
-          ],
-          onSelectChanged: (value){
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => SalesReport(
-                  customer: widget.customer,
-                  reports: report,
-                ),
-              ),
-            );
-          }),
-        );
-      }
+    for (int i = 0; i < widget.creditor!.reports!.length; i++){
+      CreditorReport report = widget.creditor!.reports![i];
+      itemRow.add(
+        DataRow(cells: [
+          DataCell(Text(Functions.money(report.amount!, 'N'))),
+          DataCell(Text(Functions.money(report.paymentMade!, 'N'))),
+          DataCell(Text(report.description!)),
+        ],
+        ),
+      );
     }
     return SingleChildScrollView(
       child: Container(
@@ -200,10 +142,9 @@ class _CustomersDetailState extends State<CustomersDetail> {
                   dataRowHeight: 65.0,
                   showCheckboxColumn: false,
                   columns: [
-                    DataColumn(label: Text('Total Sales')),
-                    DataColumn(label: Text('Invoice/Reference')),
-                    DataColumn(label: Text('Date')),
-                    DataColumn(label: Text('Due Date')),
+                    DataColumn(label: Text('Amount')),
+                    DataColumn(label: Text('Payment Made')),
+                    DataColumn(label: Text('Description')),
                   ],
                   rows: itemRow,
                 )
@@ -216,16 +157,10 @@ class _CustomersDetailState extends State<CustomersDetail> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    if(widget.customer != null) _calculateTotalSales();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) => (Scaffold(
-        appBar: buildAppBarWithBackButton(context, 'CUSTOMERS'),
+        appBar: buildAppBarWithBackButton(context, 'CREDITORS'),
         body: Padding(
           padding: EdgeInsets.fromLTRB(20, 30, 20, 0),
           child: DefaultTabController(
@@ -244,7 +179,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            // Customer detail
+                            // Creditor detail
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -260,7 +195,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                   ),
                                 ),
                                 Text(
-                                  ' Customer Detail',
+                                  ' Credit Details',
                                   style: TextStyle(
                                     color: Color(0xFF75759E),
                                     fontWeight: FontWeight.w600,
@@ -313,7 +248,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                           ],
                         ),
                         SizedBox(height: 35),
-                        // customers info
+                        // creditors info
                         Container(
                           width: constraints.maxWidth,
                           decoration: kTableContainer,
@@ -322,7 +257,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Customer’s Info',
+                                'Creditors’s Info',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w400,
@@ -343,29 +278,13 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                 children: [
                                   ReusableCustomerInfoFields(
                                     tableTitle: 'Name',
-                                    widget: Text(widget.customer!.name!),
+                                    widget: Text(widget.creditor!.name!),
                                   ),
                                   ReusableCustomerInfoFields(
-                                    tableTitle: 'Total Sales',
+                                    tableTitle: 'Total Credits',
                                     widget: Text(
-                                      Functions.money(_totalSales, 'N'),
+                                      Functions.money(_totalCredits, 'N'),
                                     ),
-                                  ),
-                                  ReusableCustomerInfoFields(
-                                    tableTitle: 'Sales Volume',
-                                    widget: Text(
-                                      widget.customer!.reports!.length.toString()
-                                    ),
-                                  ),
-                                  ReusableCustomerInfoFields(
-                                    tableTitle: 'On-board Date',
-                                    widget: Text(
-                                      Functions.getFormattedDateTime(widget.customer!.createdAt!),
-                                    ),
-                                  ),
-                                  ReusableCustomerInfoFields(
-                                    tableTitle: 'Total Debts',
-                                    widget: Text(Functions.money(_totalDebts, 'N')),
                                   ),
                                   ReusableCustomerInfoFields(
                                     tableTitle: 'Last Re-payment Date',
@@ -398,9 +317,8 @@ class _CustomersDetailState extends State<CustomersDetail> {
                         indicatorColor: Color(0xFF004E92),
                         indicatorWeight: 3,
                         tabs: [
-                          Tab(child: Text('Total Sales', style: kTabBarTextStyle)),
-                          Tab(child: Text('Debt History', style: kTabBarTextStyle)),
-                          // Tab(child: Text('Re-payment History', style: kTabBarTextStyle)),
+                          Tab(child: Text('Credit History', style: kTabBarTextStyle)),
+                          Tab(child: Text('Re-payment History', style: kTabBarTextStyle)),
                         ],
                       ),
                     ),
@@ -413,7 +331,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                         children: [
                           OutlinedButton(
                             onPressed: () {
-                              _addDebt(constraints);
+                              _addCredit(constraints);
                             },
                             style: OutlinedButton.styleFrom(
                               shape: RoundedRectangleBorder(
@@ -427,7 +345,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                               height: 50,
                               child: Center(
                                 child: Text(
-                                  'Add Debt',
+                                  'Add Credit',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     color: Color(0xFF004E92),
@@ -465,9 +383,8 @@ class _CustomersDetailState extends State<CustomersDetail> {
                 Expanded(
                   child: TabBarView(
                     children: [
-                      _buildTotalSales(),
-                      _buildDebtHistory(),
-                      //RepaymentHistory(),
+                      _buildCreditHistory(),
+                      Container(), //_buildRepaymentHistory(),
                     ],
                   ),
                 ),
@@ -479,12 +396,12 @@ class _CustomersDetailState extends State<CustomersDetail> {
     );
   }
 
-  Future<void> _addDebt(BoxConstraints constraints) {
+  Future<void> _addCredit(BoxConstraints constraints) {
 
     final formKey = GlobalKey<FormState>();
     TextEditingController amountController = TextEditingController();
+    TextEditingController paymentMadeController = TextEditingController();
     TextEditingController referenceController = TextEditingController();
-    TextEditingController dueDate = TextEditingController();
     DateTime? dueDateTime;
 
     return showDialog(
@@ -525,7 +442,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'NEW DEBT',
+                                'NEW CREDIT',
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontWeight: FontWeight.w500,
@@ -551,7 +468,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                 Padding(
                                   padding: EdgeInsets.only(top: 42),
                                   child: Text(
-                                    'Add Debt',
+                                    'Add Credit',
                                     style: TextStyle(
                                       color: Color(0xFF00509A),
                                       fontSize: 19,
@@ -563,7 +480,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 35, vertical: 15.0),
                                   child: Text(
-                                    'You have made additional sales on credit. Please fill the fields to record your credit sales.',
+                                    'You have made additional purchase on credit. Please fill the fields to record your credit purchase.',
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       color: Color(0xFF000428).withOpacity(0.6),
@@ -579,29 +496,6 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        /// Customer name
-                                        Column(
-                                          children: [
-                                            Text(
-                                              'Customer',
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                            SizedBox(height: 10),
-                                            Text(
-                                              widget.customer!.name!,
-                                              style: TextStyle(
-                                                color: Color(0xFF1F1F1F),
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.normal,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 30),
                                         /// Amount
                                         Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -623,9 +517,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                                   FilteringTextInputFormatter.allow(RegExp('[0-9.]')),
                                                 ],
                                                 validator: (value) {
-                                                  if (value!.isEmpty) {
-                                                    return 'Enter amount';
-                                                  }
+                                                  if (value!.isEmpty) return 'Enter amount';
                                                   return null;
                                                 },
                                                 decoration: kTextFieldBorderDecoration.copyWith(
@@ -642,11 +534,49 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                           ],
                                         ),
                                         SizedBox(height: 20),
-                                        /// Reference
+                                        /// Payment made
                                         Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            Text('Reference'),
+                                            Text('Payment Made'),
+                                            SizedBox(height: 10),
+                                            Container(
+                                              width: constraints.maxWidth,
+                                              child: TextFormField(
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.normal,
+                                                ),
+                                                textInputAction: TextInputAction.next,
+                                                keyboardType: TextInputType.number,
+                                                controller: paymentMadeController,
+                                                inputFormatters: [
+                                                  FilteringTextInputFormatter.allow(RegExp('[0-9.]')),
+                                                ],
+                                                validator: (value) {
+                                                  if (value!.isEmpty) return 'Enter payment';
+                                                  return null;
+                                                },
+                                                decoration: kTextFieldBorderDecoration.copyWith(
+                                                  hintText: 'N0.00',
+                                                  hintStyle: TextStyle(
+                                                    color: Colors.black.withOpacity(0.5),
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.normal,
+                                                  ),
+                                                  contentPadding: EdgeInsets.all(10),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 30),
+                                        /// Description
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text('Description'),
                                             SizedBox(height: 10),
                                             Container(
                                               width: constraints.maxWidth,
@@ -660,76 +590,11 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                                 keyboardType: TextInputType.name,
                                                 controller: referenceController,
                                                 validator: (value) {
-                                                  if (value!.isEmpty) {
-                                                    return 'Enter reference or description';
-                                                  }
+                                                  if (value!.isEmpty) return 'Enter description';
                                                   return null;
                                                 },
                                                 decoration: kTextFieldBorderDecoration.copyWith(
-                                                  hintText: 'Enter reference or description',
-                                                  hintStyle: TextStyle(
-                                                    color: Colors.black.withOpacity(0.5),
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.normal,
-                                                  ),
-                                                  contentPadding: EdgeInsets.all(10),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 20),
-                                        /// Due date
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text('Due Date'),
-                                            SizedBox(height: 10),
-                                            Container(
-                                              width: constraints.maxWidth,
-                                              child: TextFormField(
-                                                style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.normal,
-                                                ),
-                                                keyboardType: TextInputType.text,
-                                                controller: dueDate,
-                                                readOnly: true,
-                                                onTap: () async {
-                                                  DateTime now = DateTime.now();
-                                                  final DateTime? picked = await showDatePicker(
-                                                      context: context,
-                                                      initialDate: now,
-                                                      firstDate: now,
-                                                      lastDate: DateTime(2030),
-                                                      builder: (BuildContext context, Widget? child) {
-                                                        return Theme(
-                                                          data: ThemeData.light().copyWith(
-                                                            colorScheme: ColorScheme.light().copyWith(
-                                                              primary: Color(0xFF00509A),
-                                                            ),
-                                                          ),
-                                                          child: child!,
-                                                        );
-                                                      }
-                                                  );
-                                                  if (picked != null && picked != now) {
-                                                    if (!mounted) return;
-                                                    setDialogState(() {
-                                                      dueDateTime = picked;
-                                                      dueDate.text = Functions.getFormattedDate(picked);
-                                                    });
-                                                  }
-                                                },
-                                                validator: (value) {
-                                                  if (value!.isEmpty) {
-                                                    return 'Enter due date';
-                                                  }
-                                                  return null;
-                                                },
-                                                decoration: kTextFieldBorderDecoration.copyWith(
-                                                  hintText: 'Select due date',
+                                                  hintText: 'Enter description',
                                                   hintStyle: TextStyle(
                                                     color: Colors.black.withOpacity(0.5),
                                                     fontSize: 14,
@@ -750,13 +615,12 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                   onTap: () {
                                     if(formKey.currentState!.validate()){
                                       Map<String, dynamic> body = {
-                                        'id': widget.customer!.id!,
-                                        'totalAmount': amountController.text,
-                                        'soldAt': DateTime.now().toIso8601String(),
-                                        'dueDate': dueDateTime!.toIso8601String(),
+                                        'id': widget.creditor!.id!,
+                                        'amount': amountController.text,
+                                        'paymentMade': paymentMadeController.text,
                                         'description': referenceController.text
                                       };
-                                      _addDebtorReports(body, setDialogState);
+                                      _addNewCredit(body, setDialogState);
                                     }
                                   },
                                   buttonColor: Color(0xFF00509A),
@@ -764,7 +628,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                     child: _showSpinner
                                         ? CircleProgressIndicator()
                                         : Text(
-                                      'Record Debt',
+                                      'Record Credit',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         color: Color(0xFFFFFFFF),
@@ -811,13 +675,13 @@ class _CustomersDetailState extends State<CustomersDetail> {
     );
   }
 
-  /// function to make api call to [addPreviousCustomerReports] with the help of
-  /// [CustomerDataSource]
-  Future<void> _addDebtorReports(Map<String, dynamic> body, StateSetter setDialogState) async{
+  /// function to make api call to [addPreviousCreditorReports] with the help of
+  /// [CreditorsDataSource]
+  Future<void> _addNewCredit(Map<String, dynamic> body, StateSetter setDialogState) async{
     if(!mounted)return;
     setDialogState(() => _showSpinner = true);
-    var api = CustomerDataSource();
-    await api.addPreviousCustomerReports(body).then((message) async{
+    var api = CreditorDataSource();
+    await api.addCredit(body).then((message) async{
       if(!mounted)return;
       setDialogState((){
         _showSpinner = false;

@@ -935,6 +935,7 @@ class _CustomersState extends State<Customers> {
                                 ),
                               ),
                               SizedBox(height: 50),
+                              SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
                             ],
                           ),
                         ),
