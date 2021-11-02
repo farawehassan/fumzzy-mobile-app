@@ -17,7 +17,7 @@ import 'package:fumzy/networking/staff-datasource.dart';
 
 class FutureValues{
 
-  /// Method to get the current [user] in the database using the
+  /// Method to get the current [report] in the database using the
   /// [DatabaseHelper] class
   Future<User> getCurrentUser() async{
     var dbHelper = DatabaseHelper();
