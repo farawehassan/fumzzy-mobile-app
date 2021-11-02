@@ -536,15 +536,9 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
                                         SizedBox(height: 20),
                                         /// Payment made
                                         Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            Text(
-                                              'Payment Made',
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
+                                            Text('Payment Made'),
                                             SizedBox(height: 10),
                                             Container(
                                               width: constraints.maxWidth,
