@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:fumzy/components/app-bar.dart';
-import 'package:fumzy/components/bubble-color-indicator.dart';
 import 'package:fumzy/components/button.dart';
 import 'package:fumzy/components/circle-indicator.dart';
-import 'package:fumzy/components/invoice-pdf-download.dart';
 import 'package:fumzy/model/creditor-report.dart';
 import 'package:fumzy/model/creditor.dart';
-import 'package:fumzy/networking/customer-datasource.dart';
+import 'package:fumzy/networking/creditor-datasource.dart';
 import 'package:fumzy/utils/constant-styles.dart';
 import 'package:fumzy/utils/functions.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
@@ -402,8 +400,8 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
 
     final formKey = GlobalKey<FormState>();
     TextEditingController amountController = TextEditingController();
+    TextEditingController paymentMadeController = TextEditingController();
     TextEditingController referenceController = TextEditingController();
-    TextEditingController dueDate = TextEditingController();
     DateTime? dueDateTime;
 
     return showDialog(
@@ -498,29 +496,6 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        /// Creditors name
-                                        Column(
-                                          children: [
-                                            Text(
-                                              'Creditor',
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                            SizedBox(height: 10),
-                                            Text(
-                                              widget.creditor!.name!,
-                                              style: TextStyle(
-                                                color: Color(0xFF1F1F1F),
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.normal,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 30),
                                         /// Amount
                                         Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -559,6 +534,50 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
                                           ],
                                         ),
                                         SizedBox(height: 20),
+                                        /// Payment made
+                                        Column(
+                                          children: [
+                                            Text(
+                                              'Payment Made',
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                            SizedBox(height: 10),
+                                            Container(
+                                              width: constraints.maxWidth,
+                                              child: TextFormField(
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.normal,
+                                                ),
+                                                textInputAction: TextInputAction.next,
+                                                keyboardType: TextInputType.number,
+                                                controller: paymentMadeController,
+                                                inputFormatters: [
+                                                  FilteringTextInputFormatter.allow(RegExp('[0-9.]')),
+                                                ],
+                                                validator: (value) {
+                                                  if (value!.isEmpty) return 'Enter payment';
+                                                  return null;
+                                                },
+                                                decoration: kTextFieldBorderDecoration.copyWith(
+                                                  hintText: 'N0.00',
+                                                  hintStyle: TextStyle(
+                                                    color: Colors.black.withOpacity(0.5),
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.normal,
+                                                  ),
+                                                  contentPadding: EdgeInsets.all(10),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 30),
                                         /// Description
                                         Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -603,12 +622,11 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
                                     if(formKey.currentState!.validate()){
                                       Map<String, dynamic> body = {
                                         'id': widget.creditor!.id!,
-                                        'totalAmount': amountController.text,
-                                        'soldAt': DateTime.now().toIso8601String(),
-                                        'dueDate': dueDateTime!.toIso8601String(),
+                                        'amount': amountController.text,
+                                        'paymentMade': paymentMadeController.text,
                                         'description': referenceController.text
                                       };
-                                      _addCreditorReports(body, setDialogState);
+                                      _addNewCredit(body, setDialogState);
                                     }
                                   },
                                   buttonColor: Color(0xFF00509A),
@@ -665,11 +683,11 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
 
   /// function to make api call to [addPreviousCreditorReports] with the help of
   /// [CreditorsDataSource]
-  Future<void> _addCreditorReports(Map<String, dynamic> body, StateSetter setDialogState) async{
+  Future<void> _addNewCredit(Map<String, dynamic> body, StateSetter setDialogState) async{
     if(!mounted)return;
     setDialogState(() => _showSpinner = true);
-    var api = CustomerDataSource();
-    await api.addPreviousCustomerReports(body).then((message) async{
+    var api = CreditorDataSource();
+    await api.addCredit(body).then((message) async{
       if(!mounted)return;
       setDialogState((){
         _showSpinner = false;
