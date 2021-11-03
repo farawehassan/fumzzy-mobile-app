@@ -62,7 +62,7 @@ class _SettingsState extends State<Settings> {
         _nameController.text = value.name!;
         _phoneController.text = value.phone!;
       });
-    }).catchError((e) => Functions.showErrorMessage(e.toString()));
+    }).catchError((e) => Functions.showErrorMessage(e));
   }
 
   @override

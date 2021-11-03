@@ -138,7 +138,7 @@ class CreditorDataSource{
 
   /// A function that sends request to remove report from a creditor's list of
   /// reports with [body] as details
-  /// A post request to use the [REMOVE_CREDITS] endpoint
+  /// A put request to use the [REMOVE_CREDITS] endpoint
   /// It returns a [String]
   Future<dynamic> removeCreditor(Map<String, dynamic> body) async {
     Map<String, String>? header;
@@ -155,7 +155,7 @@ class CreditorDataSource{
     });
   }
 
-  /// A function that deletes a creditor in the database GET
+  /// A function that deletes a creditor in the database PUT
   /// It returns a [String]
   Future<dynamic> deleteCreditor(String id) async {
     Map<String, String> header = {};

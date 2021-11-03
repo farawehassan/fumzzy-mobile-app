@@ -7,6 +7,7 @@ import 'package:fumzy/components/circle-indicator.dart';
 import 'package:fumzy/model/creditor-report.dart';
 import 'package:fumzy/model/creditor.dart';
 import 'package:fumzy/networking/creditor-datasource.dart';
+import 'package:fumzy/screens/creditors/creditors-detail/pop-up.dart';
 import 'package:fumzy/utils/constant-styles.dart';
 import 'package:fumzy/utils/functions.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
@@ -63,7 +64,18 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
           DataCell(Text(Functions.money(report.amount!, 'N'))),
           DataCell(Text(report.description!)),
           DataCell(Text(Functions.money(report.paymentMade!, 'N'))),
+          DataCell(ReusablePopMenu(report: report, creditor: widget.creditor)),
         ],
+        // onSelectChanged: (value) {
+        //   Navigator.push(
+        //     context,
+        //     MaterialPageRoute(
+        //       builder: (context) => ReusablePopMenu(
+        //         userId: '',
+        //       ),
+        //     ),
+        //   ).then((value) => ReusablePopMenu(userId: '',));
+        // },
         ),
       );
     }
@@ -94,6 +106,7 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
                     DataColumn(label: Text('Amount')),
                     DataColumn(label: Text('Description')),
                     DataColumn(label: Text('Payment Made')),
+                    DataColumn(label: Text('Edit')),
                   ],
                   rows: itemRow,
                 )
@@ -615,7 +628,7 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
                                   onTap: () {
                                     if(formKey.currentState!.validate()){
                                       Map<String, dynamic> body = {
-                                        'id': widget.creditor!.id!,
+                                        'creditorId': widget.creditor!.id!,
                                         'amount': amountController.text,
                                         'paymentMade': paymentMadeController.text,
                                         'description': referenceController.text
@@ -749,7 +762,7 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
                     ),
                   ],
                 ),
-              ), //new category header with cancel icon
+              ),
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
