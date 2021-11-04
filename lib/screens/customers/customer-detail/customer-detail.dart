@@ -161,6 +161,49 @@ class _CustomersDetailState extends State<CustomersDetail> {
                 color: Color(0xFFF64932),
               ),
             )),
+            DataCell(PopupMenuButton(
+              offset: Offset(110, 40),
+              icon: Icon(
+                Icons.more_horiz,
+                color: Color(0xFF00509A),
+              ),
+              onSelected: (value) {
+                switch (value) {
+                  case 0: {  } break;
+                  case 1: {  } break;
+                  case 2: {  } break;
+                }
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  child: Container(width: 135, child: Text('Record Payment')),
+                  value: 0,
+                ),
+                PopupMenuItem(
+                  child: Text('Mark as settled'),
+                  value: 1,
+                ),
+                PopupMenuItem(
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.delete,
+                        color: Color(0xFFF64932),
+                        size: 14,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 1.5),
+                        child: Text(
+                          'Delete Credit',
+                          style: TextStyle(color: Color(0xFFF64932)),
+                        ),
+                      ),
+                    ],
+                  ),
+                  value: 2,
+                ),
+              ],
+            )),
           ],
           onSelectChanged: (value){
             Navigator.push(
@@ -204,6 +247,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                     DataColumn(label: Text('Invoice/Reference')),
                     DataColumn(label: Text('Date')),
                     DataColumn(label: Text('Due Date')),
+                    DataColumn(label: Text('')),
                   ],
                   rows: itemRow,
                 )
@@ -269,47 +313,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                 ),
                               ],
                             ),
-                            //delete, mark as settled
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                //ReusableDeleteText(textSize: 16),
-                                /*Container(
-                                  height: 25,
-                                  margin: EdgeInsets.symmetric(horizontal: 9.0),
-                                  child: VerticalDivider(
-                                    color: Colors.grey,
-                                    thickness: 0.6,
-                                    width: 1,
-                                  ),
-                                ),*/
-                                /*Container(
-                                  height: 15,
-                                  width: 30,
-                                  child: Checkbox(
-                                    value: checkBoxValue,
-                                    onChanged: (onChanged) {
-                                      if (checkBoxValue == true){
-                                        return null;
-                                      }
-                                      _markAsSettled();
-                                    },
-                                    activeColor: Color(0xFF00AF27),
-                                    checkColor: Colors.white,
-                                    shape: CircleBorder(),
-                                    splashRadius: 23,
-                                  ),
-                                ),
-                                Text(
-                                  'Mark as Settled',
-                                  style: TextStyle(
-                                    color: Color(0xFF052121),
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),*/
-                              ],
-                            ),
+                           Container(),
                           ],
                         ),
                         SizedBox(height: 35),

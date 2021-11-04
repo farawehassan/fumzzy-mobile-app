@@ -140,7 +140,7 @@ class CreditorDataSource{
   /// reports with [body] as details
   /// A put request to use the [REMOVE_CREDITS] endpoint
   /// It returns a [String]
-  Future<dynamic> removeCreditor(Map<String, dynamic> body) async {
+  Future<dynamic> removeCredit(Map<String, dynamic> body) async {
     Map<String, String>? header;
     Future<User> user = _futureValue.getCurrentUser();
     await user.then((value) {

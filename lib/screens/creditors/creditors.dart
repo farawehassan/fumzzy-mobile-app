@@ -136,7 +136,7 @@ class _CreditorsState extends State<Creditors> {
             decoration: kTableContainer,
             child: SingleChildScrollView(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
@@ -157,9 +157,9 @@ class _CreditorsState extends State<Creditors> {
                         showCheckboxColumn: false,
                         columns: [
                           DataColumn(label: Text('Name')),
-                          DataColumn(label: Text('Total Sales')),
+                          DataColumn(label: Text('Total Amount')),
                           DataColumn(label: Text('Volume')),
-                          DataColumn(label: Text('Onboard Date')),
+                          DataColumn(label: Text('Date')),
                           DataColumn(label: Text('')),
                         ],
                         rows: itemRow,

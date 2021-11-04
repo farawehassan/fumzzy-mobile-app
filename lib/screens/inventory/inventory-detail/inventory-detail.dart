@@ -13,13 +13,9 @@ import 'package:fumzy/model/category.dart';
 import 'package:fumzy/model/product.dart';
 import 'package:fumzy/model/purchases.dart';
 import 'package:fumzy/networking/product-datasource.dart';
-import 'package:fumzy/screens/dashboard/drawer.dart';
 import 'package:fumzy/utils/constant-styles.dart';
 import 'package:fumzy/utils/functions.dart';
-import 'package:fumzy/utils/size-config.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:shimmer/shimmer.dart';
-import 'delete-inventory.dart';
 
 class InventoryDetail extends StatefulWidget {
 
@@ -68,12 +64,6 @@ class _InventoryDetailState extends State<InventoryDetail> {
     'Out of Stock': Color(0xFFF64932),
     '': Colors.transparent
   };
-
-  final Color shortStockColor = Color(0xFFF28301);
-
-  final Color inStockColor = Color(0xFF00AF27);
-
-  final Color outOfStockColor = Color(0xFFF64932);
 
   String _status = '';
 
@@ -163,10 +153,10 @@ class _InventoryDetailState extends State<InventoryDetail> {
               DataCell(Text(Functions.getFormattedDateTime(purchase.product!.createdAt!))),
               DataCell(Text(purchase.product!.sellersName!)),
               DataCell(Text(purchase.quantity!.toString())),
-              DataCell(Text(Functions.money(purchase.product!.costPrice!, 'N'))),
-              DataCell(Text(Functions.money(purchase.product!.sellingPrice!, 'N'))),
+              DataCell(Text(Functions.money(purchase.costPrice!, 'N'))),
+              DataCell(Text(Functions.money(purchase.sellingPrice!, 'N'))),
               DataCell(Text(
-                Functions.money(purchase.product!.costPrice! * purchase.quantity!, 'N'),
+                Functions.money(purchase.costPrice! * purchase.quantity!, 'N'),
                 style: TextStyle(fontWeight: FontWeight.bold),
               )),
               DataCell(InkWell(
@@ -264,7 +254,7 @@ class _InventoryDetailState extends State<InventoryDetail> {
     super.initState();
     _checkStatus();
     _setProductDetails();
-    _getAllPurchases();
+    _getAllPurchases(refresh: true);
   }
 
   @override
