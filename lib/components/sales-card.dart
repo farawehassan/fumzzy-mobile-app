@@ -13,7 +13,7 @@ class TotalSalesCard extends StatelessWidget {
 
   final String? cardName;
 
-  final double? totalPrice;
+  final int? totalPrice;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +35,7 @@ class TotalSalesCard extends StatelessWidget {
             FadeAnimation(
               delay: 1.3,
               child: Text(
-                Functions.money(totalPrice!, 'N'),
+                Functions.money(totalPrice!.toDouble(), 'N'),
                 style: TextStyle(
                   fontSize: 20,
                   color: Color(0xFF171725),

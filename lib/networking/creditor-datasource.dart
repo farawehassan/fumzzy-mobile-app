@@ -165,7 +165,7 @@ class CreditorDataSource{
       header = {'Authorization': 'Bearer ${value.token}'};
     });
     String DELETE_CREDITOR_URL = DELETE_CREDITOR + '/$id';
-    return _netUtil.get(DELETE_CREDITOR_URL + '/$id', headers: header).then((dynamic res) {
+    return _netUtil.delete(DELETE_CREDITOR_URL, body: {}, headers: header).then((dynamic res) {
       if (res['error']) throw res['message'];
       return res['message'];
     }).catchError((e) {

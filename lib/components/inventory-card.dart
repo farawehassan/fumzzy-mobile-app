@@ -13,7 +13,7 @@ class InventoryCard extends StatelessWidget {
 
   final String? cardName;
 
-  final double? totalPrice;
+  final int? totalPrice;
 
   final Color? cardColor;
 
@@ -60,7 +60,7 @@ class InventoryCard extends StatelessWidget {
             FadeAnimation(
               delay: 1.3,
               child: Text(
-                Functions.money(totalPrice!, 'N'),
+                Functions.money(totalPrice!.toDouble(), 'N'),
                 style: TextStyle(
                   fontSize: 23,
                   color: Colors.white,

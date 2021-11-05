@@ -5,6 +5,7 @@ import 'package:fumzy/model/creditor.dart';
 import 'package:fumzy/model/customer-names.dart';
 import 'package:fumzy/model/expense.dart';
 import 'package:fumzy/model/product.dart';
+import 'package:fumzy/model/store.dart';
 import 'package:fumzy/model/user.dart';
 import 'package:fumzy/model/staffs.dart';
 import 'package:fumzy/networking/creditor-datasource.dart';
@@ -12,6 +13,7 @@ import 'package:fumzy/networking/customer-datasource.dart';
 import 'package:fumzy/networking/expense-datasource.dart';
 import 'package:fumzy/networking/product-datasource.dart';
 import 'package:fumzy/networking/sales-datasource.dart';
+import 'package:fumzy/networking/store-datasource.dart';
 import 'package:fumzy/networking/user-datasource.dart';
 import 'package:fumzy/networking/staff-datasource.dart';
 
@@ -143,6 +145,15 @@ class FutureValues{
     var data = CreditorDataSource();
     Future<List<Creditor>> creditors = data.getAllCreditors();
     return creditors;
+  }
+
+  /// A function that fetches all customers name in the database with the help of
+  /// [StoreDataSource]
+  /// It returns model [Store]
+  Future<Store> getStoreInformation() async{
+    var data = StoreDataSource();
+    Future<Store> store = data.getAllStoreInformation();
+    return store;
   }
 
 }

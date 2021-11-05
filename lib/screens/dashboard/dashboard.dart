@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:fumzy/bloc/future-values.dart';
 import 'package:fumzy/components/app-bar.dart';
 import 'package:fumzy/components/fade-animation.dart';
 import 'package:fumzy/components/inventory-card.dart';
 import 'package:fumzy/components/reusable-card.dart';
 import 'package:fumzy/components/sales-card.dart';
+import 'package:fumzy/model/store.dart';
 import 'package:fumzy/utils/constant-styles.dart';
 import 'package:fumzy/utils/functions.dart';
 import 'drawer.dart';
@@ -23,6 +25,31 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+
+  /// Instantiating a class of the [FutureValues]
+  var futureValue = FutureValues();
+
+  ///
+  var _storeInfo = Store();
+
+  void _getStoreInformation() async{
+    Future<Store> store = futureValue.getStoreInformation();
+      await store.then((Store value) {
+      setState(() {
+        _storeInfo = value;
+       });
+      print(_storeInfo.totalSales);
+    }).catchError((e){
+      print(e);
+      Functions.showErrorMessage(e);
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getStoreInformation();
+  }
 
   List<String> _view = [
     "This Week",
@@ -98,24 +125,24 @@ class _DashboardState extends State<Dashboard> {
                   children: [
                     TotalSalesCard(
                       cardName: 'Total Sales',
-                      totalPrice: 800000000,
+                      totalPrice: _storeInfo.totalSales!,
                     ),
                     TotalSalesCard(
                       cardName: 'Total Purchases',
-                      totalPrice: 5000000,
+                      totalPrice: _storeInfo.totalPurchases!,
                     ),
                     TotalSalesCard(
                       cardName: 'Total Expenses',
-                      totalPrice: 150900,
+                      totalPrice: _storeInfo.totalExpenses!,
                     ),
                     TotalSalesCard(
                       cardName: 'Total Profit',
-                      totalPrice: 2849100,
+                      totalPrice: _storeInfo.totalProfitMade!,
                     ),
-                    TotalSalesCard(
-                      cardName: 'Total Discounts',
-                      totalPrice: 85115,
-                    ),
+                    // TotalSalesCard(
+                    //   cardName: 'Total Discounts',
+                    //   totalPrice: _store!.totalSales!.toDouble(),
+                    // ),
                   ],
                 ),
                 SizedBox(height: 30),
@@ -123,18 +150,23 @@ class _DashboardState extends State<Dashboard> {
                   children: [
                     InventoryCard(
                       cardName: 'Inventory Cost Price',
-                      totalPrice: 89981900,
+                      totalPrice: _storeInfo.inventoryCostPrice,
                       cardColor: Color(0xFFF64932),
                     ),
                     InventoryCard(
                       cardName: 'Inventory Selling Price',
-                      totalPrice: 150981900,
+                      totalPrice: _storeInfo.inventorySellingPrice,
                       cardColor: Color(0xFF00AF27),
                     ),
                     InventoryCard(
                       cardName: 'Inventory Profit',
-                      totalPrice: 600981900000,
+                      totalPrice: _storeInfo.inventoryProfit,
                       cardColor: Color(0xFF00509A),
+                    ),
+                    InventoryCard(
+                      cardName: 'Inventory Items',
+                      totalPrice: _storeInfo.inventoryItems,
+                      cardColor: Colors.brown,
                     ),
                   ],
                 ),

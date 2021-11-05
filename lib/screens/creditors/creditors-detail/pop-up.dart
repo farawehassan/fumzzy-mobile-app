@@ -18,7 +18,10 @@ class ReusablePopMenu extends StatefulWidget {
   final CreditorReport? report;
   final Creditor? creditor;
 
-  ReusablePopMenu({required this.report, required this.creditor});
+  ReusablePopMenu({
+    required this.report,
+    required this.creditor
+  });
 
   @override
   State<ReusablePopMenu> createState() => _ReusablePopMenuState();
@@ -29,6 +32,8 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
   var _futureValue = FutureValues();
 
   bool _showSpinner = false;
+
+  bool checkBoxValue = false;
 
   String _adminPin = '';
 
@@ -454,7 +459,7 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'BLOCK STAFF',
+                              'MARK AS SETTLED',
                               style: TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.w600,
@@ -479,7 +484,7 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
                             Padding(
                               padding: EdgeInsets.only(top: 42),
                               child: Text(
-                                'Are you sure you want to block this Staff?',
+                                'Are you sure you want to mark this Credit as settled?',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: Color(0xFF00509A),
@@ -492,7 +497,7 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 35, vertical: 15.0),
                               child: Text(
-                                'This will mean that this staff will temporary not be allowed to make/conduct business decisions or activities',
+                                'This will mean that you no longer owe this person and you wont find them under the creditors\'s list.',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: Color(0xFF000428).withOpacity(0.6),
@@ -568,15 +573,16 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
                                                     fontWeight: FontWeight.w500,
                                                   ),
                                                   pinTheme: PinTheme(
-                                                      shape: PinCodeFieldShape.box,
-                                                      borderWidth: 1,
-                                                      fieldHeight: 60,
-                                                      fieldWidth: 60,
-                                                      activeColor: Color(0xFF7BBBE5),
-                                                      selectedColor: Color(0xFF7BBBE5),
-                                                      borderRadius: BorderRadius.all(Radius.circular(3))),
+                                                    shape: PinCodeFieldShape.box,
+                                                    borderWidth: 1,
+                                                    fieldHeight: 60,
+                                                    fieldWidth: 60,
+                                                    activeColor: Color(0xFF7BBBE5),
+                                                    selectedColor: Color(0xFF7BBBE5),
+                                                    borderRadius: BorderRadius.all(Radius.circular(3)),
+                                                  ),
                                                   validator: (value) {
-                                                    if (value!.isEmpty) return 'Enter your 4 digit PIN!';
+                                                    if (value!.isEmpty) return 'Enter 4 digit PIN';
                                                     return null;
                                                   },
                                                   onChanged: (value) {
@@ -596,7 +602,12 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
                                 if(!_showSpinner){
                                   if(_formKey.currentState!.validate()){
                                     if(_confirmPin.length == 4){
-                                      _markSettled(setDialogState); //if(_confirmPin == _adminPin)
+                                      if (checkBoxValue == false) {
+                                        checkBoxValue = true;
+                                        _markSettled(setDialogState);
+                                      } else {
+                                        checkBoxValue = true;
+                                      }// if(_confirmPin == _adminPin)
                                       // Functions.showErrorMessage('Reconfirm your pin and try again!');
                                     }
                                     else {
@@ -607,10 +618,10 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
                               },
                               buttonColor: Color(0xFF00509A),
                               child: Center(
-                                child: _showSpinner ?
-                                  CircleProgressIndicator() :
-                                  const Text(
-                                  'Yes, block',
+                                child:  _showSpinner ?
+                                CircleProgressIndicator() :
+                                const Text(
+                                  'Yes, Mark as settled',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     color: Color(0xFFFFFFFF),
@@ -660,8 +671,8 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
   void _markSettled(StateSetter setDialogState) async{
     if(!mounted)return;
     setDialogState(() => _showSpinner = true);
-    var api = UserDataSource();
-    await api.blockStaff('').then((message)async{
+    var api = CreditorDataSource();
+    await api.getAllCreditors().then((message)async{
       if(!mounted)return;
       setDialogState((){
         _showSpinner = false;
@@ -896,7 +907,7 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
                                   ),
                                 ),
                               ),
-                            ),
+                            ),SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
                             SizedBox(height: 10),
                             Container(
                               width: 100,
@@ -918,7 +929,7 @@ class _ReusablePopMenuState extends State<ReusablePopMenu> {
                               ),
                             ),
                             SizedBox(height: 50),
-                            SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
+
                           ]),
                         ),
                       ),

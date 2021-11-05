@@ -1158,9 +1158,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                       autofocus: true,
                                       controller: reasonController,
                                       validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return 'Enter reason';
-                                        }
+                                        if (value!.isEmpty) return 'Enter reason';
                                         return null;
                                       },
                                       decoration: kTextFieldBorderDecoration.copyWith(
@@ -1213,9 +1211,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                         ),
                                         onChanged: (value) {
                                           if (!mounted) return;
-                                          setState(() {
-                                            newPin = value;
-                                          });
+                                          setState(() => newPin = value);
                                         }),
                                     ),
                                     SizedBox(height: 36),

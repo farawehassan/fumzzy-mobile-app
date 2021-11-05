@@ -65,3 +65,6 @@ const GET_ALL_CREDITORS_PAGINATED = BASE_URL + 'creditor/fetchAll';
 const GET_ALL_CREDITORS = BASE_URL + 'creditor/getAll';
 const REMOVE_CREDITS = BASE_URL + 'creditor/deleteCredit';
 const DELETE_CREDITOR = BASE_URL + 'creditor/delete';
+
+/// Endpoints regarding store
+const GET_STORE_DETAIL = BASE_URL + 'store/fetchDetails';
