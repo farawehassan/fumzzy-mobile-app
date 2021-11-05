@@ -7,13 +7,8 @@ import 'package:fumzy/components/circle-indicator.dart';
 import 'package:fumzy/model/creditor-report.dart';
 import 'package:fumzy/model/creditor.dart';
 import 'package:fumzy/networking/creditor-datasource.dart';
-import 'package:fumzy/screens/creditors/creditors-detail/pop-up.dart';
 import 'package:fumzy/utils/constant-styles.dart';
 import 'package:fumzy/utils/functions.dart';
-import 'package:pin_code_fields/pin_code_fields.dart';
-import 'total-sales.dart';
-import 'debt-history.dart';
-import 'repayment-history.dart';
 import 'package:fumzy/components/info-table.dart';
 
 class CreditorsDetail extends StatefulWidget {
@@ -41,18 +36,15 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
 
   DateTime? _lastRepaymentDate;
 
-  // void _calculateTotalSales(){
-  //   if(!mounted)return;
-  //   setState(() {
-  //     widget.creditor!.reports!.forEach((element) {
-  //       _totalCredits += element.totalAmount!;
-  //       if(!element.paid!){
-  //         _totalDebts += element.totalAmount! - element.paymentMade!;
-  //         if(_lastRepaymentDate == null) _lastRepaymentDate = element.dueDate!;
-  //       }
-  //     });
-  //   });
-  // }
+  void _calculateTotalCredits(){
+    if(!mounted)return;
+    setState(() {
+      _lastRepaymentDate = widget.creditor!.updatedAt!;
+      widget.creditor!.reports!.forEach((element) {
+        _totalCredits += element.amount!;
+      });
+    });
+  }
 
   Widget _buildCreditHistory(){
     List<DataRow> itemRow = [];
@@ -63,71 +55,50 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
           DataCell(Text(Functions.money(report.amount!, 'N'))),
           DataCell(Text(report.description!)),
           DataCell(Text(Functions.money(report.paymentMade!, 'N'))),
-          DataCell(ReusablePopMenu(report: report, creditor: widget.creditor)),
-        ],
-        // onSelectChanged: (value) {
-        //   Navigator.push(
-        //     context,
-        //     MaterialPageRoute(
-        //       builder: (context) => ReusablePopMenu(
-        //         userId: '',
-        //       ),
-        //     ),
-        //   ).then((value) => ReusablePopMenu(userId: '',));
-        // },
-        ),
-      );
-    }
-    return SingleChildScrollView(
-      child: Container(
-        decoration: kTableContainer,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                physics: BouncingScrollPhysics(),
-                child: DataTable(
-                  headingTextStyle: TextStyle(
-                    color: Color(0xFF75759E),
-                    fontSize: 14,
-                    fontWeight: FontWeight.normal,
-                  ),
-                  dataTextStyle: TextStyle(
-                    color: Color(0xFF1F1F1F),
-                    fontSize: 14,
-                    //fontWeight: FontWeight.w400,
-                  ),
-                  columnSpacing: 15.0,
-                  dataRowHeight: 65.0,
-                  showCheckboxColumn: false,
-                  columns: [
-                    DataColumn(label: Text('Amount')),
-                    DataColumn(label: Text('Description')),
-                    DataColumn(label: Text('Payment Made')),
-                    DataColumn(label: Text('   '+'Edit')),
-                  ],
-                  rows: itemRow,
-                )
+          DataCell(PopupMenuButton(
+            offset: Offset(110, 40),
+            icon: Icon(
+              Icons.more_horiz,
+              color: Color(0xFF00509A),
             ),
-            const SizedBox(height: 80),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRepaymentHistory(){
-    List<DataRow> itemRow = [];
-    for (int i = 0; i < widget.creditor!.reports!.length; i++){
-      CreditorReport report = widget.creditor!.reports![i];
-      itemRow.add(
-        DataRow(cells: [
-          DataCell(Text(Functions.money(report.amount!, 'N'))),
-          DataCell(Text(Functions.money(report.paymentMade!, 'N'))),
-          DataCell(Text(report.description!)),
-        ],
-        ),
+            onSelected: (value) {
+              switch (value) {
+                case 0: { _recordRepayment(report); } break;
+                case 1: { _markAsSettled(report); } break;
+                case 2: { _delete(report); } break;
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                child: Container(width: 135, child: Text('Record Payment')),
+                value: 0,
+              ),
+              PopupMenuItem(
+                child: Text('Mark as settled'),
+                value: 1,
+              ),
+              PopupMenuItem(
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.delete,
+                      color: Color(0xFFF64932),
+                      size: 14,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 1.5),
+                      child: Text(
+                        'Delete Credit',
+                        style: TextStyle(color: Color(0xFFF64932)),
+                      ),
+                    ),
+                  ],
+                ),
+                value: 2,
+              ),
+            ],
+          )),
+        ]),
       );
     }
     return SingleChildScrollView(
@@ -155,8 +126,9 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
                   showCheckboxColumn: false,
                   columns: [
                     DataColumn(label: Text('Amount')),
-                    DataColumn(label: Text('Payment Made')),
                     DataColumn(label: Text('Description')),
+                    DataColumn(label: Text('Payment Made')),
+                    DataColumn(label: Text('')),
                   ],
                   rows: itemRow,
                 )
@@ -169,14 +141,20 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _calculateTotalCredits();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) => (Scaffold(
         appBar: buildAppBarWithBackButton(context, 'CREDITORS'),
         body: Padding(
-          padding: EdgeInsets.fromLTRB(20, 15, 20, 0),
+          padding: EdgeInsets.fromLTRB(20, 30, 20, 0),
           child: DefaultTabController(
-            length: 2,
+            length: 1,
             initialIndex: 0,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -216,67 +194,7 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
                                 ),
                               ],
                             ),
-                            //delete, mark as settled
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                TextButton(
-                                  onPressed: () {
-                                    _deleteCreditorPermanently();
-                                  },
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        'Delete ',
-                                        style: TextStyle(
-                                          color: Color(0xFFF64932),
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                      Icon(
-                                        Icons.delete,
-                                        color: Color(0xFFF64932),
-                                        size: 15,
-                                      ),
-                                    ],
-                                  ),
-                                  ),
-                                /*Container(
-                                  height: 25,
-                                  margin: EdgeInsets.symmetric(horizontal: 9.0),
-                                  child: VerticalDivider(
-                                    color: Colors.grey,
-                                    thickness: 0.6,
-                                    width: 1,
-                                  ),
-                                ),*/
-                                /*Container(
-                                  height: 15,
-                                  width: 30,
-                                  child: Checkbox(
-                                    value: checkBoxValue,
-                                    onChanged: (onChanged) {
-                                      if (checkBoxValue == true){
-                                        return null;
-                                      }
-                                      _markAsSettled();
-                                    },
-                                    activeColor: Color(0xFF00AF27),
-                                    checkColor: Colors.white,
-                                    shape: CircleBorder(),
-                                    splashRadius: 23,
-                                  ),
-                                ),
-                                Text(
-                                  'Mark as Settled',
-                                  style: TextStyle(
-                                    color: Color(0xFF052121),
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),*/
-                              ],
-                            ),
+                            Container()
                           ],
                         ),
                         SizedBox(height: 35),
@@ -350,7 +268,7 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
                         indicatorWeight: 3,
                         tabs: [
                           Tab(child: Text('Credit History', style: kTabBarTextStyle)),
-                          Tab(child: Text('Re-payment History', style: kTabBarTextStyle)),
+                          //Tab(child: Text('Re-payment History', style: kTabBarTextStyle)),
                         ],
                       ),
                     ),
@@ -388,24 +306,6 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
                               ),
                             ),
                           ),
-                          /*Button(
-                            onTap: () {
-                              _recordRepayment(constraints);
-                            },
-                            buttonColor: Color(0xFF00509A),
-                            width: 120,
-                            child: Center(
-                              child: Text(
-                                'Record Payment',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Color(0xFFFFFFFF),
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
-                            ),
-                          ),*/
                         ],
                       ),
                     ),
@@ -416,7 +316,6 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
                   child: TabBarView(
                     children: [
                       _buildCreditHistory(),
-                      Container(), //_buildRepaymentHistory(),
                     ],
                   ),
                 ),
@@ -428,14 +327,11 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
     );
   }
 
-  /// Widget to add credit
   Future<void> _addCredit(BoxConstraints constraints) {
 
     final formKey = GlobalKey<FormState>();
     TextEditingController amountController = TextEditingController();
-    TextEditingController paymentMadeController = TextEditingController();
     TextEditingController referenceController = TextEditingController();
-    DateTime? dueDateTime;
 
     return showDialog(
       context: context,
@@ -529,6 +425,23 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
+                                        /// Creditor name
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text('Creditor Name'),
+                                            SizedBox(height: 10),
+                                            Text(
+                                              widget.creditor!.name!,
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.normal,
+                                                fontSize: 14,
+                                                color: Color(0xFF1F1F1F)
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 30),
                                         /// Amount
                                         Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -555,44 +468,6 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
                                                 },
                                                 decoration: kTextFieldBorderDecoration.copyWith(
                                                   hintText: 'Enter amount',
-                                                  hintStyle: TextStyle(
-                                                    color: Colors.black.withOpacity(0.5),
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.normal,
-                                                  ),
-                                                  contentPadding: EdgeInsets.all(10),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 20),
-                                        /// Payment made
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text('Payment Made'),
-                                            SizedBox(height: 10),
-                                            Container(
-                                              width: constraints.maxWidth,
-                                              child: TextFormField(
-                                                style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.normal,
-                                                ),
-                                                textInputAction: TextInputAction.next,
-                                                keyboardType: TextInputType.number,
-                                                controller: paymentMadeController,
-                                                inputFormatters: [
-                                                  FilteringTextInputFormatter.allow(RegExp('[0-9.]')),
-                                                ],
-                                                validator: (value) {
-                                                  if (value!.isEmpty) return 'Enter payment';
-                                                  return null;
-                                                },
-                                                decoration: kTextFieldBorderDecoration.copyWith(
-                                                  hintText: 'N0.00',
                                                   hintStyle: TextStyle(
                                                     color: Colors.black.withOpacity(0.5),
                                                     fontSize: 14,
@@ -650,7 +525,7 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
                                       Map<String, dynamic> body = {
                                         'creditorId': widget.creditor!.id!,
                                         'amount': amountController.text,
-                                        'paymentMade': paymentMadeController.text,
+                                        'paymentMade': 0,
                                         'description': referenceController.text
                                       };
                                       _addNewCredit(body, setDialogState);
@@ -660,7 +535,7 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
                                   child: Center(
                                     child: _showSpinner
                                         ? CircleProgressIndicator()
-                                        : const Text(
+                                        : Text(
                                       'Record Credit',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
@@ -708,7 +583,7 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
     );
   }
 
-  /// function to make api call to [addPreviousCreditorReports] with the help of
+  /// function to make api call to [addCredit] with the help of
   /// [CreditorsDataSource]
   Future<void> _addNewCredit(Map<String, dynamic> body, StateSetter setDialogState) async{
     if(!mounted)return;
@@ -729,15 +604,273 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
     });
   }
 
-  /// Widget to delete creditor
-  Future<void> _deleteCreditorPermanently() {
-
-    final _formKey = GlobalKey<FormState>();
-    TextEditingController _reasonController = TextEditingController();
-    String _confirmPin = '';
+  Future<void> _recordRepayment(CreditorReport reports) {
+    final formKey = GlobalKey<FormState>();
+    TextEditingController amountController = TextEditingController();
+    TextEditingController referenceController = TextEditingController();
+    referenceController.text = reports.description!;
 
     return showDialog(
       context: context,
+      barrierColor: Color(0xFF000428).withOpacity(0.86),
+      barrierDismissible: false,
+      builder: (context) => GestureDetector(
+        onTap: (){
+          FocusScopeNode currentFocus = FocusScope.of(context);
+          if(!currentFocus.hasPrimaryFocus) currentFocus.unfocus();
+        },
+        child: StatefulBuilder(
+          builder: (BuildContext context, StateSetter setDialogState) {
+            return AbsorbPointer(
+                absorbing: _showSpinner,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Color(0xFFFFFFFF),
+                  ),
+                  margin: EdgeInsets.all(50),
+                  child: Material(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.fromLTRB(24, 30, 24, 27),
+                          decoration: BoxDecoration(
+                            color: Color(0xFFF5F8FF),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(15.0),
+                              topRight: Radius.circular(15.0),
+                            ),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'DEBT REPAYMENT',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 15,
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Icon(
+                                  IconlyBold.closeSquare,
+                                  color: Colors.black.withOpacity(0.7),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.only(top: 42),
+                                  child: Text(
+                                    'Debt repayment',
+                                    style: TextStyle(
+                                      color: Color(0xFF00509A),
+                                      fontSize: 19,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 35, vertical: 15.0),
+                                  child: Text(
+                                    'You have made additional purchase on credit. Please fill the fields to repay your debt.',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Color(0xFF000428).withOpacity(0.6),
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 15.0,
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.only(left: 20, right: 20),
+                                  child: Form(
+                                    key: formKey,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        /// Creditor name
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text('Creditor Name'),
+                                            SizedBox(height: 10),
+                                            Text(
+                                              widget.creditor!.name!,
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.normal,
+                                                  fontSize: 14,
+                                                  color: Color(0xFF1F1F1F)
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 30),
+                                        /// Amount
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text('Payment Made'),
+                                            SizedBox(height: 10),
+                                            TextFormField(
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                              textInputAction: TextInputAction.next,
+                                              keyboardType: TextInputType.number,
+                                              controller: amountController,
+                                              inputFormatters: [
+                                                FilteringTextInputFormatter.allow(RegExp('[0-9.]')),
+                                              ],
+                                              validator: (value) {
+                                                if (value!.isEmpty) return 'Enter amount';
+                                                if ((double.parse(value) + reports.paymentMade!) > reports.amount!){
+                                                  return 'Invalid amount';
+                                                }
+                                                return null;
+                                              },
+                                              decoration: kTextFieldBorderDecoration.copyWith(
+                                                hintText: 'Enter amount',
+                                                hintStyle: TextStyle(
+                                                  color: Colors.black.withOpacity(0.5),
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.normal,
+                                                ),
+                                                contentPadding: EdgeInsets.all(10),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 30),
+                                        /// Description
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text('Description'),
+                                            SizedBox(height: 10),
+                                            TextFormField(
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                              textInputAction: TextInputAction.next,
+                                              keyboardType: TextInputType.name,
+                                              controller: referenceController,
+                                              validator: (value) {
+                                                if (value!.isEmpty) return 'Enter description';
+                                                return null;
+                                              },
+                                              decoration: kTextFieldBorderDecoration.copyWith(
+                                                hintText: 'Enter description',
+                                                hintStyle: TextStyle(
+                                                  color: Colors.black.withOpacity(0.5),
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.normal,
+                                                ),
+                                                contentPadding: EdgeInsets.all(10),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 20),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: 40),
+                                Button(
+                                  onTap: () {
+                                    if(formKey.currentState!.validate()){
+                                      Map<String, dynamic> body = {
+                                        "creditorId": widget.creditor!.id,
+                                        "reportId": reports.id,
+                                        "amount": reports.amount,
+                                        "paymentMade": reports.paymentMade!
+                                            + double.parse(amountController.text),
+                                        "description": referenceController.text
+                                      };
+                                      _updateCredit(body, setDialogState);
+                                    }
+                                  },
+                                  buttonColor: Color(0xFF00509A),
+                                  child: Center(
+                                    child: _showSpinner
+                                        ? CircleProgressIndicator()
+                                        : Text(
+                                      'Record Repayment',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Color(0xFFFFFFFF),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: 10),
+                                Container(
+                                  width: 100,
+                                  child: TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: Center(
+                                      child: Text(
+                                        'No, Cancel',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          decoration: TextDecoration.underline,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: 50),
+                                SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Future<void> _markAsSettled(CreditorReport reports) {
+    final formKey = GlobalKey<FormState>();
+    TextEditingController amountController = TextEditingController();
+    amountController.text = reports.amount!.toString();
+    TextEditingController referenceController = TextEditingController();
+    referenceController.text = reports.description!;
+
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
       barrierColor: Color(0xFF000428).withOpacity(0.86),
       builder: (context) => GestureDetector(
         onTap: (){
@@ -745,828 +878,530 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
           if(!currentFocus.hasPrimaryFocus) currentFocus.unfocus();
         },
         child: StatefulBuilder(
-          builder: (BuildContext context, StateSetter setDialogState) => AbsorbPointer(
-            absorbing: _showSpinner,
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: Color(0xFFFFFFFF),
-              ),
-              margin: EdgeInsets.all(50),
-              child: Material(
-                borderRadius: BorderRadius.circular(20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.fromLTRB(24, 30, 24, 27),
-                      decoration: BoxDecoration(
-                        color: Color(0xFFF5F8FF),
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(15.0),
-                          topRight: Radius.circular(15.0),
-                        ),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'DELETE',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                            ),
-                          ),
-                          InkWell(
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
-                            child: Icon(
-                              IconlyBold.closeSquare,
-                              color: Colors.black.withOpacity(0.7),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(children: [
-                          Padding(
-                            padding: EdgeInsets.only(top: 42),
-                            child: Text(
-                              'Are You Sure You want to Delete this Creditor?',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Color(0xFF00509A),
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 15.0),
-                            child: Text(
-                              'This means that this Creditor will no longer be available. This action cannot be undone.',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Color(0xFF000428).withOpacity(0.6),
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 20, right: 20),
-                            child: Form(
-                              key: _formKey,
-                              child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Reason',
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.normal,
-                                          ),
-                                        ),
-                                        SizedBox(height: 10),
-                                        Container(
-                                          width: double.infinity,
-                                          child: TextFormField(
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.normal,
-                                            ),
-                                            textInputAction: TextInputAction.next,
-                                            keyboardType: TextInputType.name,
-                                            controller: _reasonController,
-                                            validator: (value) {
-                                              if (value!.isEmpty) return 'Enter reason';
-                                              return null;
-                                            },
-                                            decoration:
-                                            kTextFieldBorderDecoration.copyWith(
-                                              hintText: 'Enter reason',
-                                              hintStyle: TextStyle(
-                                                color: Colors.black.withOpacity(0.5),
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.normal,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 30),
-                                    Container(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'Enter your PIN',
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.normal,
-                                            ),
-                                          ),
-                                          SizedBox(height: 13),
-                                          Container(
-                                            width: 280,
-                                            child: PinCodeTextField(
-                                                appContext: context,
-                                                length: 4,
-                                                animationType: AnimationType.fade,
-                                                enablePinAutofill: false,
-                                                textStyle: TextStyle(
-                                                  fontSize: 20,
-                                                  color: Color(0xFF004E92),
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                                pinTheme: PinTheme(
-                                                    shape: PinCodeFieldShape.box,
-                                                    borderWidth: 1,
-                                                    fieldHeight: 60,
-                                                    fieldWidth: 60,
-                                                    activeColor: Color(0xFF7BBBE5),
-                                                    selectedColor: Color(0xFF7BBBE5),
-                                                    borderRadius: BorderRadius.all(Radius.circular(3))),
-                                                validator: (value) {
-                                                  if(value!.isEmpty) return 'Enter PIN';
-                                                  return null;
-                                                },
-                                                onChanged: (value) {
-                                                  if (!mounted) return;
-                                                  setState(() => _confirmPin = value);
-                                                }),
-                                          ),
-                                          SizedBox(height: 36),
-                                        ],
-                                      ),
-                                    ),
-                                  ]),
-                            ),
-                          ),
-                          Button(
-                            onTap: () {
-                              if(!_showSpinner){
-                                if(_formKey.currentState!.validate()){
-                                  if(_confirmPin.length == 4){
-                                    _deleteCreditor(setDialogState); // if(_confirmPin == _adminPin)
-                                    // Functions.showErrorMessage('Reconfirm your pin and try again!');
-                                  }
-                                  else {
-                                    Functions.showErrorMessage('Enter a valid 4 digit Pin!');
-                                  }
-                                }
-                              }
-                            },
-                            buttonColor: Color(0xFFF64932),
-                            child: Center(
-                              child: _showSpinner
-                                  ? CircleProgressIndicator()
-                                  : const Text(
-                                'Yes, delete',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Color(0xFFFFFFFF),
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: Center(
-                              child: Text(
-                                'No, Cancel',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 50),
-                          SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
-                        ]),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// Function to call api [DELETE_CREDITOR]
-  void _deleteCreditor(StateSetter setDialogState) async{
-    if(!mounted)return;
-    setDialogState(() => _showSpinner = true);
-    var api = CreditorDataSource();
-    await api.deleteCreditor(widget.creditor!.id!).then((message)async{
-      if(!mounted)return;
-      setDialogState((){
-        _showSpinner = false;
-        Navigator.pop(context);
-        Navigator.pop(context);
-        _popUpMessage();
-      });
-    }).catchError((e){
-      if(!mounted)return;
-      setDialogState(()=> _showSpinner = false);
-      print(e);
-      Functions.showErrorMessage(e);
-    });
-  }
-
-  Future<void> _popUpMessage() {
-    return showDialog(
-      context: context,
-      barrierColor: Color(0xFF000428).withOpacity(0.86),
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: Color(0xFFFFFFFF),
-        ),
-        margin: EdgeInsets.all(50),
-        child: Material(
-          borderRadius: BorderRadius.circular(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                padding: EdgeInsets.fromLTRB(24, 30, 24, 27),
-                decoration: BoxDecoration(
-                  color: Color(0xFFF5F8FF),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(15.0),
-                    topRight: Radius.circular(15.0),
+          builder: (BuildContext context, StateSetter setDialogState) {
+            return AbsorbPointer(
+                absorbing: _showSpinner,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Color(0xFFFFFFFF),
                   ),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'DELETE CREDIT',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Icon(
-                        IconlyBold.closeSquare,
-                        color: Colors.black.withOpacity(0.7),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
+                  margin: EdgeInsets.all(50),
+                  child: Material(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        SizedBox(height: 27),
                         Container(
-                          width: 67,
-                          height: 67,
+                          padding: EdgeInsets.fromLTRB(24, 30, 24, 27),
                           decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color(0xFFF64932).withOpacity(0.15),
-                          ),
-                          child: Icon(
-                            Icons.done_rounded,
-                            color: Color(0xFFF64932),
-                            size: 45,
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(top: 22),
-                          child: Text(
-                            'Creditor Deleted Successfully',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Color(0xFF00509A),
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700,
+                            color: Color(0xFFF5F8FF),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(15.0),
+                              topRight: Radius.circular(15.0),
                             ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 19.0),
-                          child: Text(
-                            'Creditor has been deleted successfully. Go back to review other creditors',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Color(0xFF000428).withOpacity(0.6),
-                              fontWeight: FontWeight.w400,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        Button(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          buttonColor: Color(0xFF00509A),
-                          child: Center(
-                            child: Text(
-                              'Go back',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Color(0xFFFFFFFF),
-                                fontSize: 14,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
-                      ]),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _recordRepayment(BoxConstraints constraints) {
-
-    final formKey = GlobalKey<FormState>();
-    TextEditingController amountController = TextEditingController();
-    TextEditingController referenceController = TextEditingController();
-
-    return showDialog(
-      context: context,
-      barrierColor: Color(0xFF000428).withOpacity(0.86),
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: Color(0xFFFFFFFF),
-        ),
-        margin: EdgeInsets.all(50),
-        child: Material(
-          borderRadius: BorderRadius.circular(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                padding: EdgeInsets.fromLTRB(24, 30, 24, 27),
-                decoration: BoxDecoration(
-                  color: Color(0xFFF5F8FF),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(15.0),
-                    topRight: Radius.circular(15.0),
-                  ),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'DEBT REPAYMENT',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 15,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Icon(
-                        IconlyBold.closeSquare,
-                        color: Colors.black.withOpacity(0.7),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(top: 42),
-                        child: Text(
-                          'Debt repayment',
-                          style: TextStyle(
-                            color: Color(0xFF00509A),
-                            fontSize: 19,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 35, vertical: 15.0),
-                        child: Text(
-                          'You have made additional purchase on credit. Please fill the fields to repay your debt.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Color(0xFF000428).withOpacity(0.6),
-                            fontWeight: FontWeight.w400,
-                            fontSize: 15.0,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.only(left: 20, right: 20),
-                        child: Form(
-                          key: formKey,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              ///text field for customer
                               Text(
-                                'Customer',
-                              ),
-                              SizedBox(height: 10),
-                              Text(
-                                'Obi Cubana and Sons Limited',
+                                'MARK AS SETTLED',
                                 style: TextStyle(
-                                  color: Color(0xFF1F1F1F),
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w600,
                                   fontSize: 14,
-                                  fontWeight: FontWeight.normal,
                                 ),
                               ),
-                              SizedBox(height: 30),
-                              ///field for amount
-                              Text('Amount'),
-                              SizedBox(height: 10),
-                              Container(
-                                width: constraints.maxWidth,
-                                child: TextFormField(
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.normal,
-                                  ),
-                                  textInputAction: TextInputAction.next,
-                                  keyboardType: TextInputType.number,
-                                  autofocus: true,
-                                  controller: amountController,
-                                  validator: (value) {
-                                    if (value!.isEmpty) {
-                                      return 'Enter amount';
-                                    }
-                                    return null;
-                                  },
-                                  decoration: kTextFieldBorderDecoration.copyWith(
-                                    hintText: 'Enter amount',
-                                    hintStyle: TextStyle(
-                                      color: Colors.black.withOpacity(0.5),
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.normal,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 20),
-                              ///field for reference
-                              Text('Reference'),
-                              SizedBox(height: 10),
-                              Container(
-                                width: constraints.maxWidth,
-                                child: TextFormField(
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.normal,
-                                  ),
-                                  textInputAction: TextInputAction.done,
-                                  keyboardType: TextInputType.name,
-                                  controller: referenceController,
-                                  validator: (value) {
-                                    if (value!.isEmpty) {
-                                      return 'Select invoice or reference';
-                                    }
-                                    return null;
-                                  },
-                                  decoration: kTextFieldBorderDecoration.copyWith(
-                                    hintText: 'Select invoice or reference',
-                                    hintStyle: TextStyle(
-                                      color: Colors.black.withOpacity(0.5),
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.normal,
-                                    ),
-                                  ),
+                              InkWell(
+                                onTap: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Icon(
+                                  IconlyBold.closeSquare,
+                                  color: Colors.black.withOpacity(0.7),
                                 ),
                               ),
                             ],
                           ),
                         ),
-                      ),
-                      SizedBox(height: 40),
-                      Button(
-                        onTap: () {
-                          print("Add Category");
-                        },
-                        buttonColor: Color(0xFF00509A),
-                        child: Center(
-                          child: Text(
-                            'Record Repayment',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Color(0xFFFFFFFF),
-                              fontSize: 14,
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      Container(
-                        width: 100,
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: Center(
-                            child: Text(
-                              'No, Cancel',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                decoration: TextDecoration.underline,
+                        Expanded(
+                          child: SingleChildScrollView(
+                            child: Column(children: [
+                              Padding(
+                                padding: EdgeInsets.only(top: 42),
+                                child: Text(
+                                  'Are you sure you want to mark this Debt as settled?',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Color(0xFF00509A),
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
                               ),
-                            ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 35, vertical: 15.0),
+                                child: Text(
+                                  'This will mean that this person no longer owes you and you wont find them under the debtor\'s list.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Color(0xFF000428).withOpacity(0.6),
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 20, right: 20),
+                                child: Form(
+                                  key: formKey,
+                                  child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        /// Creditor name
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text('Creditor Name'),
+                                            SizedBox(height: 10),
+                                            Text(
+                                              widget.creditor!.name!,
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.normal,
+                                                  fontSize: 14,
+                                                  color: Color(0xFF1F1F1F)
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 30),
+                                        /// Amount
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text('Payment Made'),
+                                            SizedBox(height: 10),
+                                            TextFormField(
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                              textInputAction: TextInputAction.next,
+                                              keyboardType: TextInputType.number,
+                                              controller: amountController,
+                                              inputFormatters: [
+                                                FilteringTextInputFormatter.allow(RegExp('[0-9.]')),
+                                              ],
+                                              readOnly: true,
+                                              validator: (value) {
+                                                if (value!.isEmpty) return 'Enter amount';
+                                                return null;
+                                              },
+                                              decoration: kTextFieldBorderDecoration.copyWith(
+                                                hintText: 'Enter amount',
+                                                hintStyle: TextStyle(
+                                                  color: Colors.black.withOpacity(0.5),
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.normal,
+                                                ),
+                                                contentPadding: EdgeInsets.all(10),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 30),
+                                        /// Description
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text('Description'),
+                                            SizedBox(height: 10),
+                                            TextFormField(
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                              textInputAction: TextInputAction.next,
+                                              keyboardType: TextInputType.name,
+                                              controller: referenceController,
+                                              readOnly: true,
+                                              validator: (value) {
+                                                if (value!.isEmpty) return 'Enter description';
+                                                return null;
+                                              },
+                                              decoration: kTextFieldBorderDecoration.copyWith(
+                                                hintText: 'Enter description',
+                                                hintStyle: TextStyle(
+                                                  color: Colors.black.withOpacity(0.5),
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.normal,
+                                                ),
+                                                contentPadding: EdgeInsets.all(10),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 20),
+                                      ]
+                                  ),
+                                ),
+                              ),
+                              Button(
+                                onTap: () {
+                                  if(formKey.currentState!.validate()){
+                                    Map<String, dynamic> body = {
+                                      "creditorId": widget.creditor!.id,
+                                      "reportId": reports.id,
+                                      "amount": reports.amount,
+                                      "paymentMade": reports.amount,
+                                      "description": referenceController.text
+                                    };
+                                    _updateCredit(body, setDialogState);
+                                  }
+                                },
+                                buttonColor: Color(0xFFF64932),
+                                child: Center(
+                                  child:  _showSpinner
+                                      ? CircleProgressIndicator()
+                                      : Text(
+                                    'Yes, Mark as settled',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Color(0xFFFFFFFF),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              Container(
+                                width: 100,
+                                child: TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Center(
+                                    child: Text(
+                                      'No, Cancel',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 50),
+                              SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
+                            ]),
                           ),
                         ),
-                      ),
-                      SizedBox(height: 50),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ),
-            ],
-          ),
+                )
+            );
+          },
         ),
       ),
     );
   }
 
-  Future<void> _markAsSettled() {
-
-    final formKey = GlobalKey<FormState>();
-    TextEditingController reasonController = TextEditingController();
-    String newPin = '';
+  Future<void> _delete(CreditorReport reports) {
+    TextEditingController amountController = TextEditingController();
+    amountController.text = reports.amount!.toString();
+    TextEditingController referenceController = TextEditingController();
+    referenceController.text = reports.description!;
 
     return showDialog(
       context: context,
+      barrierDismissible: false,
       barrierColor: Color(0xFF000428).withOpacity(0.86),
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: Color(0xFFFFFFFF),
-        ),
-        margin: EdgeInsets.all(50),
-        child: Material(
-          borderRadius: BorderRadius.circular(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                padding: EdgeInsets.fromLTRB(24, 30, 24, 27),
+      builder: (context) => GestureDetector(
+        onTap: (){
+          FocusScopeNode currentFocus = FocusScope.of(context);
+          if(!currentFocus.hasPrimaryFocus) currentFocus.unfocus();
+        },
+        child: StatefulBuilder(
+          builder: (BuildContext context, StateSetter setDialogState) {
+            return  AbsorbPointer(
+              absorbing: _showSpinner,
+              child: Container(
                 decoration: BoxDecoration(
-                  color: Color(0xFFF5F8FF),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(15.0),
-                    topRight: Radius.circular(15.0),
-                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  color: Color(0xFFFFFFFF),
                 ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'MARK AS SETTLED',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Icon(
-                        IconlyBold.closeSquare,
-                        color: Colors.black.withOpacity(0.7),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(children: [
-                    Padding(
-                      padding: EdgeInsets.only(top: 42),
-                      child: Text(
-                        'Are you sure you want to mark this Debt as settled?',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Color(0xFF00509A),
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
+                margin: EdgeInsets.all(50),
+                child: Material(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.fromLTRB(24, 30, 24, 27),
+                        decoration: BoxDecoration(
+                          color: Color(0xFFF5F8FF),
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(15.0),
+                            topRight: Radius.circular(15.0),
+                          ),
                         ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 35, vertical: 15.0),
-                      child: Text(
-                        'This will mean that this person no longer owes you and you wont find them under the debtor\'s list.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Color(0xFF000428).withOpacity(0.6),
-                          fontWeight: FontWeight.w400,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20, right: 20),
-                      child: Form(
-                        key: formKey,
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('Reason'),
-                                  SizedBox(height: 10),
-                                  Container(
-                                    width: double.infinity,
-                                    child: TextFormField(
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                      textInputAction: TextInputAction.next,
-                                      keyboardType: TextInputType.name,
-                                      autofocus: true,
-                                      controller: reasonController,
-                                      validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return 'Enter reason';
-                                        }
-                                        return null;
-                                      },
-                                      decoration: kTextFieldBorderDecoration.copyWith(
-                                        hintText: 'Enter reason',
-                                        hintStyle: TextStyle(
-                                          color: Colors.black.withOpacity(0.5),
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.normal,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'DELETE CREDIT',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
                               ),
-                              SizedBox(height: 30),
-                              Container(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Enter your PIN',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                    ),
-                                    SizedBox(height: 13),
-                                    Container(
-                                      width: 280,
-                                      child: PinCodeTextField(
-                                        appContext: context,
-                                        length: 4,
-                                        animationType: AnimationType.fade,
-                                        enablePinAutofill: false,
-                                        textStyle: TextStyle(
-                                          fontSize: 20,
-                                          color: Color(0xFF004E92),
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                        pinTheme: PinTheme(
-                                          shape: PinCodeFieldShape.box,
-                                          borderWidth: 1,
-                                          fieldHeight: 60,
-                                          fieldWidth: 60,
-                                          activeColor: Color(0xFF7BBBE5),
-                                          selectedColor: Color(0xFF7BBBE5),
-                                          borderRadius: BorderRadius.all(Radius.circular(3)),
-                                        ),
-                                        onChanged: (value) {
-                                          if (!mounted) return;
-                                          setState(() {
-                                            newPin = value;
-                                          });
-                                        }),
-                                    ),
-                                    SizedBox(height: 36),
-                                  ],
+                            ),
+                            InkWell(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: Icon(
+                                IconlyBold.closeSquare,
+                                color: Colors.black.withOpacity(0.7),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Column(children: [
+                            Padding(
+                              padding: EdgeInsets.only(top: 42),
+                              child: const Text(
+                                'Are you sure you want to delete this credit?',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Color(0xFF00509A),
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
-                            ]),
-                      ),
-                    ),
-                    Button(
-                      onTap: () {
-                        Navigator.pop(context);
-                        setState(() {
-                          if (checkBoxValue == false) {
-                            checkBoxValue = true;
-                          } else {
-                            checkBoxValue = true;
-                          }
-                        });
-                      },
-                      buttonColor: Color(0xFFF64932),
-                      child: Center(
-                        child: Text(
-                          'Yes, Mark as settled',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Color(0xFFFFFFFF),
-                            fontSize: 14,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    Container(
-                      width: 100,
-                      child: TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: Center(
-                          child: Text(
-                            'No, Cancel',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              decoration: TextDecoration.underline,
                             ),
-                          ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 35, vertical: 15.0),
+                              child: Text(
+                                'This means that this credit is settled and is wished not to be found on the creditors list',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Color(0xFF000428).withOpacity(0.6),
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 20, right: 20),
+                              child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    /// Creditor name
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text('Creditor Name'),
+                                        SizedBox(height: 10),
+                                        Text(
+                                          widget.creditor!.name!,
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.normal,
+                                              fontSize: 14,
+                                              color: Color(0xFF1F1F1F)
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 30),
+                                    /// Amount
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text('Payment Made'),
+                                        SizedBox(height: 10),
+                                        TextFormField(
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.normal,
+                                          ),
+                                          textInputAction: TextInputAction.next,
+                                          keyboardType: TextInputType.number,
+                                          controller: amountController,
+                                          inputFormatters: [
+                                            FilteringTextInputFormatter.allow(RegExp('[0-9.]')),
+                                          ],
+                                          readOnly: true,
+                                          validator: (value) {
+                                            if (value!.isEmpty) return 'Enter amount';
+                                            return null;
+                                          },
+                                          decoration: kTextFieldBorderDecoration.copyWith(
+                                            hintText: 'Enter amount',
+                                            hintStyle: TextStyle(
+                                              color: Colors.black.withOpacity(0.5),
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.normal,
+                                            ),
+                                            contentPadding: EdgeInsets.all(10),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 30),
+                                    /// Description
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text('Description'),
+                                        SizedBox(height: 10),
+                                        TextFormField(
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.normal,
+                                          ),
+                                          textInputAction: TextInputAction.next,
+                                          keyboardType: TextInputType.name,
+                                          controller: referenceController,
+                                          readOnly: true,
+                                          validator: (value) {
+                                            if (value!.isEmpty) return 'Enter description';
+                                            return null;
+                                          },
+                                          decoration: kTextFieldBorderDecoration.copyWith(
+                                            hintText: 'Enter description',
+                                            hintStyle: TextStyle(
+                                              color: Colors.black.withOpacity(0.5),
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.normal,
+                                            ),
+                                            contentPadding: EdgeInsets.all(10),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 20),
+                                  ]
+                              ),
+                            ),
+                            Button(
+                              onTap: () {
+                                if(!_showSpinner){
+                                  Map<String, String> body = {
+                                    "creditorId": widget.creditor!.id!,
+                                    "reportId": reports.id!
+                                  };
+                                  _deleteCredit(body, setDialogState);
+                                }
+                              },
+                              buttonColor: Color(0xFFF64932),
+                              child: Center(
+                                child: _showSpinner
+                                    ? CircleProgressIndicator()
+                                    : const Text(
+                                  'Yes, delete',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Color(0xFFFFFFFF),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            Container(
+                              width: 100,
+                              child: TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Center(
+                                  child: Text(
+                                    'No, Cancel',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 50),
+                            SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
+                          ]),
                         ),
                       ),
-                    ),
-                    SizedBox(height: 50),
-                  ]),
+                    ],
+                  ),
                 ),
               ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
+  }
+
+  /// function to make api call to [updateCreditor] with the help of
+  /// [CreditorsDataSource]
+  void _updateCredit(Map<String, dynamic> body, StateSetter setDialogState) async{
+    if(!mounted)return;
+    setDialogState(() => _showSpinner = true);
+    var api = CreditorDataSource();
+    await api.updateCreditor(body).then((message) async{
+      if(!mounted)return;
+      setDialogState((){
+        _showSpinner = false;
+        Navigator.pop(context);
+      });
+      Functions.showSuccessMessage(message);
+      Navigator.pop(context);
+    }).catchError((e){
+      if(!mounted)return;
+      setDialogState(()=> _showSpinner = false);
+      Functions.showErrorMessage(e);
+    });
+  }
+
+  /// function to make api call to [removeCredit] with the help of
+  /// [CreditorsDataSource]
+  void _deleteCredit(Map<String, dynamic> body, StateSetter setDialogState) async{
+    if(!mounted)return;
+    setDialogState(() => _showSpinner = true);
+    var api = CreditorDataSource();
+    await api.removeCredit(body).then((message) async{
+      if(!mounted)return;
+      setDialogState((){
+        _showSpinner = false;
+        Navigator.pop(context);
+      });
+      Functions.showSuccessMessage(message);
+      Navigator.pop(context);
+    }).catchError((e){
+      if(!mounted)return;
+      setDialogState(()=> _showSpinner = false);
+      Functions.showErrorMessage(e);
+    });
   }
 
 }

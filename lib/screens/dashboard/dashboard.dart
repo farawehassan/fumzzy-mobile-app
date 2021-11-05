@@ -29,7 +29,7 @@ class _DashboardState extends State<Dashboard> {
   /// Instantiating a class of the [FutureValues]
   var futureValue = FutureValues();
 
-  ///
+  /// Instantiating a class of the [Store]
   var _storeInfo = Store();
 
   void _getStoreInformation() async{

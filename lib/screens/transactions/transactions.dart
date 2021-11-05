@@ -640,7 +640,7 @@ class _TransactionsState extends State<Transactions> {
                             ),
                             Button(
                               onTap: (){
-                                Navigator.pushNamed(context, AddSale.id);
+                                Navigator.pushNamed(context, AddSale.id).then((value) => _refreshSales());
                               },
                               buttonColor: Color(0xFF00AF27),
                               width: 160,
@@ -1454,6 +1454,7 @@ class _TransactionsState extends State<Transactions> {
         Navigator.pop(context);
       });
       Functions.showSuccessMessage(message);
+      _refreshPurchases();
     }).catchError((e){
       if(!mounted)return;
       setDialogState(()=> _showSpinner = false);
