@@ -17,8 +17,6 @@ import 'package:fumzy/utils/constant-styles.dart';
 import 'package:fumzy/utils/functions.dart';
 import 'drawer.dart';
 import 'package:fumzy/components/bubble-color-indicator.dart';
-import 'recent-purchase.dart';
-import 'recent-sales.dart';
 
 class Dashboard extends StatefulWidget {
 
