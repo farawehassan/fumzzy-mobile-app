@@ -25,7 +25,7 @@ class GreenIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Indicator(
-      indicatorColor: Color(0xFF00AF27),
+      indicatorColor: const Color(0xFF00AF27),
     );
   }
 }
@@ -36,7 +36,7 @@ class CreditIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Indicator(
-      indicatorColor: Color(0xFFF64932),
+      indicatorColor: const Color(0xFFF64932),
     );
   }
 }
@@ -47,7 +47,7 @@ class PartPaidIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Indicator(
-      indicatorColor: Color(0xFFF28301),
+      indicatorColor: const Color(0xFFF28301),
     );
   }
 }

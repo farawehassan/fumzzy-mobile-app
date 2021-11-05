@@ -30,9 +30,9 @@ class InventoryCard extends StatelessWidget {
           style: BorderStyle.solid,
         ),
       ),
-      shadowColor: Color(0xFFF7F8F9),
+      shadowColor: const Color(0xFFF7F8F9),
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 33, horizontal: 26),
+        padding: const EdgeInsets.symmetric(vertical: 33, horizontal: 26),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -42,26 +42,26 @@ class InventoryCard extends StatelessWidget {
               children: [
                 Text(
                   cardName!,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 13,
                     color: Colors.white,
                     fontWeight: FontWeight.normal,
                   ),
                 ),
-                SizedBox(width: 10),
-                Icon(
+                const SizedBox(width: 10),
+                const Icon(
                   IconlyBold.graph,
                   color: Colors.white,
                   size: 17,
                 ),
               ],
             ),
-            SizedBox(height: 14),
+            const SizedBox(height: 14),
             FadeAnimation(
               delay: 1.3,
               child: Text(
                 Functions.money(totalPrice!.toDouble(), 'N'),
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 23,
                   color: Colors.white,
                   fontWeight: FontWeight.w700,

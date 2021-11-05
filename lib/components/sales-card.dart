@@ -19,24 +19,24 @@ class TotalSalesCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return ReusableCard(
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 13),
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 13),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               cardName!,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14,
                 color: Color(0xFF75759E),
                 fontWeight: FontWeight.w400,
               ),
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             FadeAnimation(
               delay: 1.3,
               child: Text(
                 Functions.money(totalPrice!.toDouble(), 'N'),
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 20,
                   color: Color(0xFF171725),
                   fontWeight: FontWeight.bold,

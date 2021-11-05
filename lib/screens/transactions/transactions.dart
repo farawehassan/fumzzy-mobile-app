@@ -26,6 +26,12 @@ class Transactions extends StatefulWidget {
 
   static const String id = 'transactions';
 
+  final int? tabSelector;
+
+  Transactions({
+    this.tabSelector
+  });
+
   @override
   _TransactionsState createState() => _TransactionsState();
 }
@@ -593,7 +599,7 @@ class _TransactionsState extends State<Transactions> {
             padding: EdgeInsets.fromLTRB(20, 30, 20, 0),
             child: DefaultTabController(
               length: 3,
-              initialIndex: 0,
+              initialIndex: widget.tabSelector ?? 0,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
