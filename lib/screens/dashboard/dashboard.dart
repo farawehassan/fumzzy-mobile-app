@@ -711,7 +711,7 @@ class _DashboardState extends State<Dashboard> {
                               const SizedBox(width: 450),
                               InkWell(
                                 onTap: () {
-                                  Navigator.push(
+                                  Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(builder: (BuildContext context) => Transactions(tabSelector: 1)),
                                   );
@@ -757,7 +757,7 @@ class _DashboardState extends State<Dashboard> {
                           ),
                           InkWell(
                             onTap: () {
-                              Navigator.pushNamed(context, Transactions.id);
+                              Navigator.pushReplacementNamed(context, Transactions.id);
                             },
                             child: const Text(
                               'See All',
