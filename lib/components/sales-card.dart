@@ -35,8 +35,10 @@ class TotalSalesCard extends StatelessWidget {
             FadeAnimation(
               delay: 1.3,
               child: Text(
-                Functions.money(totalPrice!.toDouble(), 'N'),
-                style: const TextStyle(
+                totalPrice == null
+                    ? '#.##'
+                    : Functions.money(totalPrice!.toDouble(), 'N'),
+                style: TextStyle(
                   fontSize: 20,
                   color: Color(0xFF171725),
                   fontWeight: FontWeight.bold,

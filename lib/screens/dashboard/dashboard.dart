@@ -38,7 +38,7 @@ class _DashboardState extends State<Dashboard> {
   var futureValue = FutureValues();
 
   /// Instantiating a class of the [Store]
-  var _storeInfo = Store();
+  Store? _storeInfo;
 
   /** Purchase Section **/
 
@@ -326,10 +326,7 @@ class _DashboardState extends State<Dashboard> {
   void _getStoreInformation() async{
     Future<Store> store = futureValue.getStoreInformation();
       await store.then((Store value) {
-      setState(() {
-        _storeInfo = value;
-       });
-      print(_storeInfo.totalSales);
+      setState(() => _storeInfo = value);
     }).catchError((e){
       print(e);
       Functions.showErrorMessage(e);
@@ -418,24 +415,20 @@ class _DashboardState extends State<Dashboard> {
                   children: [
                     TotalSalesCard(
                       cardName: 'Total Sales',
-                      totalPrice: _storeInfo.totalSales!,
+                      totalPrice: _storeInfo?.totalSales!,
                     ),
                     TotalSalesCard(
                       cardName: 'Total Purchases',
-                      totalPrice: _storeInfo.totalPurchases!,
+                      totalPrice: _storeInfo?.totalPurchases!,
                     ),
                     TotalSalesCard(
                       cardName: 'Total Expenses',
-                      totalPrice: _storeInfo.totalExpenses!,
+                      totalPrice: _storeInfo?.totalExpenses!,
                     ),
                     TotalSalesCard(
                       cardName: 'Total Profit',
-                      totalPrice: _storeInfo.totalProfitMade!,
+                      totalPrice: _storeInfo?.totalProfitMade!,
                     ),
-                    // TotalSalesCard(
-                    //   cardName: 'Total Discounts',
-                    //   totalPrice: _store!.totalSales!.toDouble(),
-                    // ),
                   ],
                 ),
                 const SizedBox(height: 30),
@@ -443,22 +436,22 @@ class _DashboardState extends State<Dashboard> {
                   children: [
                     InventoryCard(
                       cardName: 'Inventory Cost Price',
-                      totalPrice: _storeInfo.inventoryCostPrice,
+                      totalPrice: _storeInfo?.inventoryCostPrice,
                       cardColor: Color(0xFFF64932),
                     ),
                     InventoryCard(
                       cardName: 'Inventory Selling Price',
-                      totalPrice: _storeInfo.inventorySellingPrice,
+                      totalPrice: _storeInfo?.inventorySellingPrice,
                       cardColor: Color(0xFF00AF27),
                     ),
                     InventoryCard(
                       cardName: 'Inventory Profit',
-                      totalPrice: _storeInfo.inventoryProfit,
+                      totalPrice: _storeInfo?.inventoryProfit,
                       cardColor: Color(0xFF00509A),
                     ),
                     InventoryCard(
                       cardName: 'Inventory Items',
-                      totalPrice: _storeInfo.inventoryItems,
+                      totalPrice: _storeInfo?.inventoryItems,
                       cardColor: Colors.brown,
                     ),
                   ],

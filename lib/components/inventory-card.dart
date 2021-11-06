@@ -60,8 +60,10 @@ class InventoryCard extends StatelessWidget {
             FadeAnimation(
               delay: 1.3,
               child: Text(
-                Functions.money(totalPrice!.toDouble(), 'N'),
-                style: const TextStyle(
+                totalPrice == null
+                    ? '#.##'
+                    : Functions.money(totalPrice!.toDouble(), 'N'),
+                style: TextStyle(
                   fontSize: 23,
                   color: Colors.white,
                   fontWeight: FontWeight.w700,
