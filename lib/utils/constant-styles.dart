@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+Color mainColor = Color(0xFF004E92);
+
 /// Text style for the tab bar view
 final TextStyle kTabBarTextStyle = TextStyle(
   fontSize: 14,

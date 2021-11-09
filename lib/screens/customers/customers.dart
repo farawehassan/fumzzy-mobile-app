@@ -287,8 +287,10 @@ class _CustomersState extends State<Customers> {
         double totalDebts = 0;
         customer.reports!.forEach((element) {
           totalDebts += (element.totalAmount! - element.paymentMade!);
-          if(element.description == null) invoices += 1;
-          else references += 1;
+          if(element.paid!){
+            if(element.description == null) invoices += 1;
+            else references += 1;
+          }
         });
         itemRow.add(
           DataRow(cells: [

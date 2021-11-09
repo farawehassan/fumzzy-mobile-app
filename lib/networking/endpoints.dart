@@ -68,3 +68,4 @@ const DELETE_CREDITOR = BASE_URL + 'creditor/delete';
 
 /// Endpoints regarding store
 const GET_STORE_DETAIL = BASE_URL + 'store/fetchDetails';
+const GET_STORE_CHARTS_DETAIL = BASE_URL + 'store/fetchDetailsChart';

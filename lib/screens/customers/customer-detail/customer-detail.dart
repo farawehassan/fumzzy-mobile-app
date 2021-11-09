@@ -9,15 +9,11 @@ import 'package:fumzy/components/invoice-pdf-download.dart';
 import 'package:fumzy/model/all-customers.dart';
 import 'package:fumzy/model/customer-reports.dart';
 import 'package:fumzy/networking/customer-datasource.dart';
-import 'package:fumzy/screens/dashboard/drawer.dart';
+import 'package:fumzy/screens/transactions/print-receipt.dart';
 import 'package:fumzy/utils/constant-styles.dart';
 import 'package:fumzy/utils/functions.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
-import 'delete-customer.dart';
 import 'sales-report.dart';
-import 'total-sales.dart';
-import 'debt-history.dart';
-import 'repayment-history.dart';
 import 'package:fumzy/components/info-table.dart';
 
 class CustomersDetail extends StatefulWidget {
@@ -79,7 +75,20 @@ class _CustomersDetailState extends State<CustomersDetail> {
       }
       itemRow.add(
         DataRow(cells: [
-          DataCell(ReusableDownloadPdf(invoiceNo: report.id!.substring(0, 8))),
+          DataCell(InkWell(
+            onTap: (){
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PrintReceipt(
+                      reports: report.toJson(),
+                      paymentMode: 'Cash'
+                  ),
+                ),
+              );
+            },
+            child: ReusableDownloadPdf(invoiceNo: report.id!.substring(0, 8)))
+          ),
           DataCell(Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -106,6 +115,8 @@ class _CustomersDetailState extends State<CustomersDetail> {
         }),
       );
     }
+    List<DataRow> items = [];
+    items.addAll(itemRow.reversed);
     return SingleChildScrollView(
       child: Container(
         decoration: kTableContainer,
@@ -135,7 +146,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                     DataColumn(label: Text('Amount')),
                     DataColumn(label: Text('Date')),
                   ],
-                  rows: itemRow,
+                  rows: items,
                 )
             ),
             const SizedBox(height: 80),
@@ -163,15 +174,12 @@ class _CustomersDetailState extends State<CustomersDetail> {
             )),
             DataCell(PopupMenuButton(
               offset: Offset(110, 40),
-              icon: Icon(
-                Icons.more_horiz,
-                color: Color(0xFF00509A),
-              ),
+              icon: Icon(Icons.more_horiz, color: Color(0xFF00509A)),
               onSelected: (value) {
                 switch (value) {
-                  case 0: {  } break;
-                  case 1: {  } break;
-                  case 2: {  } break;
+                  case 0: { _recordRepayment(report); } break;
+                  case 1: { _markAsSettled(report); } break;
+                  case 2: { _deleteReport(report); } break;
                 }
               },
               itemBuilder: (context) => [
@@ -179,10 +187,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                   child: Container(width: 135, child: Text('Record Payment')),
                   value: 0,
                 ),
-                PopupMenuItem(
-                  child: Text('Mark as settled'),
-                  value: 1,
-                ),
+                PopupMenuItem(child: Text('Mark as settled'), value: 1),
                 PopupMenuItem(
                   child: Row(
                     children: [
@@ -353,6 +358,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                     tableTitle: 'Total Sales',
                                     widget: Text(
                                       Functions.money(_totalSales, 'N'),
+                                      style: TextStyle(fontWeight: FontWeight.bold),
                                     ),
                                   ),
                                   ReusableCustomerInfoFields(
@@ -364,19 +370,22 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                   ReusableCustomerInfoFields(
                                     tableTitle: 'On-board Date',
                                     widget: Text(
-                                      Functions.getFormattedDateTime(widget.customer!.createdAt!),
+                                      Functions.getFormattedDateTimeN(widget.customer!.createdAt!),
                                     ),
                                   ),
                                   ReusableCustomerInfoFields(
                                     tableTitle: 'Total Debts',
-                                    widget: Text(Functions.money(_totalDebts, 'N')),
+                                    widget: Text(
+                                      Functions.money(_totalDebts, 'N'),
+                                      style: TextStyle(fontWeight: FontWeight.bold),
+                                    ),
                                   ),
                                   ReusableCustomerInfoFields(
                                     tableTitle: 'Last Re-payment Date',
                                     widget: Text(
                                       _lastRepaymentDate == null
                                           ? ''
-                                          : Functions.getFormattedDateTime(_lastRepaymentDate!),
+                                          : Functions.getFormattedDateTimeN(_lastRepaymentDate!),
                                     ),
                                   ),
                                 ],
@@ -836,448 +845,834 @@ class _CustomersDetailState extends State<CustomersDetail> {
     });
   }
 
-  Future<void> _recordRepayment(BoxConstraints constraints) {
-
+  Future<void> _recordRepayment(AllCustomerReport reports) {
     final formKey = GlobalKey<FormState>();
     TextEditingController amountController = TextEditingController();
     TextEditingController referenceController = TextEditingController();
+    referenceController.text = reports.description!.isNotEmpty
+        ? reports.description!
+        : 'Invoice ' + reports.id!.substring(0, 8);
 
     return showDialog(
       context: context,
       barrierColor: Color(0xFF000428).withOpacity(0.86),
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: Color(0xFFFFFFFF),
-        ),
-        margin: EdgeInsets.all(50),
-        child: Material(
-          borderRadius: BorderRadius.circular(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                padding: EdgeInsets.fromLTRB(24, 30, 24, 27),
-                decoration: BoxDecoration(
-                  color: Color(0xFFF5F8FF),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(15.0),
-                    topRight: Radius.circular(15.0),
+      barrierDismissible: false,
+      builder: (context) => GestureDetector(
+        onTap: (){
+          FocusScopeNode currentFocus = FocusScope.of(context);
+          if(!currentFocus.hasPrimaryFocus) currentFocus.unfocus();
+        },
+        child: StatefulBuilder(
+          builder: (BuildContext context, StateSetter setDialogState) {
+            return AbsorbPointer(
+                absorbing: _showSpinner,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Color(0xFFFFFFFF),
                   ),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'DEBT REPAYMENT',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 15,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Icon(
-                        IconlyBold.closeSquare,
-                        color: Colors.black.withOpacity(0.7),
-                      ),
-                    ),
-                  ],
-                ),
-              ), //new category header with cancel icon
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(top: 42),
-                        child: Text(
-                          'Debt repayment',
-                          style: TextStyle(
-                            color: Color(0xFF00509A),
-                            fontSize: 19,
-                            fontWeight: FontWeight.w500,
+                  margin: EdgeInsets.all(50),
+                  child: Material(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.fromLTRB(24, 30, 24, 27),
+                          decoration: BoxDecoration(
+                            color: Color(0xFFF5F8FF),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(15.0),
+                              topRight: Radius.circular(15.0),
+                            ),
                           ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 35, vertical: 15.0),
-                        child: Text(
-                          'You have made additional purchase on credit. Please fill the fields to repay your debt.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Color(0xFF000428).withOpacity(0.6),
-                            fontWeight: FontWeight.w400,
-                            fontSize: 15.0,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.only(left: 20, right: 20),
-                        child: Form(
-                          key: formKey,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              ///text field for customer
                               Text(
-                                'Customer',
-                              ),
-                              SizedBox(height: 10),
-                              Text(
-                                'Obi Cubana and Sons Limited',
+                                'DEBT REPAYMENT',
                                 style: TextStyle(
-                                  color: Color(0xFF1F1F1F),
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.normal,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 15,
                                 ),
                               ),
-                              SizedBox(height: 30),
-                              ///field for amount
-                              Text('Amount'),
-                              SizedBox(height: 10),
-                              Container(
-                                width: constraints.maxWidth,
-                                child: TextFormField(
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.normal,
-                                  ),
-                                  textInputAction: TextInputAction.next,
-                                  keyboardType: TextInputType.number,
-                                  autofocus: true,
-                                  controller: amountController,
-                                  validator: (value) {
-                                    if (value!.isEmpty) {
-                                      return 'Enter amount';
-                                    }
-                                    return null;
-                                  },
-                                  decoration: kTextFieldBorderDecoration.copyWith(
-                                    hintText: 'Enter amount',
-                                    hintStyle: TextStyle(
-                                      color: Colors.black.withOpacity(0.5),
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.normal,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 20),
-                              ///field for reference
-                              Text('Reference'),
-                              SizedBox(height: 10),
-                              Container(
-                                width: constraints.maxWidth,
-                                child: TextFormField(
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.normal,
-                                  ),
-                                  textInputAction: TextInputAction.done,
-                                  keyboardType: TextInputType.name,
-                                  controller: referenceController,
-                                  validator: (value) {
-                                    if (value!.isEmpty) {
-                                      return 'Select invoice or reference';
-                                    }
-                                    return null;
-                                  },
-                                  decoration: kTextFieldBorderDecoration.copyWith(
-                                    hintText: 'Select invoice or reference',
-                                    hintStyle: TextStyle(
-                                      color: Colors.black.withOpacity(0.5),
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.normal,
-                                    ),
-                                  ),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Icon(
+                                  IconlyBold.closeSquare,
+                                  color: Colors.black.withOpacity(0.7),
                                 ),
                               ),
                             ],
                           ),
                         ),
-                      ),
-                      SizedBox(height: 40),
-                      Button(
-                        onTap: () {
-                          print("Add Category");
-                        },
-                        buttonColor: Color(0xFF00509A),
-                        child: Center(
-                          child: Text(
-                            'Record Repayment',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Color(0xFFFFFFFF),
-                              fontSize: 14,
-                              fontWeight: FontWeight.normal,
+                        Expanded(
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.only(top: 42),
+                                  child: Text(
+                                    'Debt repayment',
+                                    style: TextStyle(
+                                      color: Color(0xFF00509A),
+                                      fontSize: 19,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 35, vertical: 15.0),
+                                  child: Text(
+                                    'You have made additional purchase on credit. Please fill the fields to repay your debt.',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Color(0xFF000428).withOpacity(0.6),
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 15.0,
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.only(left: 20, right: 20),
+                                  child: Form(
+                                    key: formKey,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        /// Customer name
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text('Customer Name'),
+                                            SizedBox(height: 10),
+                                            Text(
+                                              widget.customer!.name!,
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.normal,
+                                                  fontSize: 14,
+                                                  color: Color(0xFF1F1F1F)
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 30),
+                                        /// Amount
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text('Payment Made'),
+                                            SizedBox(height: 10),
+                                            TextFormField(
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                              textInputAction: TextInputAction.next,
+                                              keyboardType: TextInputType.number,
+                                              controller: amountController,
+                                              inputFormatters: [
+                                                FilteringTextInputFormatter.allow(RegExp('[0-9.]')),
+                                              ],
+                                              validator: (value) {
+                                                if (value!.isEmpty) return 'Enter amount';
+                                                if ((double.parse(value) + reports.paymentMade!) > reports.totalAmount!){
+                                                  return 'Invalid amount';
+                                                }
+                                                return null;
+                                              },
+                                              decoration: kTextFieldBorderDecoration.copyWith(
+                                                hintText: 'Enter amount',
+                                                hintStyle: TextStyle(
+                                                  color: Colors.black.withOpacity(0.5),
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.normal,
+                                                ),
+                                                contentPadding: EdgeInsets.all(10),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 30),
+                                        /// Description
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text('Description'),
+                                            SizedBox(height: 10),
+                                            TextFormField(
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                              textInputAction: TextInputAction.next,
+                                              keyboardType: TextInputType.name,
+                                              controller: referenceController,
+                                              validator: (value) {
+                                                if (value!.isEmpty) return 'Enter description';
+                                                return null;
+                                              },
+                                              decoration: kTextFieldBorderDecoration.copyWith(
+                                                hintText: 'Enter description',
+                                                hintStyle: TextStyle(
+                                                  color: Colors.black.withOpacity(0.5),
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.normal,
+                                                ),
+                                                contentPadding: EdgeInsets.all(10),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 20),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: 40),
+                                Button(
+                                  onTap: () {
+                                    if(formKey.currentState!.validate()){
+                                      Map<String, dynamic> body = {
+                                        'id': widget.customer!.id,
+                                        'reportId': reports.id,
+                                        'payment': amountController.text
+                                      };
+                                      _updatePayment(body, setDialogState);
+                                    }
+                                  },
+                                  buttonColor: Color(0xFF00509A),
+                                  child: Center(
+                                    child: _showSpinner
+                                        ? CircleProgressIndicator()
+                                        : Text(
+                                      'Record Repayment',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Color(0xFFFFFFFF),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: 10),
+                                Container(
+                                  width: 100,
+                                  child: TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: Center(
+                                      child: Text(
+                                        'No, Cancel',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          decoration: TextDecoration.underline,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: 50),
+                                SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
+                              ],
                             ),
                           ),
                         ),
-                      ),
-                      SizedBox(height: 10),
-                      Container(
-                        width: 100,
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: Center(
-                            child: Text(
-                              'No, Cancel',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 50),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ),
-            ],
-          ),
+                )
+            );
+          },
         ),
       ),
     );
   }
 
-  Future<void> _markAsSettled() {
-
+  Future<void> _markAsSettled(AllCustomerReport reports) {
     final formKey = GlobalKey<FormState>();
-    TextEditingController reasonController = TextEditingController();
-    String newPin = '';
+    TextEditingController amountController = TextEditingController();
+    amountController.text = reports.totalAmount!.toString();
+    TextEditingController referenceController = TextEditingController();
+    referenceController.text = reports.description!.isNotEmpty
+        ? reports.description!
+        : 'Invoice ' + reports.id!.substring(0, 8);
 
     return showDialog(
       context: context,
+      barrierDismissible: false,
       barrierColor: Color(0xFF000428).withOpacity(0.86),
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: Color(0xFFFFFFFF),
-        ),
-        margin: EdgeInsets.all(50),
-        child: Material(
-          borderRadius: BorderRadius.circular(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                padding: EdgeInsets.fromLTRB(24, 30, 24, 27),
-                decoration: BoxDecoration(
-                  color: Color(0xFFF5F8FF),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(15.0),
-                    topRight: Radius.circular(15.0),
+      builder: (context) => GestureDetector(
+        onTap: (){
+          FocusScopeNode currentFocus = FocusScope.of(context);
+          if(!currentFocus.hasPrimaryFocus) currentFocus.unfocus();
+        },
+        child: StatefulBuilder(
+          builder: (BuildContext context, StateSetter setDialogState) {
+            return AbsorbPointer(
+                absorbing: _showSpinner,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Color(0xFFFFFFFF),
                   ),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'MARK AS SETTLED',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Icon(
-                        IconlyBold.closeSquare,
-                        color: Colors.black.withOpacity(0.7),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(children: [
-                    Padding(
-                      padding: EdgeInsets.only(top: 42),
-                      child: Text(
-                        'Are you sure you want to mark this Debt as settled?',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Color(0xFF00509A),
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 35, vertical: 15.0),
-                      child: Text(
-                        'This will mean that this person no longer owes you and you wont find them under the debtor\'s list.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Color(0xFF000428).withOpacity(0.6),
-                          fontWeight: FontWeight.w400,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20, right: 20),
-                      child: Form(
-                        key: formKey,
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                  margin: EdgeInsets.all(50),
+                  child: Material(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.fromLTRB(24, 30, 24, 27),
+                          decoration: BoxDecoration(
+                            color: Color(0xFFF5F8FF),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(15.0),
+                              topRight: Radius.circular(15.0),
+                            ),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('Reason'),
-                                  SizedBox(height: 10),
-                                  Container(
-                                    width: double.infinity,
-                                    child: TextFormField(
+                              Text(
+                                'MARK AS SETTLED',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              InkWell(
+                                onTap: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Icon(
+                                  IconlyBold.closeSquare,
+                                  color: Colors.black.withOpacity(0.7),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: SingleChildScrollView(
+                            child: Column(children: [
+                              Padding(
+                                padding: EdgeInsets.only(top: 42),
+                                child: Text(
+                                  'Are you sure you want to mark this Debt as settled?',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Color(0xFF00509A),
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 35, vertical: 15.0),
+                                child: Text(
+                                  'This will mean that this person no longer owes you and you wont find them under the debtor\'s list.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Color(0xFF000428).withOpacity(0.6),
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 20, right: 20),
+                                child: Form(
+                                  key: formKey,
+                                  child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        /// Customer name
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text('Creditor Name'),
+                                            SizedBox(height: 10),
+                                            Text(
+                                              widget.customer!.name!,
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.normal,
+                                                  fontSize: 14,
+                                                  color: Color(0xFF1F1F1F)
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 30),
+                                        /// Amount
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text('Payment Made'),
+                                            SizedBox(height: 10),
+                                            TextFormField(
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                              textInputAction: TextInputAction.next,
+                                              keyboardType: TextInputType.number,
+                                              controller: amountController,
+                                              inputFormatters: [
+                                                FilteringTextInputFormatter.allow(RegExp('[0-9.]')),
+                                              ],
+                                              readOnly: true,
+                                              validator: (value) {
+                                                if (value!.isEmpty) return 'Enter amount';
+                                                return null;
+                                              },
+                                              decoration: kTextFieldBorderDecoration.copyWith(
+                                                hintText: 'Enter amount',
+                                                hintStyle: TextStyle(
+                                                  color: Colors.black.withOpacity(0.5),
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.normal,
+                                                ),
+                                                contentPadding: EdgeInsets.all(10),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 30),
+                                        /// Description
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text('Description'),
+                                            SizedBox(height: 10),
+                                            TextFormField(
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                              textInputAction: TextInputAction.next,
+                                              keyboardType: TextInputType.name,
+                                              controller: referenceController,
+                                              readOnly: true,
+                                              validator: (value) {
+                                                if (value!.isEmpty) return 'Enter description';
+                                                return null;
+                                              },
+                                              decoration: kTextFieldBorderDecoration.copyWith(
+                                                hintText: 'Enter description',
+                                                hintStyle: TextStyle(
+                                                  color: Colors.black.withOpacity(0.5),
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.normal,
+                                                ),
+                                                contentPadding: EdgeInsets.all(10),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 20),
+                                      ]
+                                  ),
+                                ),
+                              ),
+                              Button(
+                                onTap: () {
+                                  if(formKey.currentState!.validate()){
+                                    Map<String, dynamic> body = {
+                                      'id': widget.customer!.id,
+                                      'reportId': reports.id,
+                                      'payment': reports.totalAmount,
+                                      'paymentReceivedAt': DateTime.now().toIso8601String()
+                                    };
+                                    _settlePayment(body, setDialogState);
+                                  }
+                                },
+                                buttonColor: Color(0xFFF64932),
+                                child: Center(
+                                  child:  _showSpinner
+                                      ? CircleProgressIndicator()
+                                      : Text(
+                                    'Yes, Mark as settled',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Color(0xFFFFFFFF),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              Container(
+                                width: 100,
+                                child: TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Center(
+                                    child: Text(
+                                      'No, Cancel',
                                       style: TextStyle(
                                         color: Colors.black,
                                         fontSize: 14,
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                      textInputAction: TextInputAction.next,
-                                      keyboardType: TextInputType.name,
-                                      autofocus: true,
-                                      controller: reasonController,
-                                      validator: (value) {
-                                        if (value!.isEmpty) return 'Enter reason';
-                                        return null;
-                                      },
-                                      decoration: kTextFieldBorderDecoration.copyWith(
-                                        hintText: 'Enter reason',
-                                        hintStyle: TextStyle(
-                                          color: Colors.black.withOpacity(0.5),
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.normal,
-                                        ),
+                                        fontWeight: FontWeight.w500,
+                                        decoration: TextDecoration.underline,
                                       ),
                                     ),
                                   ),
-                                ],
-                              ),
-                              SizedBox(height: 30),
-                              Container(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Enter your PIN',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                    ),
-                                    SizedBox(height: 13),
-                                    Container(
-                                      width: 280,
-                                      child: PinCodeTextField(
-                                        appContext: context,
-                                        length: 4,
-                                        animationType: AnimationType.fade,
-                                        enablePinAutofill: false,
-                                        textStyle: TextStyle(
-                                          fontSize: 20,
-                                          color: Color(0xFF004E92),
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                        pinTheme: PinTheme(
-                                          shape: PinCodeFieldShape.box,
-                                          borderWidth: 1,
-                                          fieldHeight: 60,
-                                          fieldWidth: 60,
-                                          activeColor: Color(0xFF7BBBE5),
-                                          selectedColor: Color(0xFF7BBBE5),
-                                          borderRadius: BorderRadius.all(Radius.circular(3)),
-                                        ),
-                                        onChanged: (value) {
-                                          if (!mounted) return;
-                                          setState(() => newPin = value);
-                                        }),
-                                    ),
-                                    SizedBox(height: 36),
-                                  ],
                                 ),
                               ),
+                              SizedBox(height: 50),
+                              SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
                             ]),
-                      ),
-                    ),
-                    Button(
-                      onTap: () {
-                        Navigator.pop(context);
-                        setState(() {
-                          if (checkBoxValue == false) {
-                            checkBoxValue = true;
-                          } else {
-                            checkBoxValue = true;
-                          }
-                        });
-                      },
-                      buttonColor: Color(0xFFF64932),
-                      child: Center(
-                        child: Text(
-                          'Yes, Mark as settled',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Color(0xFFFFFFFF),
-                            fontSize: 14,
-                            fontWeight: FontWeight.normal,
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                    SizedBox(height: 10),
-                    Container(
-                      width: 100,
-                      child: TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: Center(
-                          child: Text(
-                            'No, Cancel',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 50),
-                  ]),
-                ),
-              ),
-            ],
-          ),
+                  ),
+                )
+            );
+          },
         ),
       ),
     );
+  }
+
+  Future<void> _deleteReport(AllCustomerReport reports) {
+    final formKey = GlobalKey<FormState>();
+    TextEditingController amountPaidController = TextEditingController();
+    amountPaidController.text = reports.totalAmount!.toString();
+    TextEditingController referenceController = TextEditingController();
+    referenceController.text = reports.description!.isNotEmpty
+        ? reports.description!
+        : 'Invoice ' + reports.id!.substring(0, 8);
+
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Color(0xFF000428).withOpacity(0.86),
+      builder: (context) => GestureDetector(
+        onTap: (){
+          FocusScopeNode currentFocus = FocusScope.of(context);
+          if(!currentFocus.hasPrimaryFocus) currentFocus.unfocus();
+        },
+        child: StatefulBuilder(
+          builder: (BuildContext context, StateSetter setDialogState) {
+            return AbsorbPointer(
+                absorbing: _showSpinner,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Color(0xFFFFFFFF),
+                  ),
+                  margin: EdgeInsets.all(50),
+                  child: Material(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.fromLTRB(24, 30, 24, 27),
+                          decoration: BoxDecoration(
+                            color: Color(0xFFF5F8FF),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(15.0),
+                              topRight: Radius.circular(15.0),
+                            ),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'DELETE REPORT',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              InkWell(
+                                onTap: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Icon(
+                                  IconlyBold.closeSquare,
+                                  color: Colors.black.withOpacity(0.7),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: SingleChildScrollView(
+                            child: Column(children: [
+                              Padding(
+                                padding: EdgeInsets.only(top: 42),
+                                child: Text(
+                                  'Are you sure you want to delete this report?',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Color(0xFF00509A),
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 35, vertical: 15.0),
+                                child: Text(
+                                  'This will mean that this person no longer owes you for this and you wont find them under the debtor\'s list.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Color(0xFF000428).withOpacity(0.6),
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 20, right: 20),
+                                child: Form(
+                                  key: formKey,
+                                  child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        /// Customer name
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text('Creditor Name'),
+                                            SizedBox(height: 10),
+                                            Text(
+                                              widget.customer!.name!,
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.normal,
+                                                  fontSize: 14,
+                                                  color: Color(0xFF1F1F1F)
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 30),
+                                        /// Total amount
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text('Total Amount'),
+                                            SizedBox(height: 10),
+                                            TextFormField(
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                              textInputAction: TextInputAction.next,
+                                              keyboardType: TextInputType.number,
+                                              controller: amountPaidController,
+                                              inputFormatters: [
+                                                FilteringTextInputFormatter.allow(RegExp('[0-9.]')),
+                                              ],
+                                              readOnly: true,
+                                              validator: (value) {
+                                                if (value!.isEmpty) return 'Enter amount';
+                                                return null;
+                                              },
+                                              decoration: kTextFieldBorderDecoration.copyWith(
+                                                hintText: 'Enter amount',
+                                                hintStyle: TextStyle(
+                                                  color: Colors.black.withOpacity(0.5),
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.normal,
+                                                ),
+                                                contentPadding: EdgeInsets.all(10),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 30),
+                                        /// Description
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text('Description'),
+                                            SizedBox(height: 10),
+                                            TextFormField(
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                              textInputAction: TextInputAction.next,
+                                              keyboardType: TextInputType.name,
+                                              controller: referenceController,
+                                              readOnly: true,
+                                              validator: (value) {
+                                                if (value!.isEmpty) return 'Enter description';
+                                                return null;
+                                              },
+                                              decoration: kTextFieldBorderDecoration.copyWith(
+                                                hintText: 'Enter description',
+                                                hintStyle: TextStyle(
+                                                  color: Colors.black.withOpacity(0.5),
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.normal,
+                                                ),
+                                                contentPadding: EdgeInsets.all(10),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 20),
+                                      ]
+                                  ),
+                                ),
+                              ),
+                              Button(
+                                onTap: () {
+                                  if(formKey.currentState!.validate()){
+                                    Map<String, dynamic> body = {
+                                      'customerId': widget.customer!.id,
+                                      'reportId': reports.id,
+                                    };
+                                    _removeReport(body, setDialogState);
+                                  }
+                                },
+                                buttonColor: Color(0xFFF64932),
+                                child: Center(
+                                  child:  _showSpinner
+                                      ? CircleProgressIndicator()
+                                      : Text(
+                                    'Yes, Mark as settled',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Color(0xFFFFFFFF),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              Container(
+                                width: 100,
+                                child: TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Center(
+                                    child: Text(
+                                      'No, Cancel',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 50),
+                              SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
+                            ]),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  /// function to make api call to [updatePaymentMade] with the help of
+  /// [CustomerDataSource]
+  void _updatePayment(Map<String, dynamic> body, StateSetter setDialogState) async{
+    if(!mounted)return;
+    setDialogState(() => _showSpinner = true);
+    var api = CustomerDataSource();
+    await api.updatePaymentMade(body).then((message) async{
+      if(!mounted)return;
+      setDialogState((){
+        _showSpinner = false;
+        Navigator.pop(context);
+      });
+      Functions.showSuccessMessage(message);
+      Navigator.pop(context);
+      Navigator.pop(context);
+    }).catchError((e){
+      if(!mounted)return;
+      setDialogState(()=> _showSpinner = false);
+      Functions.showErrorMessage(e);
+    });
+  }
+
+  /// function to make api call to [settlePayment] with the help of
+  /// [CustomerDataSource]
+  void _settlePayment(Map<String, dynamic> body, StateSetter setDialogState) async{
+    if(!mounted)return;
+    setDialogState(() => _showSpinner = true);
+    var api = CustomerDataSource();
+    await api.settlePayment(body).then((message) async{
+      if(!mounted)return;
+      setDialogState((){
+        _showSpinner = false;
+        Navigator.pop(context);
+      });
+      Functions.showSuccessMessage(message);
+      Navigator.pop(context);
+      Navigator.pop(context);
+    }).catchError((e){
+      if(!mounted)return;
+      setDialogState(()=> _showSpinner = false);
+      Functions.showErrorMessage(e);
+    });
+  }
+
+  /// function to make api call to [removeReport] with the help of
+  /// [CustomerDataSource]
+  void _removeReport(Map<String, dynamic> body, StateSetter setDialogState) async{
+    if(!mounted)return;
+    setDialogState(() => _showSpinner = true);
+    var api = CustomerDataSource();
+    await api.removeReport(body).then((message) async{
+      if(!mounted)return;
+      setDialogState((){
+        _showSpinner = false;
+        Navigator.pop(context);
+      });
+      Functions.showSuccessMessage(message);
+      Navigator.pop(context);
+      Navigator.pop(context);
+    }).catchError((e){
+      if(!mounted)return;
+      setDialogState(()=> _showSpinner = false);
+      Functions.showErrorMessage(e);
+    });
   }
 
 }

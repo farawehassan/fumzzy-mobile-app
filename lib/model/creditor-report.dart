@@ -23,17 +23,17 @@ class CreditorReport {
 
   /// Function to map creditor report's details from a JSON object
   factory CreditorReport.fromJson(Map<String, dynamic> json) => CreditorReport(
-    amount: double.parse(json["amount"].toString()),
-    paymentMade: double.parse(json["paymentMade"].toString()),
-    description: json["description"],
-    id: json["_id"],
+    amount: double.parse(json['amount'].toString()),
+    paymentMade: double.parse(json['paymentMade'].toString()),
+    description: json['description'],
+    id: json['_id'],
   );
 
   /// Function to map creditor report's details to a [Map<String, dynamic>] object
   Map<String, dynamic> toJson() => {
-    "amount": amount,
-    "paymentMade": paymentMade,
-    "description": description,
-    "_id": id,
+    'amount': amount,
+    'paymentMade': paymentMade,
+    'description': description,
+    '_id': id,
   };
 }

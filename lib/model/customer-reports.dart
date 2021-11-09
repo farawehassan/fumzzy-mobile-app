@@ -4,7 +4,6 @@ class AllCustomerReport {
   /// Setting constructor for [AllCustomerReport] class
   AllCustomerReport({
     this.report,
-    this.discount,
     this.totalAmount,
     this.paymentMade,
     this.paid,
@@ -17,9 +16,6 @@ class AllCustomerReport {
 
   /// This variable holds the list of reports [Report]
   List<Report>? report;
-
-  /// This variable holds the sales discount
-  double? discount;
 
   /// This variable holds the sales total amount
   double? totalAmount;
@@ -47,30 +43,28 @@ class AllCustomerReport {
 
   /// Function to map customer report's details from a JSON object
   factory AllCustomerReport.fromJson(Map<String, dynamic> json) => AllCustomerReport(
-    report: List<Report>.from(json["report"].map((x) => Report.fromJson(x))),
-    discount: json["discount"] == null ? 0 : double.parse(json["discount"].toString()),
-    totalAmount: double.parse(json["totalAmount"].toString()),
-    paymentMade: double.parse(json["paymentMade"].toString()),
-    paid: json["paid"],
-    soldAt: DateTime.parse(json["soldAt"]),
-    dueDate: json["dueDate"] == null ? null : DateTime.parse(json["dueDate"]),
-    description: json["description"] ?? null,
-    id: json["_id"],
-    paymentReceivedAt: json["paymentReceivedAt"] == null ? null : DateTime.parse(json["paymentReceivedAt"]),
+    report: List<Report>.from(json['report'].map((x) => Report.fromJson(x))),
+    totalAmount: double.parse(json['totalAmount'].toString()),
+    paymentMade: double.parse(json['paymentMade'].toString()),
+    paid: json['paid'],
+    soldAt: DateTime.parse(json['soldAt']),
+    dueDate: json['dueDate'] == null ? null : DateTime.parse(json['dueDate']),
+    description: json['description'] ?? '',
+    id: json['_id'],
+    paymentReceivedAt: json['paymentReceivedAt'] == null ? null : DateTime.parse(json['paymentReceivedAt']),
   );
 
   /// Function to map customer report's details to a [Map<String, dynamic>] object
   Map<String, dynamic> toJson() => {
-    "report": List<dynamic>.from(report!.map((x) => x.toJson())),
-    "discount": discount,
-    "totalAmount": totalAmount,
-    "paymentMade": paymentMade,
-    "paid": paid,
-    "soldAt": soldAt!.toIso8601String(),
-    "dueDate": dueDate == null ? null : dueDate!.toIso8601String(),
-    "description": description ?? null,
-    "_id": id,
-    "paymentReceivedAt": paymentReceivedAt == null ? null : paymentReceivedAt!.toIso8601String(),
+    'report': List<dynamic>.from(report!.map((x) => x.toJson())),
+    'totalAmount': totalAmount,
+    'paymentMade': paymentMade,
+    'paid': paid,
+    'soldAt': soldAt!.toIso8601String(),
+    'dueDate': dueDate == null ? null : dueDate!.toIso8601String(),
+    'description': description ?? null,
+    '_id': id,
+    'paymentReceivedAt': paymentReceivedAt == null ? null : paymentReceivedAt!.toIso8601String(),
   };
 }
 
@@ -103,19 +97,19 @@ class Report {
 
   /// Function to map customer report's details from a JSON object
   factory Report.fromJson(Map<String, dynamic> json) => Report(
-    quantity: double.parse(json["quantity"].toString()),
-    productName: json["productName"],
-    costPrice: double.parse(json["costPrice"].toString()),
-    unitPrice: double.parse(json["unitPrice"].toString()),
-    totalPrice: double.parse(json["totalPrice"].toString()),
+    quantity: double.parse(json['quantity'].toString()),
+    productName: json['productName'],
+    costPrice: double.parse(json['costPrice'].toString()),
+    unitPrice: double.parse(json['unitPrice'].toString()),
+    totalPrice: double.parse(json['totalPrice'].toString()),
   );
 
   /// Function to map customer report's details to a [Map<String, dynamic>] object
   Map<String, dynamic> toJson() => {
-    "quantity": quantity,
-    "productName": productName,
-    "costPrice": costPrice,
-    "unitPrice": unitPrice,
-    "totalPrice": totalPrice,
+    'quantity': quantity,
+    'productName': productName,
+    'costPrice': costPrice,
+    'unitPrice': unitPrice,
+    'totalPrice': totalPrice,
   };
 }

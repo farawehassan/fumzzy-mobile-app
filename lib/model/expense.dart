@@ -32,20 +32,20 @@ class Expense {
   DateTime? updatedAt;
 
   factory Expense.fromJson(Map<String, dynamic> json) => Expense(
-    description: json["description"],
-    amount: double.parse(json["amount"].toString()),
-    staff: Staffs.fromJson(json["staff"]),
-    id: json["_id"],
-    createdAt: DateTime.parse(json["createdAt"]),
-    updatedAt: DateTime.parse(json["updatedAt"]),
+    description: json['description'],
+    amount: double.parse(json['amount'].toString()),
+    staff: Staffs.fromJson(json['staff']),
+    id: json['_id'],
+    createdAt: DateTime.parse(json['createdAt']),
+    updatedAt: DateTime.parse(json['updatedAt']),
   );
 
   Map<String, dynamic> toJson() => {
-    "description": description,
-    "amount": amount,
-    "staff": staff,
-    "_id": id,
-    "createdAt": createdAt!.toIso8601String(),
-    "updatedAt": updatedAt!.toIso8601String(),
+    'description': description,
+    'amount': amount,
+    'staff': staff,
+    '_id': id,
+    'createdAt': createdAt!.toIso8601String(),
+    'updatedAt': updatedAt!.toIso8601String(),
   };
 }

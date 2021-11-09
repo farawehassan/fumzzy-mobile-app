@@ -29,19 +29,19 @@ class AllCustomers {
 
   /// Function to map customer's details from a JSON object
   factory AllCustomers.fromJson(Map<String, dynamic> json) => AllCustomers(
-    id: json["_id"],
-    name: json["name"],
-    reports: List<AllCustomerReport>.from(json["reports"].map((x) => AllCustomerReport.fromJson(x))),
-    createdAt: DateTime.parse(json["createdAt"]),
-    updatedAt: DateTime.parse(json["updatedAt"]),
+    id: json['_id'],
+    name: json['name'],
+    reports: List<AllCustomerReport>.from(json['reports'].map((x) => AllCustomerReport.fromJson(x))),
+    createdAt: DateTime.parse(json['createdAt']),
+    updatedAt: DateTime.parse(json['updatedAt']),
   );
 
   /// Function to map customer's details to a [Map<String, dynamic>] object
   Map<String, dynamic> toJson() => {
-    "_id": id,
-    "name": name,
-    "reports": List<dynamic>.from(reports!.map((x) => x.toJson())),
-    "createdAt": createdAt!.toIso8601String(),
-    "updatedAt": updatedAt!.toIso8601String(),
+    '_id': id,
+    'name': name,
+    'reports': List<dynamic>.from(reports!.map((x) => x.toJson())),
+    'createdAt': createdAt!.toIso8601String(),
+    'updatedAt': updatedAt!.toIso8601String(),
   };
 }

@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:fumzy/bloc/future-values.dart';
-import 'package:fumzy/model/purchases.dart';
 import 'package:fumzy/model/sales.dart';
 import 'package:fumzy/model/user.dart';
 import 'package:path_provider/path_provider.dart';
@@ -73,6 +72,24 @@ class SalesDataSource{
       header = {'Authorization': 'Bearer ${value.token}'};
     });
     return _netUtil.post(ADD_SALES, headers: header, body: body).then((dynamic res) {
+      if (res['error']) throw res['message'];
+      return res['message'];
+    }).catchError((e) {
+      errorHandler.handleError(e);
+    });
+  }
+
+  /// A function that sends request for adding a sale with [body] as details
+  /// A post request to use the [ADD_SALES] endpoint
+  /// It returns a [String]
+  Future<dynamic> deleteSales(Map<String, dynamic> body) async {
+    Map<String, String>? header;
+    Future<User> user = _futureValue.getCurrentUser();
+    await user.then((value) {
+      if(value.token == null) throw('You\'re not authorized, log out and log in back and try again!');
+      header = {'Authorization': 'Bearer ${value.token}'};
+    });
+    return _netUtil.delete(DELETE_SALE, headers: header, body: body).then((dynamic res) {
       if (res['error']) throw res['message'];
       return res['message'];
     }).catchError((e) {

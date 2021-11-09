@@ -13,7 +13,7 @@ class InventoryCard extends StatelessWidget {
 
   final String? cardName;
 
-  final int? totalPrice;
+  final double? totalPrice;
 
   final Color? cardColor;
 
@@ -62,7 +62,7 @@ class InventoryCard extends StatelessWidget {
               child: Text(
                 totalPrice == null
                     ? '#.##'
-                    : Functions.money(totalPrice!.toDouble(), 'N'),
+                    : Functions.money(totalPrice!, 'N'),
                 style: TextStyle(
                   fontSize: 23,
                   color: Colors.white,

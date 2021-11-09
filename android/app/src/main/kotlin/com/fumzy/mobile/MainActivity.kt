@@ -1,4 +1,4 @@
-package com.example.fumzy
+package com.fumzy.mobile
 
 import io.flutter.embedding.android.FlutterActivity
 

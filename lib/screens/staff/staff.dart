@@ -42,9 +42,16 @@ class _StaffState extends State<Staff> {
 
   bool _showSpinner = false;
 
+  Map<String, String> _statusValue = {
+    'active' : 'Active',
+    'block' : 'Blocked',
+    'delete' : 'Deleted'
+  };
+
   Map<String, Color> _statusColor = {
-    'Active Status Color' : Color(0xFF00AF27),
-    'Blocked Status Color' : Color(0xFF4B545A)
+    'active' : Color(0xFF00AF27),
+    'block' : Color(0xFF4B545A),
+    'delete' : Color(0xFFF64932),
   };
 
   /// A list to hold staff
@@ -79,14 +86,10 @@ class _StaffState extends State<Staff> {
     if(_filteredStaff.length > 0 && _filteredStaff.isNotEmpty){
       for(int i = 0; i < _filteredStaff.length; i++){
         Staffs staff = _filteredStaff[i];
-        String status = '';
-        staff.status! == 'active'
-            ? status = 'Active Status Color'
-            : status = 'Blocked Status Color';
         itemRow.add(
           DataRow(cells: [
             DataCell(Text(staff.name!)),
-            DataCell(Text(staff.status!,style: TextStyle(color: _statusColor[status]))),
+            DataCell(Text(_statusValue[staff.status!]!, style: TextStyle(color: _statusColor[staff.status!]))),
             DataCell(Text(Functions.getFormattedDateTime(staff.createdAt!))),
             DataCell(ReusablePopMenu(userId: staff.id!,)),
           ]),
@@ -237,7 +240,7 @@ class _StaffState extends State<Staff> {
                               ), //search
                               InkWell(
                                 onTap: () {
-                                  print("filter");
+                                  print('filter');
                                 },
                                 child: Container(
                                   width: 110,
@@ -627,10 +630,10 @@ class _StaffState extends State<Staff> {
     setDialogState(() => _showSpinner = true);
     var api = UserDataSource();
     Map<String, String> body = {
-      "name": _nameController.text,
-      "phone": _phoneController.text,
-      "type": "staff",
-      "pin": _newPin
+      'name': _nameController.text,
+      'phone': _phoneController.text,
+      'type': 'staff',
+      'pin': _newPin
     };
     await api.signUP(body).then((message)async{
       if(!mounted)return;

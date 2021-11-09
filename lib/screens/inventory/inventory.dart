@@ -37,23 +37,9 @@ class _InventoryState extends State<Inventory> {
   /// GlobalKey of a my RefreshIndicatorState to refresh my list items
   final GlobalKey<RefreshIndicatorState> _refreshCategoryKey = GlobalKey<RefreshIndicatorState>();
 
-  final _formKey = GlobalKey<FormState>();
-
-  TextEditingController _categoryController = TextEditingController();
-
   bool _showSpinner = false;
 
   TextEditingController _search = TextEditingController();
-
-  ///[CONTROLLERS] and [KEY] for [ADD PRODUCT DIALOG]
-  final _addProductFormKey = GlobalKey<FormState>();
-  Category? selectedCategory;
-  TextEditingController _productName = TextEditingController();
-  TextEditingController _productCategory = TextEditingController();
-  TextEditingController _costPrice = TextEditingController();
-  TextEditingController _sellingPrice = TextEditingController();
-  TextEditingController _quantity = TextEditingController();
-  TextEditingController _sellersName = TextEditingController();
 
   Map<String, Color> _stockColor = {
     'Short Stock': Color(0xFFF28301),
@@ -547,6 +533,8 @@ class _InventoryState extends State<Inventory> {
 
   /// Widget to show the dialog to add [CATEGORY]
   Future<void> _addNewCategory(BoxConstraints constraints) {
+    final formKey = GlobalKey<FormState>();
+    TextEditingController categoryController = TextEditingController();
     return showDialog(
       context: context,
       barrierColor: Color(0xFF000428).withOpacity(0.86),
@@ -636,7 +624,7 @@ class _InventoryState extends State<Inventory> {
                               Container(
                                 padding: const EdgeInsets.only(left: 20, right: 20),
                                 child: Form(
-                                  key: _formKey,
+                                  key: formKey,
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
@@ -652,7 +640,7 @@ class _InventoryState extends State<Inventory> {
                                           ),
                                           textInputAction: TextInputAction.done,
                                           keyboardType: TextInputType.name,
-                                          controller: _categoryController,
+                                          controller: categoryController,
                                           validator: (value) {
                                             if (value!.isEmpty) return 'Enter category name';
                                             return null;
@@ -675,8 +663,9 @@ class _InventoryState extends State<Inventory> {
                               Button(
                                 onTap: (){
                                   if(!_showSpinner){
-                                    if(_formKey.currentState!.validate()){
-                                      _createCategory(setDialogState);
+                                    if(formKey.currentState!.validate()){
+                                      Map<String, String> body = { 'name': categoryController.text };
+                                      _createCategory(body, setDialogState);
                                     }
                                   }
                                 },
@@ -733,11 +722,10 @@ class _InventoryState extends State<Inventory> {
   }
 
   /// function to make api call to [createCategory]
-  void _createCategory(StateSetter setDialogState) async{
+  void _createCategory(Map<String, String> body, StateSetter setDialogState) async{
     if(!mounted)return;
     setDialogState(() => _showSpinner = true);
     var api = ProductDataSource();
-    Map<String, String> body = { 'name': _categoryController.text };
     await api.createCategory(body).then((message) async{
       if(!mounted)return;
       setDialogState((){
@@ -969,6 +957,15 @@ class _InventoryState extends State<Inventory> {
 
   ///widget to show the dialog [ADD_NEW_PRODUCT]
   Future<void> _addNewProduct(BoxConstraints constraints) {
+    ///[CONTROLLERS] and [KEY] for [ADD PRODUCT DIALOG]
+    final addProductFormKey = GlobalKey<FormState>();
+    TextEditingController productName = TextEditingController();
+    TextEditingController productCategory = TextEditingController();
+    Category? selectedCategory;
+    TextEditingController costPrice = TextEditingController();
+    TextEditingController sellingPrice = TextEditingController();
+    TextEditingController quantity = TextEditingController();
+    TextEditingController sellersName = TextEditingController();
     return showDialog(
       context: context,
       barrierDismissible: false,
@@ -1057,7 +1054,7 @@ class _InventoryState extends State<Inventory> {
                             Container(
                               padding: const EdgeInsets.only(left: 20, right: 20),
                               child: Form(
-                                key: _addProductFormKey,
+                                key: addProductFormKey,
                                 child: Column(
                                   children: [
                                     //product name
@@ -1076,7 +1073,7 @@ class _InventoryState extends State<Inventory> {
                                             ),
                                             textInputAction: TextInputAction.next,
                                             keyboardType: TextInputType.text,
-                                            controller: _productName,
+                                            controller: productName,
                                             validator: (value) {
                                               if (value!.isEmpty) return 'Enter product name';
                                               return null;
@@ -1104,14 +1101,14 @@ class _InventoryState extends State<Inventory> {
                                           width: constraints.maxWidth,
                                           child: TypeAheadFormField(
                                             textFieldConfiguration: TextFieldConfiguration(
-                                              controller: _productCategory,
+                                              controller: productCategory,
                                               decoration: kTextFieldBorderDecoration.copyWith(
                                                 hintText: 'Category',
                                                 contentPadding: EdgeInsets.all(10),
                                               ),
                                             ),
                                             validator: (value) {
-                                              if (value!.isEmpty) return 'Select category';
+                                              if (value!.isEmpty || selectedCategory == null) return 'Select category';
                                               return null;
                                             },
                                             suggestionsCallback: (pattern) async {
@@ -1127,7 +1124,7 @@ class _InventoryState extends State<Inventory> {
                                               if (!mounted) return;
                                               setState(() {
                                                 selectedCategory = suggestion;
-                                                _productCategory.text = suggestion.name!;
+                                                productCategory.text = suggestion.name!;
                                               });
                                             },
                                           ),
@@ -1158,7 +1155,7 @@ class _InventoryState extends State<Inventory> {
                                                     inputFormatters: [
                                                       FilteringTextInputFormatter.allow(RegExp('[0-9.]')),
                                                     ],
-                                                    controller: _costPrice,
+                                                    controller: costPrice,
                                                     validator: (value) {
                                                       if (value!.isEmpty) return 'Enter amount';
                                                       return null;
@@ -1196,7 +1193,7 @@ class _InventoryState extends State<Inventory> {
                                                     inputFormatters: [
                                                       FilteringTextInputFormatter.allow(RegExp('[0-9.]')),
                                                     ],
-                                                    controller: _sellingPrice,
+                                                    controller: sellingPrice,
                                                     validator: (value) {
                                                       if (value!.isEmpty) return 'Enter amount';
                                                       return null;
@@ -1236,7 +1233,7 @@ class _InventoryState extends State<Inventory> {
                                             inputFormatters: [
                                               FilteringTextInputFormatter.allow(RegExp('[0-9.]')),
                                             ],
-                                            controller: _quantity,
+                                            controller: quantity,
                                             validator: (value) {
                                               if (value!.isEmpty) return 'Enter quantity';
                                               return null;
@@ -1270,7 +1267,7 @@ class _InventoryState extends State<Inventory> {
                                             ),
                                             textInputAction: TextInputAction.done,
                                             keyboardType: TextInputType.text,
-                                            controller: _sellersName,
+                                            controller: sellersName,
                                             validator: (value) {
                                               if (value!.isEmpty) return 'Enter seller\'s name';
                                               return null;
@@ -1295,8 +1292,18 @@ class _InventoryState extends State<Inventory> {
                             Button(
                               onTap: (){
                                 if(!_showSpinner){
-                                  if(_addProductFormKey.currentState!.validate()){
-                                    _addProduct(setDialogState);
+                                  if(addProductFormKey.currentState!.validate()){
+                                    Map<String, String> body = {
+                                      'productName': productName.text,
+                                      'category': productCategory.text,
+                                      'costPrice': costPrice.text,
+                                      'sellingPrice': sellingPrice.text,
+                                      'initialQty': quantity.text,
+                                      'currentQty': quantity.text,
+                                      'quantity': quantity.text,
+                                      'sellersName': sellersName.text,
+                                    };
+                                    _addProduct(body, setDialogState);
                                   }
                                 }
                               },
@@ -1352,20 +1359,10 @@ class _InventoryState extends State<Inventory> {
   }
 
   ///function to make api call to [ADD_PRODUCT]
-  void _addProduct(StateSetter setDialogState) async{
+  void _addProduct(Map<String, String> body, StateSetter setDialogState) async{
     if(!mounted)return;
     setDialogState(() => _showSpinner = true);
     var api = ProductDataSource();
-    Map<String, String> body = {
-      'productName': _productName.text,
-      'category': _productCategory.text,
-      'costPrice': _costPrice.text,
-      'sellingPrice': _sellingPrice.text,
-      'initialQty': _quantity.text,
-      'currentQty': _quantity.text,
-      'quantity': _quantity.text,
-      'sellersName': _sellersName.text,
-    };
     await api.addProduct(body).then((message) async{
       if(!mounted)return;
       setDialogState((){

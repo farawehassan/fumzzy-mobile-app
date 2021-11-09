@@ -13,9 +13,9 @@ import 'package:fumzy/model/customer-names.dart';
 import 'package:fumzy/model/product.dart';
 import 'package:fumzy/networking/customer-datasource.dart';
 import 'package:fumzy/networking/sales-datasource.dart';
-import 'package:fumzy/screens/dashboard/drawer.dart';
 import 'package:fumzy/utils/constant-styles.dart';
 import 'package:fumzy/utils/functions.dart';
+import 'print-receipt.dart';
 
 enum PaymentMode { cash, transfer }
 
@@ -199,6 +199,7 @@ class _AddSaleState extends State<AddSale> {
               ),
             ),
           ),
+          floatingActionButtonLocation: FloatingActionButtonLocation.miniEndTop,
         )),
       ),
     );
@@ -407,14 +408,13 @@ class _AddSaleState extends State<AddSale> {
   }
 
   List<String> paymentStatus = [
-    "Fully Paid",
-    "Part Paid",
-    "Credit",
+    'Fully Paid',
+    'Part Paid',
+    'Credit',
   ];
 
   Future<void> _checkout(BoxConstraints constraints) {
     final formKey = GlobalKey<FormState>();
-    TextEditingController discount = TextEditingController();
     CustomerName? selectedCustomer;
     TextEditingController customer = TextEditingController();
     TextEditingController amountPaid = TextEditingController();
@@ -423,8 +423,6 @@ class _AddSaleState extends State<AddSale> {
     DateTime? dueDateTime;
 
     String? selectedPaymentStatus = 'Fully Paid';
-
-    double totalPayableAmount = _totalPrice;
 
     double balance = 0;
 
@@ -529,66 +527,6 @@ class _AddSaleState extends State<AddSale> {
                                           Functions.money(_totalPrice, 'N'),
                                           style: TextStyle(
                                             color: Color(0xFF1F1F1F),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 20),
-                                    // Discount
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text('Discount'),
-                                        SizedBox(height: 10),
-                                        Container(
-                                          width: constraints.maxWidth,
-                                          child: TextFormField(
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.normal,
-                                            ),
-                                            textInputAction: TextInputAction.next,
-                                            keyboardType: TextInputType.number,
-                                            inputFormatters: [
-                                              FilteringTextInputFormatter.allow(RegExp('[0-9.]')),
-                                            ],
-                                            onChanged: (value){
-                                              if(!mounted)return;
-                                              setDialogState(() {
-                                                try{
-                                                  totalPayableAmount = _totalPrice - double.parse(value);
-                                                } catch(e){
-                                                  totalPayableAmount = _totalPrice;
-                                                }
-                                              });
-                                            },
-                                            controller: discount,
-                                            decoration: kTextFieldBorderDecoration.copyWith(
-                                              hintText: 'N Enter discount amount',
-                                              hintStyle: TextStyle(
-                                                color: Colors.black.withOpacity(0.5),
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.normal,
-                                              ),
-                                              contentPadding: EdgeInsets.all(10),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 20),
-                                    // Total amount payable
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text('Total Amount Payable'),
-                                        SizedBox(height: 11),
-                                        Text(
-                                          Functions.money(totalPayableAmount, 'N'),
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.w700,
                                           ),
                                         ),
                                       ],
@@ -920,67 +858,144 @@ class _AddSaleState extends State<AddSale> {
                               ),
                             ),
                             SizedBox(height: 40),
-                            Button(
-                              onTap: (){
-                                if(formKey.currentState!.validate()){
-                                  Map<String, dynamic> body = {};
-                                  if(selectedCustomer == null){
-                                    body['name'] = customer.text;
-                                  }
-                                  else {
-                                    body['id'] = selectedCustomer!.id;
-                                    body['name'] = selectedCustomer!.name;
-                                  }
+                            Row(
+                              children: [
+                                SizedBox(width: 10),
+                                Expanded(
+                                  child: Button(
+                                    onTap: (){
+                                      if(!_showSpinner){
+                                        if(formKey.currentState!.validate()){
+                                          Map<String, dynamic> body = {};
+                                          if(selectedCustomer == null){
+                                            body['name'] = customer.text;
+                                          }
+                                          else {
+                                            body['id'] = selectedCustomer!.id;
+                                            body['name'] = selectedCustomer!.name;
+                                          }
 
-                                  List<dynamic> reports = [];
-                                  for(int i = 0; i < _realSalesData.length; i++){
-                                    reports.add(
-                                        {
-                                          'quantity': _realSalesData[i]['quantity'],
-                                          'productName': _realSalesData[i]['product'].productName,
-                                          'costPrice': _realSalesData[i]['product'].costPrice,
-                                          'unitPrice': _realSalesData[i]['sellingPrice'],
-                                          'totalPrice': _realSalesData[i]['total']
+                                          List<dynamic> reports = [];
+                                          for(int i = 0; i < _realSalesData.length; i++){
+                                            reports.add(
+                                                {
+                                                  'quantity': _realSalesData[i]['quantity'],
+                                                  'productName': _realSalesData[i]['product'].productName,
+                                                  'costPrice': _realSalesData[i]['product'].costPrice,
+                                                  'unitPrice': _realSalesData[i]['sellingPrice'],
+                                                  'totalPrice': _realSalesData[i]['total']
+                                                }
+                                            );
+                                          }
+                                          body['report'] = reports;
+                                          body['totalAmount'] = _totalPrice;
+                                          body['paymentMade'] = amountPaid.text;
+                                          body['paid'] = selectedPaymentStatus == 'Fully Paid' ? true : false;
+                                          body['soldAt'] = DateTime.now().toIso8601String();
+                                          if(selectedPaymentStatus == 'Fully Paid'){
+                                            body['paymentReceivedAt'] = DateTime.now().toIso8601String();
+                                          }
+                                          else {
+                                            body['dueDate'] = dueDateTime!.toIso8601String();
+                                          }
+                                          String mode = _paymentMode == PaymentMode.cash
+                                              ? 'Cash' : 'Transfer' ;
+                                          if(!mounted)return;
+                                          setDialogState(() => _showSpinner = true);
+                                          if(selectedCustomer == null){
+                                            _addSales(mode, customer.text, ()=> _addNewCustomer(body, setDialogState, false));
+                                          }
+                                          else {
+                                            _addSales(mode, selectedCustomer!.name!, ()=> _addNewReportsCustomer(body, setDialogState, false));
+                                          }
                                         }
-                                    );
-                                  }
-                                  body['report'] = reports;
-                                  body['totalAmount'] = _totalPrice;
-                                  body['paymentMade'] = amountPaid.text;
-                                  body['paid'] = selectedPaymentStatus == 'Fully Paid' ? true : false;
-                                  body['soldAt'] = DateTime.now().toIso8601String();
-                                  if(selectedPaymentStatus == 'Fully Paid'){
-                                    body['paymentReceivedAt'] = DateTime.now().toIso8601String();
-                                  }
-                                  else {
-                                    body['dueDate'] = dueDateTime!.toIso8601String();
-                                  }
-                                  String mode = _paymentMode == PaymentMode.cash
-                                      ? 'Cash' : 'Transfer' ;
-                                  if(!mounted)return;
-                                  setDialogState(() => _showSpinner = true);
-                                  if(selectedCustomer == null){
-                                    _addSales(mode, customer.text, ()=> _addNewCustomer(body, setDialogState));
-                                  }
-                                  else {
-                                    _addSales(mode, selectedCustomer!.name!, ()=> _addNewReportsCustomer(body, setDialogState));
-                                  }
-                                }
-                              },
-                              buttonColor: Color(0xFF00509A),
-                              child: Center(
-                                child: _showSpinner
-                                    ? CircleProgressIndicator()
-                                    : Text(
-                                  'Generate Invoice',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Color(0xFFFFFFFF),
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.normal,
+                                      }
+                                    },
+                                    buttonColor: Color(0xFF00509A),
+                                    child: Center(
+                                      child: _showSpinner
+                                          ? CircleProgressIndicator()
+                                          : Text(
+                                        'Save',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: Color(0xFFFFFFFF),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.normal,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
+                                SizedBox(width: 20),
+                                Expanded(
+                                  child: Button(
+                                    onTap: (){
+                                      if(!_showSpinner){
+                                        if(formKey.currentState!.validate()){
+                                          Map<String, dynamic> body = {};
+                                          if(selectedCustomer == null){
+                                            body['name'] = customer.text;
+                                          }
+                                          else {
+                                            body['id'] = selectedCustomer!.id;
+                                            body['name'] = selectedCustomer!.name;
+                                          }
+
+                                          List<dynamic> reports = [];
+                                          for(int i = 0; i < _realSalesData.length; i++){
+                                            reports.add(
+                                                {
+                                                  'quantity': _realSalesData[i]['quantity'],
+                                                  'productName': _realSalesData[i]['product'].productName,
+                                                  'costPrice': _realSalesData[i]['product'].costPrice,
+                                                  'unitPrice': _realSalesData[i]['sellingPrice'],
+                                                  'totalPrice': _realSalesData[i]['total']
+                                                }
+                                            );
+                                          }
+                                          body['report'] = reports;
+                                          body['totalAmount'] = _totalPrice;
+                                          body['paymentMade'] = amountPaid.text;
+                                          body['paid'] = selectedPaymentStatus == 'Fully Paid' ? true : false;
+                                          body['soldAt'] = DateTime.now().toIso8601String();
+                                          if(selectedPaymentStatus == 'Fully Paid'){
+                                            body['paymentReceivedAt'] = DateTime.now().toIso8601String();
+                                          }
+                                          else {
+                                            body['dueDate'] = dueDateTime!.toIso8601String();
+                                          }
+                                          String mode = _paymentMode == PaymentMode.cash
+                                              ? 'Cash' : 'Transfer' ;
+                                          if(!mounted)return;
+                                          setDialogState(() => _showSpinner = true);
+                                          if(selectedCustomer == null){
+                                            _addSales(mode, customer.text, ()=> _addNewCustomer(body, setDialogState, true));
+                                          }
+                                          else {
+                                            _addSales(mode, selectedCustomer!.name!, ()=> _addNewReportsCustomer(body, setDialogState, true));
+                                          }
+                                        }
+                                      }
+                                    },
+                                    buttonColor: Color(0xFF00509A),
+                                    child: Center(
+                                      child: _showSpinner
+                                          ? CircleProgressIndicator()
+                                          : Text(
+                                        'Print & Save',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: Color(0xFFFFFFFF),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.normal,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 10),
+                              ],
                             ),
                             SizedBox(height: 20),
                             TextButton(
@@ -1161,7 +1176,7 @@ class _AddSaleState extends State<AddSale> {
                         SizedBox(height: 60),
                         Button(
                           onTap: (){
-                            print("Download");
+                            print('Download');
                           },
                           buttonColor: Color(0xFF00509A),
                           child: Center(
@@ -1179,7 +1194,7 @@ class _AddSaleState extends State<AddSale> {
                         SizedBox(height: 20),
                         TextButton(
                           onPressed: () {
-                            print("share");
+                            print('share');
                           },
                           child: Container(
                             width: 130,
@@ -1216,7 +1231,7 @@ class _AddSaleState extends State<AddSale> {
         'costPrice': _realSalesData[i]['product'].costPrice,
         'unitPrice': _realSalesData[i]['sellingPrice'],
         'totalPrice': _realSalesData[i]['total'],
-        "paymentMode": paymentMode
+        'paymentMode': paymentMode
       };
       await api.addSales(body).then((message) async{
         print('saved');
@@ -1229,7 +1244,7 @@ class _AddSaleState extends State<AddSale> {
     await next();
   }
 
-  Future<void> _addNewCustomer(Map<String, dynamic> body, StateSetter setDialogState) async{
+  Future<void> _addNewCustomer(Map<String, dynamic> body, StateSetter setDialogState, bool receipt) async{
     if(!mounted)return;
     setDialogState(() => _showSpinner = true);
     var api = CustomerDataSource();
@@ -1240,6 +1255,7 @@ class _AddSaleState extends State<AddSale> {
         Navigator.pop(context);
       });
       Functions.showSuccessMessage('Successfully added sales');
+      if(receipt) _printReceipt(body);
     }).catchError((e){
       if(!mounted)return;
       setDialogState(()=> _showSpinner = false);
@@ -1248,7 +1264,7 @@ class _AddSaleState extends State<AddSale> {
     });
   }
 
-  Future<void> _addNewReportsCustomer(Map<String, dynamic> body, StateSetter setDialogState) async{
+  Future<void> _addNewReportsCustomer(Map<String, dynamic> body, StateSetter setDialogState, bool receipt) async{
     if(!mounted)return;
     setDialogState(() => _showSpinner = true);
     var api = CustomerDataSource();
@@ -1259,12 +1275,25 @@ class _AddSaleState extends State<AddSale> {
         Navigator.pop(context);
       });
       Functions.showSuccessMessage('Successfully added sales');
+      if(receipt) _printReceipt(body);
     }).catchError((e){
       if(!mounted)return;
       setDialogState(()=> _showSpinner = false);
       print(e);
       Functions.showErrorMessage(e);
     });
+  }
+
+  void _printReceipt(Map<String, dynamic> body){
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PrintReceipt(
+            reports: body,
+            paymentMode: _paymentMode == PaymentMode.cash ? 'Cash' : 'Transfer'
+        ),
+      ),
+    );
   }
 
 }

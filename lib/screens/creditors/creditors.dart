@@ -302,7 +302,7 @@ class _CreditorsState extends State<Creditors> {
                             ), //search
                             InkWell(
                               onTap: () {
-                                print("filter");
+                                print('filter');
                               },
                               child: Container(
                                 width: 110,
@@ -572,10 +572,10 @@ class _CreditorsState extends State<Creditors> {
                                   onTap: (){
                                     if(formKey.currentState!.validate()){
                                       Map<String, dynamic> body = {
-                                        "name": creditorController.text,
-                                        "amount": amountController.text,
-                                        "paymentMade": 0,
-                                        "description": referenceController.text
+                                        'name': creditorController.text,
+                                        'amount': amountController.text,
+                                        'paymentMade': 0,
+                                        'description': referenceController.text
                                       };
                                       _addCreditor(body, setDialogState);
                                     }

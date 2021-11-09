@@ -99,7 +99,7 @@ Widget _tabletLayout(BoxConstraints constraints){
                 //filter
                 InkWell(
                   onTap: () {
-                    print("filter");
+                    print('filter');
                   },
                   child: Container(
                     width: 110,
@@ -137,7 +137,7 @@ Widget _tabletLayout(BoxConstraints constraints){
                 //refresh
                 Button(
                   onTap: () {
-                    print("Refresh");
+                    print('Refresh');
                   },
                   buttonColor: Color(0xFF00509A),
                   width: 100,
@@ -190,7 +190,7 @@ Widget _tabletLayout(BoxConstraints constraints){
                         splashColor: Color(0xFFF7FCFF),
                         highlightColor: Color(0xFFF7FCFF),
                         onTap: () {
-                          print("tapped");
+                          print('tapped');
                         },
                         child: Container(
                           padding: EdgeInsets.fromLTRB(20, 30, 15, 14),
@@ -298,7 +298,7 @@ Widget _mobileLayout(BoxConstraints constraints){
             //filter
             InkWell(
               onTap: () {
-                print("filter");
+                print('filter');
               },
               child: Container(
                 width: 110,
@@ -336,7 +336,7 @@ Widget _mobileLayout(BoxConstraints constraints){
             //refresh
             Button(
               onTap: () {
-                print("Refresh");
+                print('Refresh');
               },
               buttonColor: Color(0xFF00509A),
               width: 100,

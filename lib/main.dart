@@ -1,9 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fumzy/screens/creditors/creditors-detail/creditor-detail.dart';
 import 'package:fumzy/screens/notification/mobile-notification-content.dart';
+import 'package:fumzy/screens/products/products-only.dart';
 import 'screens/inventory/inventory.dart';
-import 'screens/invoices/invoices.dart';
 import 'screens/splash-screen.dart';
 import 'screens/creditors/creditors.dart';
 import 'screens/dashboard/dashboard.dart';
@@ -12,10 +11,6 @@ import 'screens/settings/settings.dart';
 import 'screens/staff/staff.dart';
 import 'screens/customers/customers.dart';
 import 'screens/transactions/transactions.dart';
-import 'screens/customers/customer-detail/customer-detail.dart';
-import 'screens/inventory/inventory-detail/inventory-detail.dart';
-import 'screens/transactions/sales-info.dart';
-import 'screens/transactions/expense-info.dart';
 import 'screens/transactions/purchase-info.dart';
 import 'screens/transactions/add-sale.dart';
 import 'screens/notification/notifications.dart';
@@ -49,7 +44,7 @@ class _MyAppState extends State<MyApp> {
           backgroundColor: Color(0xFFFFFFFF),
           centerTitle: false
         ),
-        fontFamily: "Overpass",
+        fontFamily: 'Overpass',
         cupertinoOverrideTheme: CupertinoThemeData(
           brightness: Brightness.dark,
         ),
@@ -75,15 +70,10 @@ class _MyAppState extends State<MyApp> {
         Staff.id: (context) => Staff(),
         Settings.id: (context) => Settings(),
         Creditors.id: (context) => Creditors(),
-        CreditorsDetail.id: (context) => CreditorsDetail(),
         Transactions.id: (context) => Transactions(),
         Inventory.id: (context) => Inventory(),
-        Invoices.id: (context) => Invoices(),
+        ProductsOnly.id: (context) => ProductsOnly(),
         Customers.id: (context) => Customers(),
-        CustomersDetail.id: (context) => CustomersDetail(),
-        InventoryDetail.id: (context) => InventoryDetail(),
-        SalesInfo.id: (context) => SalesInfo(),
-        ExpenseInfo.id: (context) => ExpenseInfo(),
         PurchaseInfo.id: (context) => PurchaseInfo(),
         AddSale.id: (context) => AddSale(),
         Notifications.id: (context) => Notifications(),

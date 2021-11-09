@@ -37,23 +37,23 @@ class Purchase {
 
   /// Function to map purchase's details from a JSON object
   factory Purchase.fromJson(Map<String, dynamic> json) => Purchase(
-    id: json["_id"],
-    product: Product.fromJson(json["product"]),
-    costPrice: double.parse(json["costPrice"].toString()),
-    sellingPrice: double.parse(json["sellingPrice"].toString()),
-    quantity: double.parse(json["quantity"].toString()),
-    createdAt: DateTime.parse(json["createdAt"]),
-    updatedAt: DateTime.parse(json["updatedAt"]),
+    id: json['_id'],
+    product: Product.fromJson(json['product']),
+    costPrice: double.parse(json['costPrice'].toString()),
+    sellingPrice: double.parse(json['sellingPrice'].toString()),
+    quantity: double.parse(json['quantity'].toString()),
+    createdAt: DateTime.parse(json['createdAt']),
+    updatedAt: DateTime.parse(json['updatedAt']),
   );
 
   /// Function to map purchase's details to a [Map<String, dynamic>] object
   Map<String, dynamic> toJson() => {
-    "_id": id,
-    "product": product!.toJson(),
-    "costPrice": costPrice,
-    "sellingPrice": sellingPrice,
-    "quantity": quantity,
-    "createdAt": createdAt!.toIso8601String(),
-    "updatedAt": updatedAt!.toIso8601String(),
+    '_id': id,
+    'product': product!.toJson(),
+    'costPrice': costPrice,
+    'sellingPrice': sellingPrice,
+    'quantity': quantity,
+    'createdAt': createdAt!.toIso8601String(),
+    'updatedAt': updatedAt!.toIso8601String(),
   };
 }

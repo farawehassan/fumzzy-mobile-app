@@ -40,7 +40,7 @@ class Button extends StatelessWidget {
       onPressed: onTap,
       child: Container(
         width: width ?? 179,
-        height: 50,
+        height: height ?? 50,
         child: child,
       ),
     );

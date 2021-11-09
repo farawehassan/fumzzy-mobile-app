@@ -248,7 +248,7 @@ class CustomerDataSource{
       if(value.token == null) throw('You\'re not authorized, log out and log in back and try again!');
       header = {'Authorization': 'Bearer ${value.token}'};
     });
-    return _netUtil.post(UPDATE_CUSTOMER_REPORT, headers: header, body: body).then((dynamic res) {
+    return _netUtil.put(UPDATE_CUSTOMER_REPORT, headers: header, body: body).then((dynamic res) {
       if (res['error']) throw res['message'];
       return res['message'];
     }).catchError((e) {
@@ -267,7 +267,7 @@ class CustomerDataSource{
       if(value.token == null) throw('You\'re not authorized, log out and log in back and try again!');
       header = {'Authorization': 'Bearer ${value.token}'};
     });
-    return _netUtil.post(UPDATE_PAYMENT_MADE_REPORT, headers: header, body: body).then((dynamic res) {
+    return _netUtil.put(UPDATE_PAYMENT_MADE_REPORT, headers: header, body: body).then((dynamic res) {
       if (res['error']) throw res['message'];
       return res['message'];
     }).catchError((e) {
@@ -305,7 +305,7 @@ class CustomerDataSource{
       if(value.token == null) throw('You\'re not authorized, log out and log in back and try again!');
       header = {'Authorization': 'Bearer ${value.token}'};
     });
-    return _netUtil.post(REMOVE_CUSTOMER_REPORT, headers: header, body: body).then((dynamic res) {
+    return _netUtil.put(REMOVE_CUSTOMER_REPORT, headers: header, body: body).then((dynamic res) {
       if (res['error']) throw res['message'];
       return res['message'];
     }).catchError((e) {

@@ -1,61 +1,62 @@
-
-///A class to hold my [STORE] model
+/// A class to hold my [Store] model
 
 class Store {
+
   Store({
     this.inventoryCostPrice,
     this.inventorySellingPrice,
     this.inventoryProfit,
     this.inventoryItems,
-    this.totalSales,
-    this.totalPurchases,
-    this.totalExpenses,
-    this.totalProfitMade,
+    this.outstandingSales,
+    this.outstandingSalesVolume,
+    this.outstandingPurchase,
+    this.outstandingPurchaseVolume,
   });
 
   /// This variable holds the store inventory cost price
-  int? inventoryCostPrice;
+  double? inventoryCostPrice;
 
   /// This variable holds the store inventory selling price
-  int? inventorySellingPrice;
+  double? inventorySellingPrice;
 
   /// This variable holds the store inventory profit
-  int? inventoryProfit;
+  double? inventoryProfit;
 
   /// This variable holds the store inventory items
-  int? inventoryItems;
+  double? inventoryItems;
 
-  /// This variable holds the store total sales
-  int? totalSales;
+  /// This variable holds the store total outstanding sales
+  double? outstandingSales;
 
-  /// This variable holds the store total purchase
-  int? totalPurchases;
+  /// This variable holds the store total outstanding sales volume
+  int? outstandingSalesVolume;
 
-  /// This variable holds the store total expenses
-  int? totalExpenses;
+  /// This variable holds the store total outstanding purchase
+  double? outstandingPurchase;
 
-  /// This variable holds the store total profit made
-  int? totalProfitMade;
+  /// This variable holds the store total outstanding purchase volume
+  int? outstandingPurchaseVolume;
 
   factory Store.fromJson(Map<String, dynamic> json) => Store(
-    inventoryCostPrice: json["inventoryCostPrice"],
-    inventorySellingPrice: json["inventorySellingPrice"],
-    inventoryProfit: json["inventoryProfit"],
-    inventoryItems: json["inventoryItems"],
-    totalSales: json["totalSales"],
-    totalPurchases: json["totalPurchases"],
-    totalExpenses: json["totalExpenses"],
-    totalProfitMade: json["totalProfitMade"],
+    inventoryCostPrice: double.parse(json['inventoryCostPrice'].toString()),
+    inventorySellingPrice: double.parse(json['inventorySellingPrice'].toString()),
+    inventoryProfit: double.parse(json['inventoryProfit'].toString()),
+    inventoryItems: double.parse(json['inventoryItems'].toString()),
+    outstandingSales: double.parse(json['outstandingSales'].toString()),
+    outstandingSalesVolume: int.parse(json['outstandingSalesVolume'].toString()),
+    outstandingPurchase: double.parse(json['outstandingPurchase'].toString()),
+    outstandingPurchaseVolume: int.parse(json['outstandingPurchaseVolume'].toString()),
   );
 
   Map<String, dynamic> toJson() => {
-    "inventoryCostPrice": inventoryCostPrice,
-    "inventorySellingPrice": inventorySellingPrice,
-    "inventoryProfit": inventoryProfit,
-    "inventoryItems": inventoryItems,
-    "totalSales": totalSales,
-    "totalPurchases": totalPurchases,
-    "totalExpenses": totalExpenses,
-    "totalProfitMade": totalProfitMade,
+    'inventoryCostPrice': inventoryCostPrice,
+    'inventorySellingPrice': inventorySellingPrice,
+    'inventoryProfit': inventoryProfit,
+    'inventoryItems': inventoryItems,
+    'outstandingSales': outstandingSales,
+    'outstandingSalesVolume': outstandingSalesVolume,
+    'outstandingPurchase': outstandingPurchase,
+    'outstandingPurchaseVolume': outstandingPurchaseVolume,
   };
+  
 }

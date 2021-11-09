@@ -5,6 +5,7 @@ import 'package:fumzy/model/creditor.dart';
 import 'package:fumzy/model/customer-names.dart';
 import 'package:fumzy/model/expense.dart';
 import 'package:fumzy/model/product.dart';
+import 'package:fumzy/model/store-charts.dart';
 import 'package:fumzy/model/store.dart';
 import 'package:fumzy/model/user.dart';
 import 'package:fumzy/model/staffs.dart';
@@ -150,9 +151,18 @@ class FutureValues{
   /// A function that fetches all customers name in the database with the help of
   /// [StoreDataSource]
   /// It returns model [Store]
-  Future<Store> getStoreInformation() async{
+  Future<Store> getStoreInformation({bool? refresh}) async{
     var data = StoreDataSource();
-    Future<Store> store = data.getAllStoreInformation();
+    Future<Store> store = data.getAllStoreInformation(refresh: refresh);
+    return store;
+  }
+
+  /// A function that fetches all customers name in the database with the help of
+  /// [StoreDataSource]
+  /// It returns model [StoreCharts]
+  Future<StoreCharts> getStoreChartsInformation({bool? refresh}) async{
+    var data = StoreDataSource();
+    Future<StoreCharts> store = data.getAllStoreChartsInformation(refresh: refresh);
     return store;
   }
 

@@ -265,8 +265,8 @@ class _LoginState extends State<Login> {
     setState(()=> _showSpinner = true);
     var api = UserDataSource();
     Map<String, String> body = {
-      "name": _nameController.text,
-      "pin": _pin
+      'name': _nameController.text,
+      'pin': _pin
     };
     await api.signIn(body).then((User user) async {
       if(!mounted)return;

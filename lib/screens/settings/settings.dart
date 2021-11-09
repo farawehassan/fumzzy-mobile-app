@@ -280,8 +280,8 @@ class _SettingsState extends State<Settings> {
     setState(() => _showSpinner = true);
     var api = UserDataSource();
     Map<String, String> body = {
-      "name": _nameController.text,
-      "phone": _phoneController.text,
+      'name': _nameController.text,
+      'phone': _phoneController.text,
     };
     await api.editUser(body).then((message) async{
       if(!mounted)return;
@@ -315,7 +315,7 @@ class _SettingsState extends State<Settings> {
                     if(_securityFormKey.currentState!.validate()){
                       if(_currentPin.length == 4 && _newPin.length == 4){
                         if(_currentPin != _newPin) _changeUserPin();
-                        Functions.showErrorMessage("You cannot use this pin because it is your current PIN");
+                        Functions.showErrorMessage('You cannot use this pin because it is your current PIN');
                       }
                     }
                   }
@@ -566,8 +566,8 @@ class _SettingsState extends State<Settings> {
     setState(() => _showSpinner = true);
     var api = UserDataSource();
     Map<String, String> body = {
-      "currentPin": _currentPin,
-      "newPin": _newPin,
+      'currentPin': _currentPin,
+      'newPin': _newPin,
     };
     await api.changePin(body).then((message) async{
       if(!mounted)return;

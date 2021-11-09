@@ -40,15 +40,15 @@ class DatabaseHelper {
   /// Function to execute sqlite statement to create a new table and its fields
   void _onCreate(Database db, int version) async {
     // When creating the db, create the table
-    await db.execute("CREATE TABLE $USER_TABLE("
-        "id TEXT PRIMARY KEY NOT NULL,"
-        "name TEXT NOT NULL,"
-        "phone TEXT,"
-        "type TEXT,"
-        "status TEXT,"
-        "createdAt TEXT,"
-        "updatedAt TEXT,"
-        "token TEXT)");
+    await db.execute('CREATE TABLE $USER_TABLE('
+        'id TEXT PRIMARY KEY NOT NULL,'
+        'name TEXT NOT NULL,'
+        'phone TEXT,'
+        'type TEXT,'
+        'status TEXT,'
+        'createdAt TEXT,'
+        'updatedAt TEXT,'
+        'token TEXT)');
     print('Created tables');
   }
 

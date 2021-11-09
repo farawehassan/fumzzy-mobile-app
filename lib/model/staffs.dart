@@ -1,4 +1,4 @@
-///A class to hold my [STAFF] model
+///A class to hold my [Staffs] model
 
 class Staffs {
   Staffs({
@@ -33,22 +33,22 @@ class Staffs {
   DateTime? updatedAt;
 
   factory Staffs.fromJson(Map<String, dynamic> json) => Staffs(
-    id: json["_id"],
-    name: json["name"],
-    phone: json["phone"],
-    type: json["type"],
-    status: json["status"],
-    createdAt: DateTime.parse(json["createdAt"]),
-    updatedAt: DateTime.parse(json["updatedAt"]),
+    id: json['_id'],
+    name: json['name'],
+    phone: json['phone'],
+    type: json['type'],
+    status: json['status'],
+    createdAt: DateTime.parse(json['createdAt']),
+    updatedAt: DateTime.parse(json['updatedAt']),
   );
 
   Map<String, dynamic> toJson() => {
-    "_id": id,
-    "name": name,
-    "phone": phone,
-    "type": type,
-    "status": status,
-    "createdAt": createdAt!.toIso8601String(),
-    "updatedAt": updatedAt!.toIso8601String(),
+    '_id': id,
+    'name': name,
+    'phone': phone,
+    'type': type,
+    'status': status,
+    'createdAt': createdAt!.toIso8601String(),
+    'updatedAt': updatedAt!.toIso8601String(),
   };
 }

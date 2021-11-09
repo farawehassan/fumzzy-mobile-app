@@ -486,7 +486,7 @@ class _TransactionsState extends State<Transactions> {
                   sale: sale,
                 ),
               ),
-            );
+            ).then((value) => _refreshSales());
           }),
         );
       }
@@ -630,7 +630,7 @@ class _TransactionsState extends State<Transactions> {
                           children: [
                             TextButton(
                               onPressed: () {
-                                _addExpense(constraints);
+                                _addExpense(constraints).then((value) => _refreshExpenses());
                               },
                               child: Container(
                                 color: Colors.transparent,
@@ -723,7 +723,7 @@ class _TransactionsState extends State<Transactions> {
                         ), //search
                         InkWell(
                           onTap: () {
-                            print("filter");
+                            print('filter');
                           },
                           child: Container(
                             width: 110,
@@ -974,8 +974,8 @@ class _TransactionsState extends State<Transactions> {
                                   if(!_showSpinner){
                                     if(_expenseFormKey.currentState!.validate()){
                                       Map<String, dynamic> body = {
-                                        "description": expenseDescription.text,
-                                        "amount": expenseAmount.text,
+                                        'description': expenseDescription.text,
+                                        'amount': expenseAmount.text,
                                       };
                                       _createExpense(setDialogState, body);
                                     }
@@ -1444,14 +1444,14 @@ class _TransactionsState extends State<Transactions> {
     setDialogState(() => _showSpinner = true);
     var api = ProductDataSource();
     Map<String, String> body = {
-      "productName": _productName.text,
-      "category": _productCategory.text,
-      "costPrice": _costPrice.text,
-      "sellingPrice": _sellingPrice.text,
-      "initialQty": _quantity.text,
-      "currentQty": _quantity.text,
-      "quantity": _quantity.text,
-      "sellersName": _sellersName.text,
+      'productName': _productName.text,
+      'category': _productCategory.text,
+      'costPrice': _costPrice.text,
+      'sellingPrice': _sellingPrice.text,
+      'initialQty': _quantity.text,
+      'currentQty': _quantity.text,
+      'quantity': _quantity.text,
+      'sellersName': _sellersName.text,
     };
     await api.addProduct(body).then((message) async{
       if(!mounted)return;

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:fumzy/bloc/future-values.dart';
 import 'package:fumzy/database/user-db-helper.dart';
+import 'package:fumzy/model/user.dart';
 import 'package:fumzy/screens/notification/notifications.dart';
 import 'package:fumzy/screens/settings/settings.dart';
 import 'package:fumzy/screens/creditors/creditors.dart';
 import 'package:fumzy/screens/staff/staff.dart';
 import 'package:fumzy/screens/inventory/inventory.dart';
-import 'package:fumzy/screens/invoices/invoices.dart';
+import 'package:fumzy/screens/products/products-only.dart';
 import 'package:fumzy/screens/transactions/transactions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../splash-screen.dart';
@@ -28,12 +31,32 @@ class RefactoredDrawer extends StatefulWidget {
 
 class _RefactoredDrawerState extends State<RefactoredDrawer> {
 
+  /// Instantiating a class of the [FutureValues]
+  var futureValue = FutureValues();
+
+  /// This is a variable that holds if the user is admin or not
+  bool _isAdmin = false;
+
+  /// Function to fetch the user's details and check if user is admin or not to
+  /// set to [_isAdmin]
+  void _getCurrentUser() async {
+    await futureValue.getCurrentUser().then((User value) async {
+      if(!mounted)return;
+      setState(() => _isAdmin = value.type! == 'admin');
+    }).catchError((e) {
+      print(e);
+    });
+  }
+
   Color _getColor (String title){
-    if(widget.title == title){
-      return Colors.white;
-    } else {
-      return Colors.white.withOpacity(0.7);
-    }
+    if(widget.title == title) return Colors.white;
+    else return Colors.white.withOpacity(0.7);
+  }
+
+  @override
+  void initState() {
+    _getCurrentUser();
+    super.initState();
   }
 
   @override
@@ -143,6 +166,7 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                         onTap: () {
                           Navigator.pop(context);
                           if(widget.title != 'DASHBOARD'){
+                            HapticFeedback.lightImpact();
                             Navigator.pushReplacementNamed(context, Dashboard.id);
                           }
                         },
@@ -165,6 +189,7 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                         onTap: () {
                           Navigator.pop(context);
                           if(widget.title != 'TRANSACTIONS'){
+                            HapticFeedback.lightImpact();
                             Navigator.pushReplacementNamed(context, Transactions.id);
                           }
                         },
@@ -187,29 +212,31 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                         onTap: () {
                           Navigator.pop(context);
                           if(widget.title != 'INVENTORY'){
+                            HapticFeedback.lightImpact();
                             Navigator.pushReplacementNamed(context, Inventory.id);
                           }
                         },
                       ),
-                      // Invoices
+                      // Products only
                       ListTile(
                         leading: Icon(
                           IconlyBold.document,
-                          color: _getColor('INVOICES'),
+                          color: _getColor('PRODUCTS'),
                           size: 20,
                         ),
                         title: Text(
-                          'Invoices',
+                          'Products',
                           style: TextStyle(
-                            color: _getColor('INVOICES'),
+                            color: _getColor('PRODUCTS'),
                             fontSize: 17,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                         onTap: () {
                           Navigator.pop(context);
-                          if(widget.title != 'INVOICES'){
-                            Navigator.pushReplacementNamed(context, Invoices.id);
+                          if(widget.title != 'PRODUCTS'){
+                            HapticFeedback.lightImpact();
+                            Navigator.pushReplacementNamed(context, ProductsOnly.id);
                           }
                         },
                       ),
@@ -231,6 +258,7 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                         onTap: () {
                           Navigator.pop(context);
                           if (widget.title != 'CUSTOMERS'){
+                            HapticFeedback.lightImpact();
                             Navigator.pushReplacementNamed(context, Customers.id);
                           }
                         },
@@ -253,12 +281,13 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                         onTap: () {
                           Navigator.pop(context);
                           if(widget.title != 'CREDITORS'){
+                            HapticFeedback.lightImpact();
                             Navigator.pushReplacementNamed(context, Creditors.id);
                           }
                         },
                       ),
                       // Notifications
-                      ListTile(
+                      /*ListTile(
                         leading: Icon(
                           IconlyBold.notification,
                           color: _getColor('NOTIFICATIONS'),
@@ -278,9 +307,11 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                             Navigator.pushReplacementNamed(context, Notifications.id);
                           }
                         },
-                      ),
+                      ),*/
                       // Staffs
-                      ListTile(
+                      !_isAdmin
+                          ? Container()
+                          : ListTile(
                         leading: Icon(
                           IconlyBold.user2,
                           color: _getColor('STAFFS'),
@@ -297,6 +328,7 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                         onTap: () {
                           Navigator.pop(context);
                           if(widget.title != 'STAFFS'){
+                            HapticFeedback.lightImpact();
                             Navigator.pushReplacementNamed(context, Staff.id);
                           }
                         },
@@ -319,6 +351,7 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                         onTap: () {
                           Navigator.pop(context);
                           if(widget.title != 'SETTINGS'){
+                            HapticFeedback.lightImpact();
                             Navigator.pushReplacementNamed(context, Settings.id);
                           }
                         },
@@ -341,6 +374,7 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                             ),
                           ),
                           onTap: () {
+                            HapticFeedback.lightImpact();
                             _logOut();
                           },
                         ),

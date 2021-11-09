@@ -13,7 +13,7 @@ class TotalSalesCard extends StatelessWidget {
 
   final String? cardName;
 
-  final int? totalPrice;
+  final dynamic? totalPrice;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +37,7 @@ class TotalSalesCard extends StatelessWidget {
               child: Text(
                 totalPrice == null
                     ? '#.##'
-                    : Functions.money(totalPrice!.toDouble(), 'N'),
+                    : Functions.money(double.parse(totalPrice!.toString()), 'N'),
                 style: TextStyle(
                   fontSize: 20,
                   color: Color(0xFF171725),

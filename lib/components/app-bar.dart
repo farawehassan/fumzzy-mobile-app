@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:fumzy/screens/transactions/add-sale.dart';
+import 'button.dart';
 
-AppBar buildAppBar(BoxConstraints constraints, String title) {
+AppBar buildAppBar(BoxConstraints constraints, String title, {BuildContext? context}) {
   return AppBar(
     iconTheme: IconThemeData(
       color: Color(0xFF004E92),
@@ -13,6 +15,31 @@ AppBar buildAppBar(BoxConstraints constraints, String title) {
         fontWeight: FontWeight.w600,
       ),
     ),
+    actions: [
+      title == 'DASHBOARD'
+          ? Container(
+        margin: EdgeInsets.only(right: 16, bottom: 10),
+        child: Button(
+          onTap: (){
+            Navigator.pushNamed(context!, AddSale.id);
+          },
+          buttonColor: Color(0xFF004E92),
+          width: 80,
+          child: Center(
+            child: Text(
+              'Add Sale',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.normal,
+                fontStyle: FontStyle.normal,
+                color: Color(0xFFFFFFFF),
+              ),
+            ),
+          ),
+        ),
+      )
+          : Container()
+    ],
   );
 }
 

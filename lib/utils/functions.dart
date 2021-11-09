@@ -56,6 +56,18 @@ class Functions{
     return DateFormat('d, MMM\nh:mm a').format(dateTime).toString();
   }
 
+  /// Converting [dateTime] to return a formatted time
+  /// of day, month, hour with am or pm
+  static String getFormattedDateTimeN(DateTime dateTime) { // 23, May\n12:130pm
+    return DateFormat('d, MMM h:mm a').format(dateTime).toString();
+  }
+
+  /// Converting [dateTime] to return a formatted time
+  /// of day, month, hour with am or pm
+  static String getFormattedDateTimeY(DateTime dateTime) { // 23, May\n12:130pm
+    return DateFormat('d, MMM YYYY h:mm a').format(dateTime).toString();
+  }
+
 }
 
 const Map currencyMap = {
@@ -138,7 +150,7 @@ const Map currencyMap = {
   'MYR': 'RM',
   'MZN': 'MTn',
   'NAD': 'N\$',
-  'NGN': '₦',
+  'NGN': 'N',
   'N': '₦',
   'NIO': 'C\$',
   'NOK': 'kr',

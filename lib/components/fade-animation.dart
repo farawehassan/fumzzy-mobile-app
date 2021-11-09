@@ -37,5 +37,5 @@ class FadeAnimation extends StatelessWidget {
   }
 
   /// Example
-  /// FadeAnimation(1.3, Text("Sneakers", style: TextStyle(color: Colors.white, fontSize: 50, fontWeight: FontWeight.bold),)),
+  /// FadeAnimation(1.3, Text('Sneakers', style: TextStyle(color: Colors.white, fontSize: 50, fontWeight: FontWeight.bold),)),
 }

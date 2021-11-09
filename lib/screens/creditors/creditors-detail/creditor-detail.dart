@@ -799,12 +799,12 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
                                   onTap: () {
                                     if(formKey.currentState!.validate()){
                                       Map<String, dynamic> body = {
-                                        "creditorId": widget.creditor!.id,
-                                        "reportId": reports.id,
-                                        "amount": reports.amount,
-                                        "paymentMade": reports.paymentMade!
+                                        'creditorId': widget.creditor!.id,
+                                        'reportId': reports.id,
+                                        'amount': reports.amount,
+                                        'paymentMade': reports.paymentMade!
                                             + double.parse(amountController.text),
-                                        "description": referenceController.text
+                                        'description': referenceController.text
                                       };
                                       _updateCredit(body, setDialogState);
                                     }
@@ -1055,11 +1055,11 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
                                 onTap: () {
                                   if(formKey.currentState!.validate()){
                                     Map<String, dynamic> body = {
-                                      "creditorId": widget.creditor!.id,
-                                      "reportId": reports.id,
-                                      "amount": reports.amount,
-                                      "paymentMade": reports.amount,
-                                      "description": referenceController.text
+                                      'creditorId': widget.creditor!.id,
+                                      'reportId': reports.id,
+                                      'amount': reports.amount,
+                                      'paymentMade': reports.amount,
+                                      'description': referenceController.text
                                     };
                                     _updateCredit(body, setDialogState);
                                   }
@@ -1305,8 +1305,8 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
                               onTap: () {
                                 if(!_showSpinner){
                                   Map<String, String> body = {
-                                    "creditorId": widget.creditor!.id!,
-                                    "reportId": reports.id!
+                                    'creditorId': widget.creditor!.id!,
+                                    'reportId': reports.id!
                                   };
                                   _deleteCredit(body, setDialogState);
                                 }

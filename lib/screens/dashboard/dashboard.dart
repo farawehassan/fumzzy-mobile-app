@@ -10,7 +10,11 @@ import 'package:fumzy/components/sales-card.dart';
 import 'package:fumzy/components/shimmer-loader.dart';
 import 'package:fumzy/model/purchases.dart';
 import 'package:fumzy/model/sales.dart';
+import 'package:fumzy/model/store-charts.dart';
 import 'package:fumzy/model/store.dart';
+import 'package:fumzy/model/user.dart';
+import 'package:fumzy/screens/creditors/creditors.dart';
+import 'package:fumzy/screens/customers/customers.dart';
 import 'package:fumzy/screens/transactions/sales-info.dart';
 import 'package:fumzy/screens/transactions/transactions.dart';
 import 'package:fumzy/utils/constant-styles.dart';
@@ -32,13 +36,19 @@ class _DashboardState extends State<Dashboard> {
 
   /// GlobalKey of a my RefreshIndicatorState to refresh my list items
   final GlobalKey<RefreshIndicatorState> _refreshPurchaseKey = GlobalKey<RefreshIndicatorState>();
+
   final GlobalKey<RefreshIndicatorState> _refreshSalesKey = GlobalKey<RefreshIndicatorState>();
+
+  final GlobalKey<RefreshIndicatorState> _refreshStoreKey = GlobalKey<RefreshIndicatorState>();
 
   /// Instantiating a class of the [FutureValues]
   var futureValue = FutureValues();
 
   /// Instantiating a class of the [Store]
   Store? _storeInfo;
+
+  /// Instantiating a class of the [StoreCharts]
+  StoreCharts? _storeChartsInfo;
 
   /** Purchase Section **/
 
@@ -321,473 +331,689 @@ class _DashboardState extends State<Dashboard> {
       Functions.showErrorMessage(e);
     });
   }
-
-
-  void _getStoreInformation() async{
-    Future<Store> store = futureValue.getStoreInformation();
-      await store.then((Store value) {
+  
+  void _getStoreInformation({bool? refresh}) async{
+    Future<Store> store = futureValue.getStoreInformation(refresh: refresh);
+    await store.then((Store value) {
       setState(() => _storeInfo = value);
     }).catchError((e){
       print(e);
+      if(e.toString() == 'No internet connection'){
+        _getStoreInformation(refresh: false);
+      }
       Functions.showErrorMessage(e);
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _getStoreInformation();
-    _getAllPurchases(refresh: true);
-    _getAllSales(refresh: true);
+  void _getStoreChartsInformation({bool? refresh}) async{
+    Future<StoreCharts> store = futureValue.getStoreChartsInformation(refresh: refresh);
+    await store.then((StoreCharts value) {
+      setState(() => _storeChartsInfo = value);
+    }).catchError((e){
+      print(e);
+      if(e.toString() == 'No internet connection'){
+        _getStoreChartsInformation(refresh: false);
+      }
+      Functions.showErrorMessage(e);
+    });
+  }
+
+  /// Function to refresh store information similar to [_getStoreInformation()]
+  Future<Null> _refreshStoreInformation() {
+    Future<Store> store = futureValue.getStoreInformation(refresh: true);
+    return store.then((value) {
+      setState(() => _storeInfo = value);
+      _getStoreChartsInformation();
+    }).catchError((e){
+      print(e);
+      if(e.toString() == 'No internet connection'){
+        _getStoreInformation(refresh: false);
+        _getStoreChartsInformation(refresh: false);
+      }
+      Functions.showErrorMessage(e);
+    });
+  }
+
+  /// This is a variable that holds if the user is admin or not
+  bool _isAdmin = false;
+
+  /// Function to fetch the user's details and check if user is admin or not to
+  /// set to [_isAdmin]
+  void _getCurrentUser() async {
+    await futureValue.getCurrentUser().then((User value) async {
+      if(!mounted)return;
+      setState(() => _isAdmin = value.type! == 'admin');
+    }).catchError((e) {
+      print(e);
+    });
   }
 
   List<String> _view = [
-    "This Week",
-    "Yesterday",
-    "Today",
-    "This Month",
-    "6 Months",
-    "All Time"
+    'Yesterday', 'Today', 'This Week',
+    'This Month', '6 Months', 'All Time'
   ];
 
-  String? _selectedView = "This Week";
+  String? _selectedView = 'Today';
+
+  Widget _getCharts(){
+    if(_storeChartsInfo == null){
+      return Wrap(
+        children: [
+          TotalSalesCard(
+            cardName: 'Total Sales',
+            totalPrice: null,
+          ),
+          TotalSalesCard(
+            cardName: 'Total Purchases',
+            totalPrice: null,
+          ),
+          TotalSalesCard(
+            cardName: 'Total Expenses',
+            totalPrice: null,
+          ),
+          _isAdmin
+              ? TotalSalesCard(
+            cardName: 'Total Profit',
+            totalPrice: null,
+          )
+              : Container(),
+        ],
+      );
+    }
+    else {
+      if(_selectedView == 'Today'){
+        return Wrap(
+          children: [
+            TotalSalesCard(
+              cardName: 'Total Sales',
+              totalPrice: _storeChartsInfo!.today!.todaySales!.isNotEmpty ? _storeChartsInfo!.today!.todaySales![0]['total'] : 0,
+            ),
+            TotalSalesCard(
+              cardName: 'Total Purchases',
+              totalPrice: _storeChartsInfo!.today!.todayPurchases!.isNotEmpty ? _storeChartsInfo!.today!.todayPurchases![0]['total'] : 0
+            ),
+            TotalSalesCard(
+              cardName: 'Total Expenses',
+              totalPrice:  _storeChartsInfo!.today!.todayExpenses!.isNotEmpty ? _storeChartsInfo!.today!.todayExpenses![0]['total'] : 0
+            ),
+            _isAdmin
+                ? TotalSalesCard(
+              cardName: 'Total Profit',
+              totalPrice: _storeChartsInfo!.today!.todayProfit!.isNotEmpty ? _storeChartsInfo!.today!.todayProfit![0]['total'] : 0,
+            )
+                : Container(),
+          ],
+        );
+      }
+      else if(_selectedView == 'Yesterday'){
+        return Wrap(
+          children: [
+            TotalSalesCard(
+              cardName: 'Total Sales',
+              totalPrice: _storeChartsInfo!.yesterday!.yesterdaySales!.isNotEmpty ? _storeChartsInfo!.yesterday!.yesterdaySales![0]['total'] : 0,
+            ),
+            TotalSalesCard(
+                cardName: 'Total Purchases',
+                totalPrice: _storeChartsInfo!.yesterday!.yesterdayPurchases!.isNotEmpty ? _storeChartsInfo!.yesterday!.yesterdayPurchases![0]['total'] : 0
+            ),
+            TotalSalesCard(
+                cardName: 'Total Expenses',
+                totalPrice:  _storeChartsInfo!.yesterday!.yesterdayExpenses!.isNotEmpty ? _storeChartsInfo!.yesterday!.yesterdayExpenses![0]['total'] : 0
+            ),
+            _isAdmin
+                ? TotalSalesCard(
+              cardName: 'Total Profit',
+              totalPrice: _storeChartsInfo!.yesterday!.yesterdayProfit!.isNotEmpty ? _storeChartsInfo!.yesterday!.yesterdayProfit![0]['total'] : 0,
+            )
+                : Container(),
+          ],
+        );
+      }
+      else if(_selectedView == 'This Week'){
+        return Wrap(
+          children: [
+            TotalSalesCard(
+              cardName: 'Total Sales',
+              totalPrice: _storeChartsInfo!.week!.weekSales!.isNotEmpty ? _storeChartsInfo!.week!.weekSales![0]['total'] : 0,
+            ),
+            TotalSalesCard(
+                cardName: 'Total Purchases',
+                totalPrice: _storeChartsInfo!.week!.weekPurchases!.isNotEmpty ? _storeChartsInfo!.week!.weekPurchases![0]['total'] : 0
+            ),
+            TotalSalesCard(
+                cardName: 'Total Expenses',
+                totalPrice:  _storeChartsInfo!.week!.weekExpenses!.isNotEmpty ? _storeChartsInfo!.week!.weekExpenses![0]['total'] : 0
+            ),
+            _isAdmin
+                ? TotalSalesCard(
+              cardName: 'Total Profit',
+              totalPrice: _storeChartsInfo!.week!.weekProfit!.isNotEmpty ? _storeChartsInfo!.week!.weekProfit![0]['total'] : 0,
+            )
+                : Container(),
+          ],
+        );
+      }
+      else if(_selectedView == 'This Month'){
+        return Wrap(
+          children: [
+            TotalSalesCard(
+              cardName: 'Total Sales',
+              totalPrice: _storeChartsInfo!.thisMonth!.monthSales!.isNotEmpty ? _storeChartsInfo!.thisMonth!.monthSales![0]['total'] : 0,
+            ),
+            TotalSalesCard(
+                cardName: 'Total Purchases',
+                totalPrice: _storeChartsInfo!.thisMonth!.monthPurchases!.isNotEmpty ? _storeChartsInfo!.thisMonth!.monthPurchases![0]['total'] : 0
+            ),
+            TotalSalesCard(
+                cardName: 'Total Expenses',
+                totalPrice:  _storeChartsInfo!.thisMonth!.monthExpenses!.isNotEmpty ? _storeChartsInfo!.thisMonth!.monthExpenses![0]['total'] : 0
+            ),
+            _isAdmin
+                ? TotalSalesCard(
+              cardName: 'Total Profit',
+              totalPrice: _storeChartsInfo!.thisMonth!.monthProfit!.isNotEmpty ? _storeChartsInfo!.thisMonth!.monthProfit![0]['total'] : 0,
+            )
+                : Container(),
+          ],
+        );
+      }
+      else if(_selectedView == '6 Months'){
+        return Wrap(
+          children: [
+            TotalSalesCard(
+              cardName: 'Total Sales',
+              totalPrice: _storeChartsInfo!.sixMonth!.sixMonthSales!.isNotEmpty ? _storeChartsInfo!.sixMonth!.sixMonthSales![0]['total'] : 0,
+            ),
+            TotalSalesCard(
+                cardName: 'Total Purchases',
+                totalPrice: _storeChartsInfo!.sixMonth!.sixMonthPurchases!.isNotEmpty ? _storeChartsInfo!.sixMonth!.sixMonthPurchases![0]['total'] : 0
+            ),
+            TotalSalesCard(
+                cardName: 'Total Expenses',
+                totalPrice:  _storeChartsInfo!.sixMonth!.sixMonthExpenses!.isNotEmpty ? _storeChartsInfo!.sixMonth!.sixMonthExpenses![0]['total'] : 0
+            ),
+            _isAdmin
+                ? TotalSalesCard(
+              cardName: 'Total Profit',
+              totalPrice: _storeChartsInfo!.sixMonth!.sixMonthProfit!.isNotEmpty ? _storeChartsInfo!.sixMonth!.sixMonthProfit![0]['total'] : 0,
+            )
+                : Container(),
+          ],
+        );
+      }
+      else {
+        return Wrap(
+          children: [
+            TotalSalesCard(
+              cardName: 'Total Sales',
+              totalPrice: _storeChartsInfo!.allTime!.allSales!.isNotEmpty ? _storeChartsInfo!.allTime!.allSales![0]['total'] : 0,
+            ),
+            TotalSalesCard(
+                cardName: 'Total Purchases',
+                totalPrice: _storeChartsInfo!.allTime!.allPurchases!.isNotEmpty ? _storeChartsInfo!.allTime!.allPurchases![0]['total'] : 0
+            ),
+            TotalSalesCard(
+                cardName: 'Total Expenses',
+                totalPrice:  _storeChartsInfo!.allTime!.allExpenses!.isNotEmpty ? _storeChartsInfo!.allTime!.allExpenses![0]['total'] : 0
+            ),
+            _isAdmin
+                ? TotalSalesCard(
+              cardName: 'Total Profit',
+              totalPrice: _storeChartsInfo!.allTime!.allProfit!.isNotEmpty ? _storeChartsInfo!.allTime!.allProfit![0]['total'] : 0,
+            )
+                : Container(),
+          ],
+        );
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    _getCurrentUser();
+    super.initState();
+    _getStoreInformation(refresh: true);
+    _getStoreChartsInformation(refresh: true);
+    _getAllPurchases(refresh: true);
+    _getAllSales(refresh: true);
+  }
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) => Scaffold(
-        appBar: buildAppBar(constraints, 'DASHBOARD'),
+        appBar: buildAppBar(constraints, 'DASHBOARD', context: context),
         drawer: RefactoredDrawer(title: 'DASHBOARD'),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(20, 30, 23, 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 200,
-                  child: DropdownButtonFormField<String>(
-                    value: _selectedView,
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedView = value;
-                      });
-                    },
-                    style: TextStyle(
-                        color: Color(0xFF171725),
-                        fontWeight: FontWeight.normal,
-                        fontSize: 14
-                    ),
-                    iconEnabledColor: Color(0xFF000000),
-                    icon: Icon(
-                      Icons.arrow_drop_down_sharp,
-                      color: Colors.black,
-                      size: 20,
-                    ),
-                    decoration: kTextFieldBorderDecoration.copyWith(
-                      contentPadding: EdgeInsets.all(12),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xFFE2E2EA), width: 1, style: BorderStyle.solid),
-                        borderRadius: BorderRadius.circular(3.0),
+        body: RefreshIndicator(
+          onRefresh: _refreshStoreInformation,
+          key: _refreshStoreKey,
+          color: Color(0xFF004E92),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(20, 30, 23, 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 200,
+                    child: DropdownButtonFormField<String>(
+                      value: _selectedView,
+                      onChanged: (value) {
+                        setState(() => _selectedView = value);
+                      },
+                      style: TextStyle(
+                          color: Color(0xFF171725),
+                          fontWeight: FontWeight.normal,
+                          fontSize: 14
                       ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xFFE2E2EA), width: 1, style: BorderStyle.solid),
-                        borderRadius: BorderRadius.circular(3.0),
+                      iconEnabledColor: Color(0xFF000000),
+                      icon: Icon(
+                        Icons.arrow_drop_down_sharp,
+                        color: Colors.black,
+                        size: 20,
                       ),
-                    ),
-                    items: _view.map((value) {
-                      return DropdownMenuItem(
-                        child: Text(
-                          value,
-                          style: TextStyle(
-                              color: Color(0xFF171725),
-                              fontWeight: FontWeight.normal,
-                              fontSize: 14
-                          ),
+                      decoration: kTextFieldBorderDecoration.copyWith(
+                        contentPadding: EdgeInsets.all(12),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFFE2E2EA), width: 1, style: BorderStyle.solid),
+                          borderRadius: BorderRadius.circular(3.0),
                         ),
-                        value: value,
-                      );
-                    }).toList(),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Wrap(
-                  children: [
-                    TotalSalesCard(
-                      cardName: 'Total Sales',
-                      totalPrice: _storeInfo?.totalSales!,
-                    ),
-                    TotalSalesCard(
-                      cardName: 'Total Purchases',
-                      totalPrice: _storeInfo?.totalPurchases!,
-                    ),
-                    TotalSalesCard(
-                      cardName: 'Total Expenses',
-                      totalPrice: _storeInfo?.totalExpenses!,
-                    ),
-                    TotalSalesCard(
-                      cardName: 'Total Profit',
-                      totalPrice: _storeInfo?.totalProfitMade!,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 30),
-                Wrap(
-                  children: [
-                    InventoryCard(
-                      cardName: 'Inventory Cost Price',
-                      totalPrice: _storeInfo?.inventoryCostPrice,
-                      cardColor: Color(0xFFF64932),
-                    ),
-                    InventoryCard(
-                      cardName: 'Inventory Selling Price',
-                      totalPrice: _storeInfo?.inventorySellingPrice,
-                      cardColor: Color(0xFF00AF27),
-                    ),
-                    InventoryCard(
-                      cardName: 'Inventory Profit',
-                      totalPrice: _storeInfo?.inventoryProfit,
-                      cardColor: Color(0xFF00509A),
-                    ),
-                    InventoryCard(
-                      cardName: 'Inventory Items',
-                      totalPrice: _storeInfo?.inventoryItems,
-                      cardColor: Colors.brown,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 50),
-                //outstanding cards, recent purchases
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Outstanding',
-                            style: TextStyle(
-                              color: Color(0xFF171725),
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                            ),
-                          ),
-                          const SizedBox(height: 15),
-                          Container(
-                            child: ReusableCard(
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                const Text(
-                                                  'Sales  ',
-                                                  style: TextStyle(
-                                                    color: Color(0xFF75759E),
-                                                    fontWeight: FontWeight.w600,
-                                                    fontSize: 15,
-                                                  ),
-                                                ),
-                                                GreenIndicator(),
-                                              ],
-                                            ),
-                                            const SizedBox(height: 14),
-                                            FadeAnimation(
-                                              delay: 1.5,
-                                              child: Text(
-                                                Functions.money(110000, 'N'),
-                                                style: const TextStyle(
-                                                  color: Color(0xFF171725),
-                                                  fontWeight: FontWeight.w700,
-                                                  fontSize: 20,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        Container(
-                                          height: 75,
-                                          margin: EdgeInsets.symmetric(horizontal: 13),
-                                          child: VerticalDivider(
-                                            color: Colors.grey,
-                                            thickness: 0.6,
-                                            width: 1,
-                                          ),
-                                        ),
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            const Text(
-                                              'Volume',
-                                              style: TextStyle(
-                                                color: Color(0xFF75759E),
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 15,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 14),
-                                            FadeAnimation(
-                                              delay: 1.5,
-                                              child: Text(
-                                                '20',
-                                                style: const TextStyle(
-                                                  color: Color(0xFF171725),
-                                                  fontWeight: FontWeight.w700,
-                                                  fontSize: 20,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 10),
-                                    GestureDetector(
-                                      onTap: () {
-                                        print("see details");
-                                      },
-                                      child: Wrap(
-                                        children: [
-                                          const Text(
-                                            'See Details  ',
-                                            style: TextStyle(
-                                              color: Color(0xFF00509A),
-                                              fontWeight: FontWeight.w400,
-                                              fontSize: 13,
-                                            ),
-                                          ),
-                                          Icon(
-                                            IconlyBold.arrowRightCircle,
-                                            size: 16.5,
-                                            color: Color(0xFF004E92).withOpacity(0.5),
-                                          ),
-                                        ],
-                                      ),
-                                    ),//see details button
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 23),
-                          Container(
-                            child: ReusableCard(
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                const Text(
-                                                  'Purchase  ',
-                                                  style: TextStyle(
-                                                    color: Color(0xFF75759E),
-                                                    fontWeight: FontWeight.w600,
-                                                    fontSize: 15,
-                                                  ),
-                                                ),
-                                                PartPaidIndicator(),
-                                              ],
-                                            ),
-                                            const SizedBox(height: 14),
-                                            FadeAnimation(
-                                              delay: 1.5,
-                                              child: Text(
-                                                Functions.money(75000, 'N'),
-                                                style: const TextStyle(
-                                                  color: Color(0xFF171725),
-                                                  fontWeight: FontWeight.w700,
-                                                  fontSize: 20,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),//purchase
-                                        Container(
-                                          height: 75,
-                                          margin: EdgeInsets.symmetric(horizontal: 13),
-                                          child: VerticalDivider(
-                                            color: Colors.grey,
-                                            thickness: 0.6,
-                                            width: 1,
-                                          ),
-                                        ),
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            const Text(
-                                              'Volume',
-                                              style: TextStyle(
-                                                color: Color(0xFF75759E),
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 15,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 14),
-                                            FadeAnimation(
-                                              delay: 1.5,
-                                              child: Text(
-                                                '12',
-                                                style: const TextStyle(
-                                                  color: Color(0xFF171725),
-                                                  fontWeight: FontWeight.w700,
-                                                  fontSize: 20,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),//volume
-                                      ],
-                                    ),
-                                    const SizedBox(height: 10),
-                                    GestureDetector(
-                                      onTap: () {
-                                        print("see details");
-                                      },
-                                      child: Wrap(
-                                        children: [
-                                          const Text(
-                                            'See Details  ',
-                                            style: TextStyle(
-                                              color: Color(0xFF00509A),
-                                              fontWeight: FontWeight.w400,
-                                              fontSize: 13,
-                                            ),
-                                          ),
-                                          Icon(
-                                            IconlyBold.arrowRightCircle,
-                                            size: 16.5,
-                                            color: Color(0xFF004E92).withOpacity(0.5),
-                                          ),
-                                        ],
-                                      ),
-                                    ),//see details button
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFFE2E2EA), width: 1, style: BorderStyle.solid),
+                          borderRadius: BorderRadius.circular(3.0),
+                        ),
                       ),
-                      const SizedBox(width: 13),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                'Recent Purchases',
-                                style: TextStyle(
-                                  color: Color(0xFF171725),
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 14,
-                                ),
+                      items: _view.map((value) {
+                        return DropdownMenuItem(
+                          child: Text(
+                            value,
+                            style: TextStyle(
+                                color: Color(0xFF171725),
+                                fontWeight: FontWeight.normal,
+                                fontSize: 14
+                            ),
+                          ),
+                          value: value,
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  _getCharts(),
+                  const SizedBox(height: 30),
+                  _isAdmin
+                      ? Wrap(
+                    children: [
+                      InventoryCard(
+                        cardName: 'Inventory Cost Price',
+                        totalPrice: _storeInfo?.inventoryCostPrice,
+                        cardColor: Color(0xFFF64932),
+                      ),
+                      InventoryCard(
+                        cardName: 'Inventory Selling Price',
+                        totalPrice: _storeInfo?.inventorySellingPrice,
+                        cardColor: Color(0xFF00AF27),
+                      ),
+                      InventoryCard(
+                        cardName: 'Inventory Profit',
+                        totalPrice: _storeInfo?.inventoryProfit,
+                        cardColor: Color(0xFF00509A),
+                      ),
+                      InventoryCard(
+                        cardName: 'Inventory Items',
+                        totalPrice: _storeInfo?.inventoryItems,
+                        cardColor: Colors.brown,
+                      ),
+                    ],
+                  )
+                      : Container(),
+                  const SizedBox(height: 50),
+                  //outstanding cards, recent purchases
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Outstanding',
+                              style: TextStyle(
+                                color: Color(0xFF171725),
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
                               ),
-                              const SizedBox(width: 450),
-                              InkWell(
-                                onTap: () {
-                                  Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(builder: (BuildContext context) => Transactions(tabSelector: 1)),
-                                  );
-                                },
-                                child: const Text(
-                                  'See All',
-                                  style: TextStyle(
-                                    color: Color(0xFF00509A),
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 14,
-                                    decoration: TextDecoration.underline,
+                            ),
+                            const SizedBox(height: 15),
+                            InkWell(
+                              onTap: () {
+                                Navigator.pushReplacementNamed(context, Customers.id);
+                              },
+                              child: ReusableCard(
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  const Text(
+                                                    'Sales  ',
+                                                    style: TextStyle(
+                                                      color: Color(0xFF75759E),
+                                                      fontWeight: FontWeight.w600,
+                                                      fontSize: 15,
+                                                    ),
+                                                  ),
+                                                  GreenIndicator(),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 14),
+                                              FadeAnimation(
+                                                delay: 1.5,
+                                                child: Text(
+                                                  _storeInfo == null
+                                                      ? '#.##'
+                                                      : Functions.money(_storeInfo!.outstandingSales!, 'N'),
+                                                  style: const TextStyle(
+                                                    color: Color(0xFF171725),
+                                                    fontWeight: FontWeight.w700,
+                                                    fontSize: 20,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Container(
+                                            height: 75,
+                                            margin: EdgeInsets.symmetric(horizontal: 13),
+                                            child: VerticalDivider(
+                                              color: Colors.grey,
+                                              thickness: 0.6,
+                                              width: 1,
+                                            ),
+                                          ),
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              const Text(
+                                                'Volume',
+                                                style: TextStyle(
+                                                  color: Color(0xFF75759E),
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 15,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 14),
+                                              FadeAnimation(
+                                                delay: 1.5,
+                                                child: Text(
+                                                  _storeInfo == null
+                                                      ? '##'
+                                                      : '${_storeInfo!.outstandingSalesVolume!}',
+                                                  style: const TextStyle(
+                                                    color: Color(0xFF171725),
+                                                    fontWeight: FontWeight.w700,
+                                                    fontSize: 20,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 10),
+                                      InkWell(
+                                        onTap: () {
+                                          Navigator.pushReplacementNamed(context, Customers.id);
+                                        },
+                                        child: Wrap(
+                                          children: [
+                                            const Text(
+                                              'See Details  ',
+                                              style: TextStyle(
+                                                color: Color(0xFF00509A),
+                                                fontWeight: FontWeight.w400,
+                                                fontSize: 13,
+                                              ),
+                                            ),
+                                            Icon(
+                                              IconlyBold.arrowRightCircle,
+                                              size: 16.5,
+                                              color: Color(0xFF004E92).withOpacity(0.5),
+                                            ),
+                                          ],
+                                        ),
+                                      ),//see details button
+                                    ],
                                   ),
                                 ),
                               ),
-                            ],
-                          ),
-                          const SizedBox(height: 15),
-                          ReusableCard(
-                            child: Container(
-                              height: 340,
-                              child: _buildPurchaseList(),
                             ),
+                            const SizedBox(height: 23),
+                            InkWell(
+                              onTap: () {
+                                Navigator.pushReplacementNamed(context, Creditors.id);
+                              },
+                              child: ReusableCard(
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  const Text(
+                                                    'Purchase  ',
+                                                    style: TextStyle(
+                                                      color: Color(0xFF75759E),
+                                                      fontWeight: FontWeight.w600,
+                                                      fontSize: 15,
+                                                    ),
+                                                  ),
+                                                  PartPaidIndicator(),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 14),
+                                              FadeAnimation(
+                                                delay: 1.5,
+                                                child: Text(
+                                                  _storeInfo == null
+                                                      ? '#.##'
+                                                      : Functions.money(_storeInfo!.outstandingPurchase!, 'N'),
+                                                  style: const TextStyle(
+                                                    color: Color(0xFF171725),
+                                                    fontWeight: FontWeight.w700,
+                                                    fontSize: 20,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),//purchase
+                                          Container(
+                                            height: 75,
+                                            margin: EdgeInsets.symmetric(horizontal: 13),
+                                            child: VerticalDivider(
+                                              color: Colors.grey,
+                                              thickness: 0.6,
+                                              width: 1,
+                                            ),
+                                          ),
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              const Text(
+                                                'Volume',
+                                                style: TextStyle(
+                                                  color: Color(0xFF75759E),
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 15,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 14),
+                                              FadeAnimation(
+                                                delay: 1.5,
+                                                child: Text(
+                                                  _storeInfo == null
+                                                      ? '##'
+                                                      : '${_storeInfo!.outstandingPurchaseVolume!}',
+                                                  style: const TextStyle(
+                                                    color: Color(0xFF171725),
+                                                    fontWeight: FontWeight.w700,
+                                                    fontSize: 20,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),//volume
+                                        ],
+                                      ),
+                                      const SizedBox(height: 10),
+                                      InkWell(
+                                        onTap: () {
+                                          Navigator.pushReplacementNamed(context, Creditors.id);
+                                        },
+                                        child: Wrap(
+                                          children: [
+                                            const Text(
+                                              'See Details  ',
+                                              style: TextStyle(
+                                                color: Color(0xFF00509A),
+                                                fontWeight: FontWeight.w400,
+                                                fontSize: 13,
+                                              ),
+                                            ),
+                                            Icon(
+                                              IconlyBold.arrowRightCircle,
+                                              size: 16.5,
+                                              color: Color(0xFF004E92).withOpacity(0.5),
+                                            ),
+                                          ],
+                                        ),
+                                      ),//see details button
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(width: 13),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'Recent Purchases',
+                                  style: TextStyle(
+                                    color: Color(0xFF171725),
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                const SizedBox(width: 450),
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(builder: (BuildContext context) => Transactions(tabSelector: 1)),
+                                    );
+                                  },
+                                  child: const Text(
+                                    'See All',
+                                    style: TextStyle(
+                                      color: Color(0xFF00509A),
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 15),
+                            ReusableCard(
+                              child: Container(
+                                height: 340,
+                                child: _buildPurchaseList(),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Column(
+                    children: [
+                      Container(
+                        margin: EdgeInsets.only(top: 40, bottom: 15),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Recent Sales',
+                              style: TextStyle(
+                                color: Color(0xFF171725),
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                            ),
+                            InkWell(
+                              onTap: () {
+                                Navigator.pushReplacementNamed(context, Transactions.id);
+                              },
+                              child: const Text(
+                                'See All',
+                                style: TextStyle(
+                                  color: Color(0xFF00509A),
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        height: 340,
+                        //width: constraints.maxWidth,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(17),
+                          border: Border.all(
+                            width: 1,
+                            color: Color(0xFFE2E2EA),
                           ),
-                        ],
+                        ),
+                        child: _buildSaleList(),
                       ),
                     ],
                   ),
-                ),
-                Column(
-                  children: [
-                    Container(
-                      margin: EdgeInsets.only(top: 40, bottom: 15),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Recent Sales',
-                            style: TextStyle(
-                              color: Color(0xFF171725),
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                            ),
-                          ),
-                          InkWell(
-                            onTap: () {
-                              Navigator.pushReplacementNamed(context, Transactions.id);
-                            },
-                            child: const Text(
-                              'See All',
-                              style: TextStyle(
-                                color: Color(0xFF00509A),
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      height: 340,
-                      //width: constraints.maxWidth,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(17),
-                        border: Border.all(
-                          width: 1,
-                          color: Color(0xFFE2E2EA),
-                        ),
-                      ),
-                      child: _buildSaleList(),
-                    ),
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
