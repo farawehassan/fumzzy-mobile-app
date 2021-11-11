@@ -82,7 +82,8 @@ class _CustomersDetailState extends State<CustomersDetail> {
                 MaterialPageRoute(
                   builder: (context) => PrintReceipt(
                       reports: report.toJson(),
-                      paymentMode: 'Cash'
+                      paymentMode: 'Cash',
+                      name: widget.customer!.name!
                   ),
                 ),
               );

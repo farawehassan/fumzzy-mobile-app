@@ -1289,8 +1289,9 @@ class _AddSaleState extends State<AddSale> {
       context,
       MaterialPageRoute(
         builder: (context) => PrintReceipt(
-            reports: body,
-            paymentMode: _paymentMode == PaymentMode.cash ? 'Cash' : 'Transfer'
+          reports: body,
+          paymentMode: _paymentMode == PaymentMode.cash ? 'Cash' : 'Transfer',
+          name: body['name']
         ),
       ),
     );

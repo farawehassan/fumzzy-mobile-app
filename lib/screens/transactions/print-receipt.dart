@@ -14,11 +14,13 @@ class PrintReceipt extends StatefulWidget {
 
   final Map<String, dynamic>? reports;
   final String? paymentMode;
+  final String? name;
 
   const PrintReceipt({
     Key? key,
     @required this.reports,
-    @required this.paymentMode
+    @required this.paymentMode,
+    @required this.name
   }) : super(key: key);
 
   @override
@@ -36,7 +38,6 @@ class _PrintReceiptState extends State<PrintReceipt> {
   void initPrinter() {
     print('init printer');
     _printerManager.startScan(Duration(seconds: 2));
-    print('yup ypu');
     _printerManager.scanResults.listen((event) {
       if (!mounted) return;
       setState(() {
@@ -196,8 +197,17 @@ class _PrintReceiptState extends State<PrintReceipt> {
     bytes += ticket.text('Lagos, Nigeria',
         styles: PosStyles(align: PosAlign.center));
     bytes += ticket.text('Tel: 08130855871, 08033664053',
-        styles: PosStyles(align: PosAlign.center));
+        styles: PosStyles(align: PosAlign.center), linesAfter: 1);
 
+    bytes += ticket.text(
+      widget.name!,
+      styles: PosStyles(
+        align: PosAlign.left,
+        height: PosTextSize.size4,
+        width: PosTextSize.size3,
+        bold: true
+      ),
+    );
     bytes += ticket.hr();
     bytes += ticket.row([
       PosColumn(text: 'Qty', width: 1),
