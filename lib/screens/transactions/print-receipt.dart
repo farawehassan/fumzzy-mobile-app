@@ -8,6 +8,7 @@ import 'package:flutter/material.dart' hide Image;
 import 'package:fumzy/utils/constant-styles.dart';
 import 'package:fumzy/utils/functions.dart';
 import 'package:image/image.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class PrintReceipt extends StatefulWidget {
 
@@ -35,6 +36,7 @@ class _PrintReceiptState extends State<PrintReceipt> {
   void initPrinter() {
     print('init printer');
     _printerManager.startScan(Duration(seconds: 2));
+    print('yup ypu');
     _printerManager.scanResults.listen((event) {
       if (!mounted) return;
       setState(() {
@@ -46,9 +48,17 @@ class _PrintReceiptState extends State<PrintReceipt> {
     });
   }
 
-  void _startScan(){
+  void _permission() async {
+    Map<Permission, PermissionStatus> statuses = await [
+    Permission.location,
+        Permission.locationWhenInUse,
+    ].request();
+  }
+
+  void _startScan() {
     if (Platform.isIOS) initPrinter();
     else {
+      _permission();
       bluetoothManager.state.listen((val) {
         print("state = $val");
         if (!mounted) return;
@@ -67,7 +77,7 @@ class _PrintReceiptState extends State<PrintReceipt> {
 
   @override
   void initState() {
-    initPrinter();
+    _startScan();
     super.initState();
   }
 
