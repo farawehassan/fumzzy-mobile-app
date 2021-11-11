@@ -575,8 +575,23 @@ class _TransactionsState extends State<Transactions> {
     });
   }
 
+  /// This is a variable that holds if the user is admin or not
+  bool _isAdmin = false;
+
+  /// Function to fetch the user's details and check if user is admin or not to
+  /// set to [_isAdmin]
+  void _getCurrentUser() async {
+    await futureValue.getCurrentUser().then((value) async {
+      if(!mounted)return;
+      setState(() => _isAdmin = value.type! == 'admin');
+    }).catchError((e) {
+      print(e);
+    });
+  }
+
   @override
   void initState() {
+    _getCurrentUser();
     super.initState();
     _getAllPurchases(refresh: true);
     _getAllSales(refresh: true);
@@ -662,7 +677,7 @@ class _TransactionsState extends State<Transactions> {
                                 ),
                               ),
                             ),
-                            Button(
+                            if(_isAdmin) Button(
                               onTap: (){
                                 _addPurchase(constraints);
                               },

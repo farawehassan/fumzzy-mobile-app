@@ -411,12 +411,10 @@ class _DashboardState extends State<Dashboard> {
             cardName: 'Total Expenses',
             totalPrice: null,
           ),
-          _isAdmin
-              ? TotalSalesCard(
+          if(_isAdmin) TotalSalesCard(
             cardName: 'Total Profit',
             totalPrice: null,
           )
-              : Container(),
         ],
       );
     }
@@ -641,8 +639,7 @@ class _DashboardState extends State<Dashboard> {
                   const SizedBox(height: 20),
                   _getCharts(),
                   const SizedBox(height: 30),
-                  _isAdmin
-                      ? Wrap(
+                  if(_isAdmin) Wrap(
                     children: [
                       InventoryCard(
                         cardName: 'Inventory Cost Price',
@@ -665,8 +662,7 @@ class _DashboardState extends State<Dashboard> {
                         cardColor: Colors.brown,
                       ),
                     ],
-                  )
-                      : Container(),
+                  ),
                   const SizedBox(height: 50),
                   //outstanding cards, recent purchases
                   SingleChildScrollView(
@@ -802,7 +798,7 @@ class _DashboardState extends State<Dashboard> {
                               ),
                             ),
                             const SizedBox(height: 23),
-                            InkWell(
+                            if(_isAdmin) InkWell(
                               onTap: () {
                                 Navigator.pushReplacementNamed(context, Creditors.id);
                               },

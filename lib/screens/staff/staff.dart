@@ -484,6 +484,11 @@ class _StaffState extends State<Staff> {
                                                   length: 4,
                                                   animationType: AnimationType.fade,
                                                   enablePinAutofill: false,
+                                                  keyboardType: TextInputType.number,
+                                                  inputFormatters: [
+                                                    FilteringTextInputFormatter.allow(RegExp('[0-9]')),
+                                                    FilteringTextInputFormatter.digitsOnly
+                                                  ],
                                                   textStyle: TextStyle(
                                                     fontSize: 20,
                                                     color: Color(0xFF004E92),
@@ -532,6 +537,11 @@ class _StaffState extends State<Staff> {
                                                 length: 4,
                                                 animationType: AnimationType.fade,
                                                 enablePinAutofill: false,
+                                                  keyboardType: TextInputType.number,
+                                                  inputFormatters: [
+                                                    FilteringTextInputFormatter.allow(RegExp('[0-9]')),
+                                                    FilteringTextInputFormatter.digitsOnly
+                                                  ],
                                                 textStyle: TextStyle(
                                                   fontSize: 20,
                                                   color: Color(0xFF004E92),

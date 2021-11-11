@@ -224,6 +224,7 @@ class _LoginState extends State<Login> {
                     keyboardType: TextInputType.number,
                     inputFormatters: [
                       FilteringTextInputFormatter.allow(RegExp('[0-9]')),
+                      FilteringTextInputFormatter.digitsOnly
                     ],
                     textInputAction: TextInputAction.done,
                     animationType: AnimationType.fade,

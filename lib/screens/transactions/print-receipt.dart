@@ -5,7 +5,6 @@ import 'package:flutter_bluetooth_basic/flutter_bluetooth_basic.dart';
 import 'package:esc_pos_bluetooth/esc_pos_bluetooth.dart';
 import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:flutter/material.dart' hide Image;
-import 'package:fumzy/components/app-bar.dart';
 import 'package:fumzy/utils/constant-styles.dart';
 import 'package:fumzy/utils/functions.dart';
 import 'package:image/image.dart';
@@ -31,14 +30,17 @@ class _PrintReceiptState extends State<PrintReceipt> {
   List<PrinterBluetooth> _devices = [];
   String? _devicesMsg;
   BluetoothManager bluetoothManager = BluetoothManager.instance;
+  bool _scanned = false;
 
   void initPrinter() {
     print('init printer');
     _printerManager.startScan(Duration(seconds: 2));
     _printerManager.scanResults.listen((event) {
-      _devices.clear();
       if (!mounted) return;
-      setState(() => _devices = event);
+      setState(() {
+        _devices = event;
+        _scanned = true;
+      });
       if (_devices.isEmpty)
         setState(() => _devicesMsg = 'No devices');
     });
@@ -65,7 +67,7 @@ class _PrintReceiptState extends State<PrintReceipt> {
 
   @override
   void initState() {
-    _startScan();
+    initPrinter();
     super.initState();
   }
 
@@ -92,7 +94,9 @@ class _PrintReceiptState extends State<PrintReceipt> {
         ),
         actions: [
           /*IconButton(
-            onPressed: ()=> _startScan(),
+            onPressed: (){
+              _startScan();
+            },
             icon: Icon(Icons.refresh, color: mainColor),
           )*/
         ],
@@ -101,7 +105,9 @@ class _PrintReceiptState extends State<PrintReceipt> {
         itemCount: _devices.length,
         itemBuilder: (BuildContext context, int index) {
           return InkWell(
-            onTap: () => _startPrint(_devices[index]),
+            onTap: (){
+              if(_scanned) _startPrint(_devices[index]);
+            },
             child: Column(
               children: <Widget>[
                 Container(
@@ -141,17 +147,14 @@ class _PrintReceiptState extends State<PrintReceipt> {
     try {
       _printerManager.selectPrinter(printer);
 
-      // TODO Don't forget to choose printer's paper
+      /// Printer's paper
       const PaperSize paper = PaperSize.mm58;
       final profile = await CapabilityProfile.load();
 
-      // TEST PRINT
-      // final PosPrintResult res =
-      // await printerManager.printTicket(await testTicket(paper));
-
-      // DEMO RECEIPT
-      final PosPrintResult res = await _printerManager.printTicket((await _formatReceipt(paper, profile)));
-      Functions.showSuccessMessage(res.msg);
+      /// Sales RECEIPT
+      await _printerManager.printTicket((await _formatReceipt(paper, profile))).then((PosPrintResult res) {
+        Functions.showSuccessMessage(res.msg);
+      });
     } catch(e){
       print(e);
       Functions.showErrorMessage(e.toString());
@@ -160,6 +163,7 @@ class _PrintReceiptState extends State<PrintReceipt> {
 
   Future<List<int>> _formatReceipt(PaperSize paper, CapabilityProfile profile) async {
     final Generator ticket = Generator(paper, profile);
+    ticket.spaceBetweenRows = 1;
     List<int> bytes = [];
 
     // Print image
@@ -171,8 +175,9 @@ class _PrintReceiptState extends State<PrintReceipt> {
     bytes += ticket.text('FUMZZY GLOBAL VENTURES',
         styles: PosStyles(
           align: PosAlign.center,
-          height: PosTextSize.size2,
-          width: PosTextSize.size2,
+          height: PosTextSize.size4,
+          width: PosTextSize.size3,
+          bold: true
         ),
         linesAfter: 1);
 
@@ -180,15 +185,15 @@ class _PrintReceiptState extends State<PrintReceipt> {
         styles: PosStyles(align: PosAlign.center));
     bytes += ticket.text('Lagos, Nigeria',
         styles: PosStyles(align: PosAlign.center));
-    bytes += ticket.text('Tel: 08033664054',
+    bytes += ticket.text('Tel: 08130855871, 08033664053',
         styles: PosStyles(align: PosAlign.center));
 
     bytes += ticket.hr();
     bytes += ticket.row([
       PosColumn(text: 'Qty', width: 1),
-      PosColumn(text: 'Item', width: 7, styles: PosStyles(align: PosAlign.center)),
-      PosColumn(text: 'Price', width: 2, styles: PosStyles(align: PosAlign.center)),
-      PosColumn(text: 'Total', width: 2, styles: PosStyles(align: PosAlign.center)),
+      PosColumn(text: 'Item', width: 5),
+      PosColumn(text: 'Price', width: 3),
+      PosColumn(text: 'Total', width: 3),
     ]);
 
     for(int i = 0; i < widget.reports!['report'].length; i++){
@@ -196,24 +201,11 @@ class _PrintReceiptState extends State<PrintReceipt> {
       double totalPrice = double.parse(widget.reports!['report'][i]['totalPrice'].toString());
       bytes += ticket.row([
         PosColumn(
-            text: widget.reports!['report'][i]['quantity'].toString(),
-            width: 1
+          text: widget.reports!['report'][i]['quantity'].toString(), width: 1
         ),
-        PosColumn(
-            text: widget.reports!['report'][i]['productName'],
-            width: 7,
-            styles: PosStyles(align: PosAlign.left)
-        ),
-        PosColumn(
-            text: Functions.money(unitPrice, ''),
-            width: 2,
-            styles: PosStyles(align: PosAlign.left)
-        ),
-        PosColumn(
-            text: Functions.money(totalPrice, ''),
-            width: 2,
-            styles: PosStyles(align: PosAlign.left)
-        ),
+        PosColumn(text: widget.reports!['report'][i]['productName'], width: 5),
+        PosColumn(text: Functions.money0(unitPrice, ''), width: 3),
+        PosColumn(text: Functions.money0(totalPrice, ''), width: 3),
       ]);
     }
     bytes += ticket.hr();
@@ -222,18 +214,19 @@ class _PrintReceiptState extends State<PrintReceipt> {
     bytes += ticket.row([
       PosColumn(
           text: 'TOTAL: ',
-          width: 6,
+          width: 4,
           styles: PosStyles(
-            height: PosTextSize.size5,
-            width: PosTextSize.size5,
+            align: PosAlign.left,
+            height: PosTextSize.size3,
+            bold: true
           )),
       PosColumn(
-          text: Functions.money(totalPrice, 'NGN'),
-          width: 6,
+          text: Functions.money0(totalPrice, 'NGN'),
+          width: 8,
           styles: PosStyles(
             align: PosAlign.right,
-            height: PosTextSize.size5,
-            width: PosTextSize.size5,
+            height: PosTextSize.size3,
+            bold: true
           )),
     ]);
 
@@ -242,23 +235,27 @@ class _PrintReceiptState extends State<PrintReceipt> {
     bytes += ticket.row([
       PosColumn(
           text: widget.paymentMode! + ' ',
-          width: 7,
-          styles: PosStyles(align: PosAlign.right, width: PosTextSize.size2)),
-      PosColumn(
-          text: Functions.money(paymentMade, 'NGN'),
           width: 5,
-          styles: PosStyles(align: PosAlign.right, width: PosTextSize.size2)),
+          styles: PosStyles(align: PosAlign.left, bold: true)
+      ),
+      PosColumn(
+          text: Functions.money0(paymentMade, 'NGN'),
+          width: 7,
+          styles: PosStyles(align: PosAlign.left, bold: true)
+      ),
     ]);
     if((totalPrice - paymentMade) > 0){
       bytes += ticket.row([
         PosColumn(
             text: 'Balance',
-            width: 7,
-            styles: PosStyles(align: PosAlign.right, width: PosTextSize.size2)),
-        PosColumn(
-            text: Functions.money((totalPrice - paymentMade), 'NGN'),
             width: 5,
-            styles: PosStyles(align: PosAlign.right, width: PosTextSize.size2)),
+            styles: PosStyles(align: PosAlign.left, bold: true)
+        ),
+        PosColumn(
+            text: Functions.money0((totalPrice - paymentMade), 'NGN'),
+            width: 7,
+            styles: PosStyles(align: PosAlign.left, bold: true)
+        ),
       ]);
     }
 
@@ -271,14 +268,14 @@ class _PrintReceiptState extends State<PrintReceipt> {
     bytes += ticket.text(
         timestamp,
         styles: PosStyles(align: PosAlign.center),
-        linesAfter: 2
+        linesAfter: 4
     );
     ticket.feed(2);
     ticket.cut();
     return bytes;
   }
 
-  Future<List<int>> testTicket(PaperSize paper, CapabilityProfile profile) async {
+  Future<List<int>> _testTicket(PaperSize paper, CapabilityProfile profile) async {
     final Generator generator = Generator(paper, profile);
     List<int> bytes = [];
 

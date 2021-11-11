@@ -6,7 +6,13 @@ class Functions{
 
   /// Convert a double [value] to a currency
   static String money(double value, String currency) {
-    final nf = NumberFormat('#\,##0.00', 'en_US');
+    final nf = NumberFormat('#\,##0', 'en_US');
+    return '${currencyMap[currency]}${nf.format(value)}';
+  }
+
+  /// Convert a double [value] to a currency
+  static String money0(double value, String currency) {
+    final nf = NumberFormat('#\,##0', 'en_US');
     return '${currencyMap[currency]}${nf.format(value)}';
   }
 
@@ -65,7 +71,7 @@ class Functions{
   /// Converting [dateTime] to return a formatted time
   /// of day, month, hour with am or pm
   static String getFormattedDateTimeY(DateTime dateTime) { // 23, May\n12:130pm
-    return DateFormat('d, MMM YYYY h:mm a').format(dateTime).toString();
+    return DateFormat('d, MMM y h:mm a').format(dateTime).toString();
   }
 
 }

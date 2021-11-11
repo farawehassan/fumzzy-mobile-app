@@ -4,7 +4,6 @@ import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:fumzy/bloc/future-values.dart';
 import 'package:fumzy/database/user-db-helper.dart';
 import 'package:fumzy/model/user.dart';
-import 'package:fumzy/screens/notification/notifications.dart';
 import 'package:fumzy/screens/settings/settings.dart';
 import 'package:fumzy/screens/creditors/creditors.dart';
 import 'package:fumzy/screens/staff/staff.dart';
@@ -264,7 +263,7 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                         },
                       ),
                       // Creditor
-                      ListTile(
+                      if(_isAdmin) ListTile(
                         leading: Icon(
                           IconlyBold.wallet,
                           color: _getColor('CREDITORS'),
@@ -309,9 +308,7 @@ class _RefactoredDrawerState extends State<RefactoredDrawer> {
                         },
                       ),*/
                       // Staffs
-                      !_isAdmin
-                          ? Container()
-                          : ListTile(
+                      if(_isAdmin) ListTile(
                         leading: Icon(
                           IconlyBold.user2,
                           color: _getColor('STAFFS'),

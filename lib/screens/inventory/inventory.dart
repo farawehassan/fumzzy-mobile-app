@@ -290,8 +290,23 @@ class _InventoryState extends State<Inventory> {
     });
   }
 
+  /// This is a variable that holds if the user is admin or not
+  bool _isAdmin = false;
+
+  /// Function to fetch the user's details and check if user is admin or not to
+  /// set to [_isAdmin]
+  void _getCurrentUser() async {
+    await futureValue.getCurrentUser().then((value) async {
+      if(!mounted)return;
+      setState(() => _isAdmin = value.type! == 'admin');
+    }).catchError((e) {
+      print(e);
+    });
+  }
+
   @override
   void initState() {
+    _getCurrentUser();
     super.initState();
     _getAllProducts(refresh: true);
     _getAllCategories();
@@ -333,7 +348,7 @@ class _InventoryState extends State<Inventory> {
                           ),
                         ),
                       ),
-                      Expanded(
+                      if(_isAdmin) Expanded(
                         child: Wrap(
                           crossAxisAlignment: WrapCrossAlignment.end,
                           alignment: WrapAlignment.end,
