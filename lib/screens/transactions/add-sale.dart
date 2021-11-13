@@ -262,7 +262,7 @@ class _AddSaleState extends State<AddSale> {
               ReusableCustomerInfoFields(
                 tableTitle: 'Selling Price',
                 widget: Container(
-                  width: 67,
+                  width: 77,
                   child: TextFormField(
                     style: TextStyle(
                       color: Colors.black,
@@ -276,14 +276,24 @@ class _AddSaleState extends State<AddSale> {
                     ],
                     controller: sellingPrice,
                     onChanged: (value){
-                      _salesData[index - 1]['sellingPrice'] = value;
-                      if(quantity.text.isNotEmpty){
-                        amount.text = (double.parse(sellingPrice.text) * double.parse(value)).toString();
-                        _salesData[index - 1]['total'] = double.parse(amount.text);
+                      try{
+                        _salesData[index - 1]['sellingPrice'] = value;
+                        if(quantity.text.isNotEmpty){
+                          amount.text = (double.parse(quantity.text) * double.parse(value)).toString();
+                          _salesData[index - 1]['total'] = double.parse(amount.text);
+                        }
+                      } catch(e){
+                        print(e);
+                        _salesData[index - 1]['sellingPrice'] = 0;
+                        if(quantity.text.isNotEmpty){
+                          amount.text = '0';
+                          _salesData[index - 1]['total'] = 0;
+                        }
                       }
                     },
                     validator: (value) {
-                      if (value!.isEmpty) return 'Enter selling price';
+                      if (value!.isEmpty) return 'Enter price';
+                      if (value == '0') return 'Enter price';
                       return null;
                     },
                     decoration: kTextFieldBorderDecoration.copyWith(
@@ -315,27 +325,34 @@ class _AddSaleState extends State<AddSale> {
                     ],
                     controller: quantity,
                     onChanged: (value){
-                      if(!mounted)return;
-                      setState(() {
-                        _salesData[index - 1]['quantity'] = value;
-                        if(sellingPrice.text.isNotEmpty){
-                          try{
+                      try{
+                        if(!mounted)return;
+                        setState(() {
+                          _salesData[index - 1]['quantity'] = value;
+                          if(sellingPrice.text.isNotEmpty){
                             double total = double.parse(sellingPrice.text) * double.parse(value);
                             amount.text = Functions.money(total, 'N');
                             _salesData[index - 1]['total'] = total;
-                          } catch(e){
-                            print(e);
-                            amount.text = 'N0.0';
-                            _salesData[index - 1]['total'] = 0.0;
                           }
-                        }
-                      });
+                        });
+                      } catch(e){
+                        if(!mounted)return;
+                        setState(() {
+                          _salesData[index - 1]['quantity'] = 0;
+                          if(sellingPrice.text.isNotEmpty){
+                            double total = 0;
+                            amount.text = '0';
+                            _salesData[index - 1]['total'] = 0;
+                          }
+                        });
+                      }
                     },
                     validator: (value) {
                       if (value!.isEmpty) return 'Enter quantity';
+                      if (value == '0') return 'Enter quantity';
                       if(selectedProduct != null) {
                         if(selectedProduct!.currentQty! < double.parse(value)){
-                          return 'You don\'t have up to $value ${selectedProduct!.productName}';
+                          return 'Invalid';
                         }
                       }
                       return null;
@@ -355,7 +372,7 @@ class _AddSaleState extends State<AddSale> {
               ReusableCustomerInfoFields(
                 tableTitle: 'Amount',
                 widget: Container(
-                  width: 100,
+                  width: 110,
                   child: TextFormField(
                     style: TextStyle(
                       color: Colors.black,
@@ -1028,194 +1045,6 @@ class _AddSaleState extends State<AddSale> {
               ),
             );
           },
-        ),
-      ),
-    );
-  }
-
-  Future<void> _generateInvoice() {
-    return showDialog(
-      context: context,
-      barrierColor: Color(0xFF000428).withOpacity(0.86),
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: Color(0xFFFFFFFF),
-        ),
-        margin: EdgeInsets.all(50),
-        child: Material(
-          borderRadius: BorderRadius.circular(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                padding: EdgeInsets.fromLTRB(24, 30, 24, 27),
-                decoration: BoxDecoration(
-                  color: Color(0xFFF5F8FF),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(15.0),
-                    topRight: Radius.circular(15.0),
-                  ),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'DOWNLOAD AND SHARE INVOICE',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Icon(
-                        IconlyBold.closeSquare,
-                        color: Colors.black.withOpacity(0.7),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        SizedBox(height: 27),
-                        Container(
-                          width: 67,
-                          height: 67,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color(0xFF00CFA0).withOpacity(0.15),
-                          ),
-                          child: Icon(
-                            Icons.done_rounded,
-                            color: Color(0xFF00CFA0),
-                            size: 45,
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(top: 22),
-                          child: Text(
-                            'Transaction Invoice Generated Successfully',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Color(0xFF00509A),
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 19.0),
-                          child: Text(
-                            'Your transaction invoice has been generated. You can download or share with customers.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Color(0xFF000428).withOpacity(0.6),
-                              fontWeight: FontWeight.w400,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 45),
-                        ReusableCard(
-                          elevation: 5,
-                          child: Container(
-                            padding: EdgeInsets.fromLTRB(12, 17, 21, 27),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  width: 62,
-                                  height: 60,
-                                  decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                      image: AssetImage('assets/images/pdf-image.png'),
-                                      fit: BoxFit.contain,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 5),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Invoice' + 023345.toString() + '.pdf',
-                                      style: TextStyle(
-                                        color: Color(0xFF002338),
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                    ),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      '34MB',
-                                      style: TextStyle(
-                                        color: Color(0xFF002338).withOpacity(0.3),
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w300,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 60),
-                        Button(
-                          onTap: (){
-                            print('Download');
-                          },
-                          buttonColor: Color(0xFF00509A),
-                          child: Center(
-                            child: Text(
-                              'Download',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Color(0xFFFFFFFF),
-                                fontSize: 14,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        TextButton(
-                          onPressed: () {
-                            print('share');
-                          },
-                          child: Container(
-                            width: 130,
-                            child: Center(
-                              child: Text(
-                                'Share',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ]),
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );

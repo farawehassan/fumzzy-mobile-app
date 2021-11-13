@@ -35,6 +35,20 @@ class _ProductsOnlyState extends State<ProductsOnly> {
     '': Colors.transparent
   };
 
+  /// This is a variable that holds if the user is admin or not
+  bool _isAdmin = false;
+
+  /// Function to fetch the user's details and check if user is admin or not to
+  /// set to [_isAdmin]
+  void _getCurrentUser() async {
+    await futureValue.getCurrentUser().then((value) async {
+      if(!mounted)return;
+      setState(() => _isAdmin = value.type! == 'admin');
+    }).catchError((e) {
+      print(e);
+    });
+  }
+
   /** Product aspect ***/
 
   /// A List to hold the all the products
@@ -84,7 +98,7 @@ class _ProductsOnlyState extends State<ProductsOnly> {
             DataCell(Text(product.productName!)),
             DataCell(Text(product.category!.name!)),
             DataCell(Text(product.currentQty.toString())),
-            DataCell(Text(Functions.money(product.costPrice!, 'N'))),
+            if(_isAdmin) DataCell(Text(Functions.money(product.costPrice!, 'N'))),
             DataCell(Text(Functions.money(product.sellingPrice!, 'N'))),
             DataCell(Text(stock, style: TextStyle(color: _stockColor[stock]))),
             DataCell(TableArrowButton()),
@@ -128,11 +142,11 @@ class _ProductsOnlyState extends State<ProductsOnly> {
                     columnSpacing: 15.0,
                     dataRowHeight: 65.0,
                     showCheckboxColumn: false,
-                    columns: const [
+                    columns: [
                       DataColumn(label: Text('Product Name')),
                       DataColumn(label: Text('Category')),
                       DataColumn(label: Text('Quantity')),
-                      DataColumn(label: Text('Cost Price')),
+                      if(_isAdmin) DataColumn(label: Text('Cost Price')),
                       DataColumn(label: Text('Selling Price')),
                       DataColumn(label: Text('Status')),
                       DataColumn(label: Text('')),
@@ -187,6 +201,7 @@ class _ProductsOnlyState extends State<ProductsOnly> {
 
   @override
   void initState() {
+    _getCurrentUser();
     super.initState();
     _getAllProducts(refresh: true);
     _getAllCategories();

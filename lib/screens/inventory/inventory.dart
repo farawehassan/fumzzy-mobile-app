@@ -97,7 +97,7 @@ class _InventoryState extends State<Inventory> {
             DataCell(Text(product.productName!)),
             DataCell(Text(product.category!.name!)),
             DataCell(Text(product.currentQty.toString())),
-            DataCell(Text(Functions.money(product.costPrice!, 'N'))),
+            if(_isAdmin) DataCell(Text(Functions.money(product.costPrice!, 'N'))),
             DataCell(Text(Functions.money(product.sellingPrice!, 'N'))),
             DataCell(Text(stock, style: TextStyle(color: _stockColor[stock]))),
             DataCell(TableArrowButton()),
@@ -141,11 +141,11 @@ class _InventoryState extends State<Inventory> {
                     columnSpacing: 15.0,
                     dataRowHeight: 65.0,
                     showCheckboxColumn: false,
-                    columns: const [
+                    columns: [
                       DataColumn(label: Text('Product Name')),
                       DataColumn(label: Text('Category')),
                       DataColumn(label: Text('Quantity')),
-                      DataColumn(label: Text('Cost Price')),
+                      if(_isAdmin) DataColumn(label: Text('Cost Price')),
                       DataColumn(label: Text('Selling Price')),
                       DataColumn(label: Text('Status')),
                       DataColumn(label: Text('')),

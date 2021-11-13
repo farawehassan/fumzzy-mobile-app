@@ -89,19 +89,37 @@ class _DashboardState extends State<Dashboard> {
   Widget _buildPurchaseList() {
     List<DataRow> itemRow = [];
     if(_filteredPurchases.length > 0 && _filteredPurchases.isNotEmpty){
-      for (int i = 0; i <= 3; i++){
-        Purchase purchase = _filteredPurchases[i];
-        itemRow.add(
-          DataRow(cells: [
-            DataCell(Text(Functions.getFormattedDateTime(purchase.createdAt!))),
-            DataCell(Text(purchase.product!.productName!)),
-            DataCell(Text(purchase.product!.category!.name!)),
-            DataCell(Text(purchase.quantity!.toString())),
-            DataCell(Text(Functions.money(purchase.costPrice!, 'N'))),
-            DataCell(Text(Functions.money(purchase.costPrice!, 'N'))),
-            DataCell(Text(Functions.money(purchase.product!.costPrice! * purchase.quantity!, 'N'))),
-          ]),
-        );
+      if(_filteredPurchases.length > 3){
+        for (int i = 0; i <= 3; i++){
+          Purchase purchase = _filteredPurchases[i];
+          itemRow.add(
+            DataRow(cells: [
+              DataCell(Text(Functions.getFormattedDateTime(purchase.createdAt!))),
+              DataCell(Text(purchase.product!.productName!)),
+              DataCell(Text(purchase.product!.category!.name!)),
+              DataCell(Text(purchase.quantity!.toString())),
+              DataCell(Text(Functions.money(purchase.costPrice!, 'N'))),
+              DataCell(Text(Functions.money(purchase.costPrice!, 'N'))),
+              DataCell(Text(Functions.money(purchase.product!.costPrice! * purchase.quantity!, 'N'))),
+            ]),
+          );
+        }
+      }
+      else {
+        for (int i = 0; i < _filteredPurchases.length; i++){
+          Purchase purchase = _filteredPurchases[i];
+          itemRow.add(
+            DataRow(cells: [
+              DataCell(Text(Functions.getFormattedDateTime(purchase.createdAt!))),
+              DataCell(Text(purchase.product!.productName!)),
+              DataCell(Text(purchase.product!.category!.name!)),
+              DataCell(Text(purchase.quantity!.toString())),
+              DataCell(Text(Functions.money(purchase.costPrice!, 'N'))),
+              DataCell(Text(Functions.money(purchase.costPrice!, 'N'))),
+              DataCell(Text(Functions.money(purchase.product!.costPrice! * purchase.quantity!, 'N'))),
+            ]),
+          );
+        }
       }
       return RefreshIndicator(
         onRefresh: _refreshPurchases,
@@ -225,32 +243,65 @@ class _DashboardState extends State<Dashboard> {
   Widget _buildSaleList() {
     List<DataRow> itemRow = [];
     if(_filteredSales.length > 0 && _filteredSales.isNotEmpty){
-      for (int i = 0; i <= 3; i++){
-        Sale sale = _filteredSales[i];
-        itemRow.add(
-          DataRow(cells: [
-            DataCell(Text(Functions.getFormattedDateTime(sale.createdAt!))),
-            DataCell(Text(sale.productName!)),
-            DataCell(Text(sale.quantity!.toString())),
-            DataCell(Text(sale.paymentMode!)),
-            DataCell(Text(
-              Functions.money(sale.totalPrice!, 'N'),
-              style: TextStyle(fontWeight: FontWeight.bold),
-            )),
-            DataCell(TableArrowButton()),
-          ],
-            onSelectChanged: (value){
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SalesInfo(
-                    sale: sale,
-                  ),
-                ),
-              );
-            }),
-        );
+      if(_filteredSales.length > 3){
+        for (int i = 0; i <= 3; i++){
+          Sale sale = _filteredSales[i];
+          itemRow.add(
+            DataRow(cells: [
+              DataCell(Text(Functions.getFormattedDateTime(sale.createdAt!))),
+              DataCell(Text(sale.productName!)),
+              DataCell(Text(sale.quantity!.toString())),
+              DataCell(Text(sale.paymentMode!)),
+              DataCell(Text(
+                Functions.money(sale.totalPrice!, 'N'),
+                style: TextStyle(fontWeight: FontWeight.bold),
+              )),
+              DataCell(TableArrowButton()),
+            ],
+                onSelectChanged: (value){
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SalesInfo(
+                        sale: sale,
+                      ),
+                    ),
+                  );
+                }),
+          );
+        }
       }
+      else {
+        for (int i = 0; i < _filteredSales.length; i++){
+          for (int i = 0; i < _filteredSales.length; i++){
+            Sale sale = _filteredSales[i];
+            itemRow.add(
+              DataRow(cells: [
+                DataCell(Text(Functions.getFormattedDateTime(sale.createdAt!))),
+                DataCell(Text(sale.productName!)),
+                DataCell(Text(sale.quantity!.toString())),
+                DataCell(Text(sale.paymentMode!)),
+                DataCell(Text(
+                  Functions.money(sale.totalPrice!, 'N'),
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                )),
+                DataCell(TableArrowButton()),
+              ],
+                  onSelectChanged: (value){
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SalesInfo(
+                          sale: sale,
+                        ),
+                      ),
+                    );
+                  }),
+            );
+          }
+        }
+      }
+
       return RefreshIndicator(
         onRefresh: _refreshSales,
         key: _refreshSalesKey,

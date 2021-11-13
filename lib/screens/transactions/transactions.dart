@@ -931,7 +931,7 @@ class _TransactionsState extends State<Transactions> {
                                                 return null;
                                               },
                                               decoration: kTextFieldBorderDecoration.copyWith(
-                                                hintText: 'Bought 10 litres petrol',
+                                                hintText: 'Enter description',
                                                 hintStyle: TextStyle(
                                                   color: Colors.black.withOpacity(0.5),
                                                   fontSize: 14,

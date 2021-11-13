@@ -51,8 +51,10 @@ class ProductDataSource{
         if (res['error']) throw res['message'];
         file.writeAsStringSync(jsonEncode(res), flush: true, mode: FileMode.write);
         List<Purchase> allPurchases = [];
-        var rest = res['data']['items'] as List;
-        allPurchases = rest.map<Purchase>((json) => Purchase.fromJson(json)).toList();
+        if(res['data']['items'] != null){
+          var rest = res['data']['items'] as List;
+          allPurchases = rest.map<Purchase>((json) => Purchase.fromJson(json)).toList();
+        }
         result['totalCount'] = res['data']['totalCount'];
         result['page'] = res['data']['page'];
         result['items'] = allPurchases;

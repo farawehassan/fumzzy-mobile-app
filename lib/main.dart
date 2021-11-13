@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fumzy/screens/notification/mobile-notification-content.dart';
-import 'package:fumzy/screens/products/products-only.dart';
+import 'screens/notification/mobile-notification-content.dart';
+import 'screens/products/products-only.dart';
 import 'screens/inventory/inventory.dart';
 import 'screens/splash-screen.dart';
 import 'screens/creditors/creditors.dart';
