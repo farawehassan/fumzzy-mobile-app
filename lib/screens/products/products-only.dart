@@ -8,6 +8,7 @@ import 'package:fumzy/model/category.dart';
 import 'package:fumzy/model/product.dart';
 import 'package:fumzy/screens/dashboard/drawer.dart';
 import 'package:fumzy/screens/inventory/inventory-detail/inventory-detail.dart';
+import 'package:fumzy/utils/constant-styles.dart';
 import 'package:fumzy/utils/functions.dart';
 
 class ProductsOnly extends StatefulWidget {
@@ -86,7 +87,7 @@ class _ProductsOnlyState extends State<ProductsOnly> {
   /// A function to build the list of all the products
   Widget _buildProductList() {
     List<DataRow> itemRow = [];
-    if(_products.length > 0 && _products.isNotEmpty){
+    if(_products.isNotEmpty){
       for (int i = 0; i < _products.length; i++){
         Product product = _products[i];
         String stock = '';
@@ -122,40 +123,38 @@ class _ProductsOnlyState extends State<ProductsOnly> {
         key: _refreshProductKey,
         color: Color(0xFF004E92),
         child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  physics: BouncingScrollPhysics(),
-                  child: DataTable(
-                    headingTextStyle: TextStyle(
-                      color: Color(0xFF75759E),
-                      fontSize: 14,
-                      fontWeight: FontWeight.normal,
-                    ),
-                    dataTextStyle: TextStyle(
-                      color: Color(0xFF1F1F1F),
-                      fontSize: 14,
-                      fontWeight: FontWeight.normal,
-                    ),
-                    columnSpacing: 15.0,
-                    dataRowHeight: 65.0,
-                    showCheckboxColumn: false,
-                    columns: [
-                      DataColumn(label: Text('Product Name')),
-                      DataColumn(label: Text('Category')),
-                      DataColumn(label: Text('Quantity')),
-                      if(_isAdmin) DataColumn(label: Text('Cost Price')),
-                      DataColumn(label: Text('Selling Price')),
-                      DataColumn(label: Text('Status')),
-                      DataColumn(label: Text('')),
-                    ],
-                    rows: itemRow,
-                  )
-              ),
-              const SizedBox(height: 80),
-            ],
+          child: Container(
+            padding: EdgeInsets.only(bottom: 80),
+            decoration: kTableContainer,
+            child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                physics: BouncingScrollPhysics(),
+                child: DataTable(
+                  headingTextStyle: TextStyle(
+                    color: Color(0xFF75759E),
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                  ),
+                  dataTextStyle: TextStyle(
+                    color: Color(0xFF1F1F1F),
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                  ),
+                  columnSpacing: 15.0,
+                  dataRowHeight: 65.0,
+                  showCheckboxColumn: false,
+                  columns: [
+                    DataColumn(label: Text('Product Name')),
+                    DataColumn(label: Text('Category')),
+                    DataColumn(label: Text('Quantity')),
+                    if(_isAdmin) DataColumn(label: Text('Cost Price')),
+                    DataColumn(label: Text('Selling Price')),
+                    DataColumn(label: Text('Status')),
+                    DataColumn(label: Text('')),
+                  ],
+                  rows: itemRow,
+                )
+            ),
           ),
         ),
       );

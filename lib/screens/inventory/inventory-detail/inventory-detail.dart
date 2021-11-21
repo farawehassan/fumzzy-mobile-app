@@ -144,7 +144,7 @@ class _InventoryDetailState extends State<InventoryDetail> {
   /// A function to build the list of all the purchases
   Widget _buildPurchaseList() {
     List<DataRow> itemRow = [];
-    if(_filteredPurchases.length > 0 && _filteredPurchases.isNotEmpty){
+    if(_filteredPurchases.isNotEmpty){
       for (int i = 0; i < _filteredPurchases.length; i++){
         Purchase purchase = _filteredPurchases[i];
         itemRow.add(
@@ -177,7 +177,7 @@ class _InventoryDetailState extends State<InventoryDetail> {
         decoration: kTableContainer,
         child: SingleChildScrollView(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
@@ -207,16 +207,13 @@ class _InventoryDetailState extends State<InventoryDetail> {
                   )
               ),
               const SizedBox(height: 80),
-              _showPurchaseSpinner
-                  ? Center(
-                child: Padding(
-                  padding: EdgeInsets.all(24.0),
+              if(_showPurchaseSpinner)
+                Padding(
+                  padding: EdgeInsets.only(left: 200),
                   child: CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0A459F)),
                   ),
                 ),
-              )
-                  : Container(),
               const SizedBox(height: 50),
             ],
           ),
@@ -249,8 +246,23 @@ class _InventoryDetailState extends State<InventoryDetail> {
     });
   }
 
+  /// This is a variable that holds if the user is admin or not
+  bool _isAdmin = false;
+
+  /// Function to fetch the user's details and check if user is admin or not to
+  /// set to [_isAdmin]
+  void _getCurrentUser() async {
+    await futureValue.getCurrentUser().then((value) async {
+      if(!mounted)return;
+      setState(() => _isAdmin = value.type! == 'admin');
+    }).catchError((e) {
+      print(e);
+    });
+  }
+
   @override
   void initState() {
+    _getCurrentUser();
     super.initState();
     _checkStatus();
     _setProductDetails();
@@ -280,153 +292,148 @@ class _InventoryDetailState extends State<InventoryDetail> {
                 padding: EdgeInsets.fromLTRB(20, 25, 20, 0),
                 child: SingleChildScrollView(
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  InkWell(
-                                    onTap: () => Navigator.pop(context),
-                                    child: Icon(
-                                      IconlyBold.arrowLeftCircle,
-                                      size: 19,
-                                      color: Color(0xFF004E92).withOpacity(0.5),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 2.0),
-                                    child: Text(
-                                      ' Inventory Detail',
-                                      style: TextStyle(
-                                        color: Color(0xFF75759E),
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 15.7,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                              InkWell(
+                                onTap: () => Navigator.pop(context),
+                                child: Icon(
+                                  IconlyBold.arrowLeftCircle,
+                                  size: 19,
+                                  color: Color(0xFF004E92).withOpacity(0.5),
+                                ),
                               ),
-                              Button(
-                                onTap: () => _restockProduct(constraints),
-                                buttonColor: Color(0xFF00509A),
-                                width: 100,
-                                child: Center(
-                                  child: Text(
-                                    'Re-stock',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: Color(0xFFFFFFFF),
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.normal,
-                                    ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 2.0),
+                                child: Text(
+                                  ' Inventory Detail',
+                                  style: TextStyle(
+                                    color: Color(0xFF75759E),
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 15.7,
                                   ),
                                 ),
                               ),
                             ],
                           ),
-                          SizedBox(height: 35),
-                          // Product info
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Container(
-                              width: constraints.maxWidth,
-                              decoration: kTableContainer,
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 30, vertical: 24),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                          if(_isAdmin)
+                            Button(
+                              onTap: () => _restockProduct(constraints),
+                              buttonColor: Color(0xFF00509A),
+                              width: 100,
+                              child: Center(
+                                child: Text(
+                                  'Re-stock',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Color(0xFFFFFFFF),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      SizedBox(height: 35),
+                      // Product info
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Container(
+                          width: constraints.maxWidth,
+                          decoration: kTableContainer,
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 30, vertical: 24),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Product Info',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  color: Color(0xFF004E92),
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.symmetric(vertical: 15.0),
+                                child: Divider(
+                                  height: 1,
+                                  thickness: 1,
+                                  color: Colors.black.withOpacity(0.2),
+                                ),
+                              ),
+                              Wrap(
+                                runSpacing: 20,
+                                spacing: 55,
                                 children: [
-                                  Text(
-                                    'Product Info',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                      color: Color(0xFF004E92),
+                                  ReusableCustomerInfoFields(
+                                    tableTitle: 'Product Name',
+                                    widget: Text(
+                                      widget.product!.productName!,
                                     ),
                                   ),
-                                  Container(
-                                    margin: EdgeInsets.symmetric(vertical: 15.0),
-                                    child: Divider(
-                                      height: 1,
-                                      thickness: 1,
-                                      color: Colors.black.withOpacity(0.2),
+                                  ReusableCustomerInfoFields(
+                                    tableTitle: 'Category',
+                                    widget: Text(
+                                      widget.product!.category!.name!,
                                     ),
                                   ),
-                                  Wrap(
-                                    runSpacing: 20,
-                                    spacing: 55,
-                                    children: [
-                                      ReusableCustomerInfoFields(
-                                        tableTitle: 'Product Name',
-                                        widget: Text(
-                                          widget.product!.productName!,
-                                        ),
-                                      ),
-                                      ReusableCustomerInfoFields(
-                                        tableTitle: 'Category',
-                                        widget: Text(
-                                          widget.product!.category!.name!,
-                                        ),
-                                      ),
-                                      ReusableCustomerInfoFields(
-                                        tableTitle: 'Quantity',
-                                        widget: Text(
-                                          widget.product!.currentQty!.toString(),
-                                        ),
-                                      ),
-                                      ReusableCustomerInfoFields(
-                                        tableTitle: 'Status',
-                                        widget: Text(
-                                          _status,
-                                          style: TextStyle(
-                                            color: _stockColor[_status]
-                                          ),
-                                        ),
-                                      ),
-                                    ],
+                                  ReusableCustomerInfoFields(
+                                    tableTitle: 'Quantity',
+                                    widget: Text(
+                                      widget.product!.currentQty!.toString(),
+                                    ),
                                   ),
-                                  SizedBox(height: 30),
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      ReusableCustomerInfoFields(
-                                        tableTitle: 'Unit Selling Price',
-                                        widget: Text(Functions.money(widget.product!.sellingPrice!, 'N')),
+                                  ReusableCustomerInfoFields(
+                                    tableTitle: 'Status',
+                                    widget: Text(
+                                      _status,
+                                      style: TextStyle(
+                                        color: _stockColor[_status]
                                       ),
-                                      SizedBox(width: 40),
-                                      ReusableCustomerInfoFields(
-                                        tableTitle: 'Last Re-payment Date',
-                                        widget: Text(Functions.getFormattedDate(widget.product!.updatedAt!)),
-                                      ),
-                                    ],
+                                    ),
                                   ),
                                 ],
                               ),
-                            ),
+                              SizedBox(height: 30),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  ReusableCustomerInfoFields(
+                                    tableTitle: 'Unit Selling Price',
+                                    widget: Text(Functions.money(widget.product!.sellingPrice!, 'N')),
+                                  ),
+                                  SizedBox(width: 40),
+                                  ReusableCustomerInfoFields(
+                                    tableTitle: 'Last Re-payment Date',
+                                    widget: Text(Functions.getFormattedDate(widget.product!.updatedAt!)),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                          SizedBox(height: 70),
-                          Text(
-                            'Restock History',
-                            style: TextStyle(
-                              color: Color(0xFF00509A),
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          SizedBox(height: 19),
-                          _buildPurchaseList(),
-                          SizedBox(height: 100),
-                        ],
+                        ),
                       ),
+                      SizedBox(height: 70),
+                      Text(
+                        'Restock History',
+                        style: TextStyle(
+                          color: Color(0xFF00509A),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      SizedBox(height: 19),
+                      _buildPurchaseList(),
+                      SizedBox(height: 100),
                     ],
                   ),
                 )),

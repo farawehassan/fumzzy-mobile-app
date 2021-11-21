@@ -13,7 +13,7 @@ class TotalSalesCard extends StatelessWidget {
 
   final String? cardName;
 
-  final dynamic? totalPrice;
+  final dynamic totalPrice;
 
   @override
   Widget build(BuildContext context) {

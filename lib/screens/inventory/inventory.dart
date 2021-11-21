@@ -85,7 +85,7 @@ class _InventoryState extends State<Inventory> {
   /// A function to build the list of all the products
   Widget _buildProductList() {
     List<DataRow> itemRow = [];
-    if(_products.length > 0 && _products.isNotEmpty){
+    if(_products.isNotEmpty){
       for (int i = 0; i < _products.length; i++){
         Product product = _products[i];
         String stock = '';
@@ -121,41 +121,39 @@ class _InventoryState extends State<Inventory> {
         key: _refreshProductKey,
         color: Color(0xFF004E92),
         child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  physics: BouncingScrollPhysics(),
-                  child: DataTable(
-                    headingTextStyle: TextStyle(
-                      color: Color(0xFF75759E),
-                      fontSize: 14,
-                      fontWeight: FontWeight.normal,
-                    ),
-                    dataTextStyle: TextStyle(
-                      color: Color(0xFF1F1F1F),
-                      fontSize: 14,
-                      fontWeight: FontWeight.normal,
-                    ),
-                    columnSpacing: 15.0,
-                    dataRowHeight: 65.0,
-                    showCheckboxColumn: false,
-                    columns: [
-                      DataColumn(label: Text('Product Name')),
-                      DataColumn(label: Text('Category')),
-                      DataColumn(label: Text('Quantity')),
-                      if(_isAdmin) DataColumn(label: Text('Cost Price')),
-                      DataColumn(label: Text('Selling Price')),
-                      DataColumn(label: Text('Status')),
-                      DataColumn(label: Text('')),
-                    ],
-                    rows: itemRow,
-                  )
+            child: Container(
+              padding: EdgeInsets.only(bottom: 80),
+              decoration: kTableContainer,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                physics: BouncingScrollPhysics(),
+                child: DataTable(
+                  headingTextStyle: TextStyle(
+                    color: Color(0xFF75759E),
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                  ),
+                  dataTextStyle: TextStyle(
+                    color: Color(0xFF1F1F1F),
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                  ),
+                  columnSpacing: 15.0,
+                  dataRowHeight: 65.0,
+                  showCheckboxColumn: false,
+                  columns: [
+                    DataColumn(label: Text('Product Name')),
+                    DataColumn(label: Text('Category')),
+                    DataColumn(label: Text('Quantity')),
+                    if(_isAdmin) DataColumn(label: Text('Cost Price')),
+                    DataColumn(label: Text('Selling Price')),
+                    DataColumn(label: Text('Status')),
+                    DataColumn(label: Text('')),
+                  ],
+                  rows: itemRow,
+                ),
               ),
-              const SizedBox(height: 80),
-            ],
-          ),
+            )
         ),
       );
     }
@@ -207,7 +205,7 @@ class _InventoryState extends State<Inventory> {
   /// A function to build the list of all the categories
   Widget _buildCategoryList() {
     List<DataRow> itemRow = [];
-    if(_categories.length > 0 && _categories.isNotEmpty){
+    if(_categories.isNotEmpty){
       for (int i = 0; i < _categories.length; i++){
         Category category = _categories[i];
         itemRow.add(
@@ -246,25 +244,35 @@ class _InventoryState extends State<Inventory> {
         onRefresh: _refreshCategories,
         key: _refreshCategoryKey,
         color: Color(0xFF004E92),
-        child: DataTable(
-          headingTextStyle: TextStyle(
-            color: Color(0xFF75759E),
-            fontSize: 14,
-            fontWeight: FontWeight.normal,
+        child: SingleChildScrollView(
+          child: Container(
+            padding: EdgeInsets.only(bottom: 80),
+            decoration: kTableContainer,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: BouncingScrollPhysics(),
+              child: DataTable(
+                headingTextStyle: TextStyle(
+                  color: Color(0xFF75759E),
+                  fontSize: 14,
+                  fontWeight: FontWeight.normal,
+                ),
+                dataTextStyle: TextStyle(
+                  color: Color(0xFF1F1F1F),
+                  fontSize: 14,
+                  fontWeight: FontWeight.normal,
+                ),
+                columnSpacing: 15.0,
+                dataRowHeight: 65.0,
+                columns: [
+                  DataColumn(label: Text('Category')),
+                  DataColumn(label: Text('Products')),
+                  DataColumn(label: Text('')),
+                ],
+                rows: itemRow,
+              ),
+            ),
           ),
-          dataTextStyle: TextStyle(
-            color: Color(0xFF1F1F1F),
-            fontSize: 14,
-            fontWeight: FontWeight.normal,
-          ),
-          columnSpacing: 15.0,
-          dataRowHeight: 65.0,
-          columns: [
-            DataColumn(label: Text('Category')),
-            DataColumn(label: Text('Products')),
-            DataColumn(label: Text('')),
-          ],
-          rows: itemRow,
         ),
       );
     }
@@ -491,8 +499,8 @@ class _InventoryState extends State<Inventory> {
                   Expanded(
                     child: TabBarView(
                       children: [
-                        _productView(),
-                        _productCategoriesView(),
+                        _buildProductList(),
+                        _buildCategoryList(),
                       ],
                     ),
                   )
@@ -501,47 +509,6 @@ class _InventoryState extends State<Inventory> {
             ),
           ),
         )),
-      ),
-    );
-  }
-
-  Widget _productView(){
-    return Container(
-        decoration: kTableContainer,
-        child: _buildProductList()
-    );
-  }
-
-  Widget _productCategoriesView(){
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-              decoration: kTableContainer,
-              child: _buildCategoryList()
-          ),
-          SizedBox(height: 40),
-          Button(
-            onTap: (){
-              print('save changes');
-            },
-            buttonColor: Color(0xFF00509A),
-            width: 160,
-            child: Center(
-              child: Text(
-                'Save Changes',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Color(0xFFFFFFFF),
-                  fontSize: 14,
-                  fontWeight: FontWeight.normal,
-                ),
-              ),
-            ),
-          ),
-          SizedBox(height: 80),
-        ],
       ),
     );
   }

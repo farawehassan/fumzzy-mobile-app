@@ -119,41 +119,34 @@ class _CustomersDetailState extends State<CustomersDetail> {
     List<DataRow> items = [];
     items.addAll(itemRow.reversed);
     return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      physics: BouncingScrollPhysics(),
       child: Container(
+        padding: EdgeInsets.only(bottom: 80),
         decoration: kTableContainer,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                physics: BouncingScrollPhysics(),
-                child: DataTable(
-                  headingTextStyle: TextStyle(
-                    color: Color(0xFF75759E),
-                    fontSize: 14,
-                    fontWeight: FontWeight.normal,
-                  ),
-                  dataTextStyle: TextStyle(
-                    color: Color(0xFF1F1F1F),
-                    fontSize: 14,
-                    //fontWeight: FontWeight.w400,
-                  ),
-                  columnSpacing: 15.0,
-                  dataRowHeight: 65.0,
-                  showCheckboxColumn: false,
-                  columns: [
-                    DataColumn(label: Text('Name')),
-                    DataColumn(label: Text('Status')),
-                    DataColumn(label: Text('Amount')),
-                    DataColumn(label: Text('Date')),
-                  ],
-                  rows: items,
-                )
-            ),
-            const SizedBox(height: 80),
+        child: DataTable(
+          headingTextStyle: TextStyle(
+            color: Color(0xFF75759E),
+            fontSize: 14,
+            fontWeight: FontWeight.normal,
+          ),
+          dataTextStyle: TextStyle(
+            color: Color(0xFF1F1F1F),
+            fontSize: 14,
+            //fontWeight: FontWeight.w400,
+          ),
+          columnSpacing: 15.0,
+          dataRowHeight: 65.0,
+          showCheckboxColumn: false,
+          columns: [
+            DataColumn(label: Text('Name')),
+            DataColumn(label: Text('Status')),
+            DataColumn(label: Text('Amount')),
+            DataColumn(label: Text('Date')),
           ],
+          rows: items,
         ),
-      ),
+      )
     );
   }
 
@@ -165,7 +158,21 @@ class _CustomersDetailState extends State<CustomersDetail> {
         itemRow.add(
           DataRow(cells: [
             DataCell(Text(Functions.money((report.totalAmount! - report.paymentMade!), 'N'))),
-            DataCell(ReusableDownloadPdf(invoiceNo: report.id!.substring(0, 8))),
+            DataCell(InkWell(
+              onTap: (){
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PrintReceipt(
+                        reports: report.toJson(),
+                        paymentMode: 'Cash',
+                        name: widget.customer!.name!
+                    ),
+                  ),
+                );
+              },
+              child: ReusableDownloadPdf(invoiceNo: report.id!.substring(0, 8)))
+            ),
             DataCell(Text(Functions.getFormattedDateTime(report.soldAt!))),
             DataCell(Text(
               Functions.getFormattedDateTime(report.dueDate!),
@@ -226,42 +233,34 @@ class _CustomersDetailState extends State<CustomersDetail> {
       }
     }
     return SingleChildScrollView(
-      child: Container(
-        decoration: kTableContainer,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                physics: BouncingScrollPhysics(),
-                child: DataTable(
-                  headingTextStyle: TextStyle(
-                    color: Color(0xFF75759E),
-                    fontSize: 14,
-                    fontWeight: FontWeight.normal,
-                  ),
-                  dataTextStyle: TextStyle(
-                    color: Color(0xFF1F1F1F),
-                    fontSize: 14,
-                    //fontWeight: FontWeight.w400,
-                  ),
-                  columnSpacing: 15.0,
-                  dataRowHeight: 65.0,
-                  showCheckboxColumn: false,
-                  columns: [
-                    DataColumn(label: Text('Total Sales')),
-                    DataColumn(label: Text('Invoice/Reference')),
-                    DataColumn(label: Text('Date')),
-                    DataColumn(label: Text('Due Date')),
-                    DataColumn(label: Text('')),
-                  ],
-                  rows: itemRow,
-                )
+        scrollDirection: Axis.horizontal,
+        physics: BouncingScrollPhysics(),
+        child: Container(
+          padding: EdgeInsets.only(bottom: 80),
+          decoration: kTableContainer,
+          child: DataTable(
+            headingTextStyle: TextStyle(
+              color: Color(0xFF75759E),
+              fontSize: 14,
+              fontWeight: FontWeight.normal,
             ),
-            const SizedBox(height: 80),
-          ],
-        ),
-      ),
+            dataTextStyle: TextStyle(
+              color: Color(0xFF1F1F1F),
+              fontSize: 14,
+            ),
+            columnSpacing: 15.0,
+            dataRowHeight: 65.0,
+            showCheckboxColumn: false,
+            columns: [
+              DataColumn(label: Text('Total Sales')),
+              DataColumn(label: Text('Invoice/Reference')),
+              DataColumn(label: Text('Date')),
+              DataColumn(label: Text('Due Date')),
+              DataColumn(label: Text('')),
+            ],
+            rows: itemRow,
+          ),
+        )
     );
   }
 
@@ -404,7 +403,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
-                      width: constraints.maxWidth / 2.2,
+                      width: 300,
                       child: TabBar(
                         labelStyle: kTabBarTextStyle,
                         labelColor: Color(0xFF004E92),
@@ -1045,7 +1044,8 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                       Map<String, dynamic> body = {
                                         'id': widget.customer!.id,
                                         'reportId': reports.id,
-                                        'payment': amountController.text
+                                        'payment': double.parse(amountController.text),
+                                        'totalPaid': reports.paymentMade! + double.parse(amountController.text)
                                       };
                                       _updatePayment(body, setDialogState);
                                     }
@@ -1300,7 +1300,8 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                     Map<String, dynamic> body = {
                                       'id': widget.customer!.id,
                                       'reportId': reports.id,
-                                      'payment': reports.totalAmount,
+                                      'payment': reports.totalAmount! - reports.paymentMade!,
+                                      'totalPayment': reports.totalAmount,
                                       'paymentReceivedAt': DateTime.now().toIso8601String()
                                     };
                                     _settlePayment(body, setDialogState);
@@ -1624,7 +1625,6 @@ class _CustomersDetailState extends State<CustomersDetail> {
       });
       Functions.showSuccessMessage(message);
       Navigator.pop(context);
-      Navigator.pop(context);
     }).catchError((e){
       if(!mounted)return;
       setDialogState(()=> _showSpinner = false);
@@ -1646,7 +1646,6 @@ class _CustomersDetailState extends State<CustomersDetail> {
       });
       Functions.showSuccessMessage(message);
       Navigator.pop(context);
-      Navigator.pop(context);
     }).catchError((e){
       if(!mounted)return;
       setDialogState(()=> _showSpinner = false);
@@ -1667,7 +1666,6 @@ class _CustomersDetailState extends State<CustomersDetail> {
         Navigator.pop(context);
       });
       Functions.showSuccessMessage(message);
-      Navigator.pop(context);
       Navigator.pop(context);
     }).catchError((e){
       if(!mounted)return;

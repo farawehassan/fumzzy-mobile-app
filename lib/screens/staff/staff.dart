@@ -83,7 +83,7 @@ class _StaffState extends State<Staff> {
   ///A widget to build staff table
   Widget _buildAllStaffList() {
     List<DataRow> itemRow = [];
-    if(_filteredStaff.length > 0 && _filteredStaff.isNotEmpty){
+    if(_filteredStaff.isNotEmpty){
       for(int i = 0; i < _filteredStaff.length; i++){
         Staffs staff = _filteredStaff[i];
         itemRow.add(
@@ -106,7 +106,7 @@ class _StaffState extends State<Staff> {
           fontSize: 14,
           //fontWeight: FontWeight.w400,
         ),
-        columnSpacing: 3.0,
+        columnSpacing: 30.0,
         dataRowHeight: 65.0,
         columns: [
           DataColumn(label: Text('Username')),
@@ -202,6 +202,7 @@ class _StaffState extends State<Staff> {
                 Expanded(
                   child: SingleChildScrollView(
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(height: 20),
                         Container(
@@ -280,9 +281,9 @@ class _StaffState extends State<Staff> {
                         ),
                         SizedBox(height: 35),
                         Container(
-                            width: constraints.maxWidth,
-                            decoration: kTableContainer,
-                            child: _buildAllStaffList()),
+                          decoration: kTableContainer,
+                          child: _buildAllStaffList()
+                        ),
                       ],
                     ),
                   ),

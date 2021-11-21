@@ -88,7 +88,7 @@ class _DashboardState extends State<Dashboard> {
   /// A function to build the list of all the purchases
   Widget _buildPurchaseList() {
     List<DataRow> itemRow = [];
-    if(_filteredPurchases.length > 0 && _filteredPurchases.isNotEmpty){
+    if(_filteredPurchases.isNotEmpty){
       if(_filteredPurchases.length > 3){
         for (int i = 0; i <= 3; i++){
           Purchase purchase = _filteredPurchases[i];
@@ -242,7 +242,7 @@ class _DashboardState extends State<Dashboard> {
   /// A function to build the list of all the sales
   Widget _buildSaleList() {
     List<DataRow> itemRow = [];
-    if(_filteredSales.length > 0 && _filteredSales.isNotEmpty){
+    if(_filteredSales.isNotEmpty){
       if(_filteredSales.length > 3){
         for (int i = 0; i <= 3; i++){
           Sale sale = _filteredSales[i];
@@ -462,6 +462,14 @@ class _DashboardState extends State<Dashboard> {
             cardName: 'Total Expenses',
             totalPrice: null,
           ),
+          TotalSalesCard(
+            cardName: 'Total Transfer ',
+            totalPrice: null,
+          ),
+          TotalSalesCard(
+            cardName: 'Available Cash',
+            totalPrice: null,
+          ),
           if(_isAdmin) TotalSalesCard(
             cardName: 'Total Profit',
             totalPrice: null,
@@ -471,6 +479,9 @@ class _DashboardState extends State<Dashboard> {
     }
     else {
       if(_selectedView == 'Today'){
+        dynamic availableCash = (_storeChartsInfo!.today!.todaySales!.isNotEmpty ? _storeChartsInfo!.today!.todaySales![0]['total'] : 0)
+          - (_storeChartsInfo!.today!.todayExpenses!.isNotEmpty ? _storeChartsInfo!.today!.todayExpenses![0]['total'] : 0)
+          - (_storeChartsInfo!.today!.todayTransferredSales!.isNotEmpty ? _storeChartsInfo!.today!.todayTransferredSales![0]['total'] : 0);
         return Wrap(
           children: [
             TotalSalesCard(
@@ -485,6 +496,14 @@ class _DashboardState extends State<Dashboard> {
               cardName: 'Total Expenses',
               totalPrice:  _storeChartsInfo!.today!.todayExpenses!.isNotEmpty ? _storeChartsInfo!.today!.todayExpenses![0]['total'] : 0
             ),
+            TotalSalesCard(
+              cardName: 'Total Transfer ',
+              totalPrice:  _storeChartsInfo!.today!.todayTransferredSales!.isNotEmpty ? _storeChartsInfo!.today!.todayTransferredSales![0]['total'] : 0
+            ),
+            TotalSalesCard(
+              cardName: 'Available Cash',
+              totalPrice: availableCash
+            ),
             _isAdmin
                 ? TotalSalesCard(
               cardName: 'Total Profit',
@@ -495,6 +514,9 @@ class _DashboardState extends State<Dashboard> {
         );
       }
       else if(_selectedView == 'Yesterday'){
+        dynamic availableCash = (_storeChartsInfo!.yesterday!.yesterdaySales!.isNotEmpty ? _storeChartsInfo!.yesterday!.yesterdaySales![0]['total'] : 0)
+          - (_storeChartsInfo!.yesterday!.yesterdayExpenses!.isNotEmpty ? _storeChartsInfo!.yesterday!.yesterdayExpenses![0]['total'] : 0)
+          - (_storeChartsInfo!.yesterday!.yesterdayTransferredSales!.isNotEmpty ? _storeChartsInfo!.yesterday!.yesterdayTransferredSales![0]['total'] : 0);
         return Wrap(
           children: [
             TotalSalesCard(
@@ -509,6 +531,14 @@ class _DashboardState extends State<Dashboard> {
                 cardName: 'Total Expenses',
                 totalPrice:  _storeChartsInfo!.yesterday!.yesterdayExpenses!.isNotEmpty ? _storeChartsInfo!.yesterday!.yesterdayExpenses![0]['total'] : 0
             ),
+            TotalSalesCard(
+                cardName: 'Total Transfer ',
+                totalPrice:  _storeChartsInfo!.yesterday!.yesterdayTransferredSales!.isNotEmpty ? _storeChartsInfo!.yesterday!.yesterdayTransferredSales![0]['total'] : 0
+            ),
+            TotalSalesCard(
+                cardName: 'Available Cash',
+                totalPrice: availableCash
+            ),
             _isAdmin
                 ? TotalSalesCard(
               cardName: 'Total Profit',
@@ -519,6 +549,9 @@ class _DashboardState extends State<Dashboard> {
         );
       }
       else if(_selectedView == 'This Week'){
+        dynamic availableCash = (_storeChartsInfo!.week!.weekSales!.isNotEmpty ? _storeChartsInfo!.week!.weekSales![0]['total'] : 0)
+          - (_storeChartsInfo!.week!.weekExpenses!.isNotEmpty ? _storeChartsInfo!.week!.weekExpenses![0]['total'] : 0)
+          - (_storeChartsInfo!.week!.weekTransferredSales!.isNotEmpty ? _storeChartsInfo!.week!.weekTransferredSales![0]['total'] : 0);
         return Wrap(
           children: [
             TotalSalesCard(
@@ -533,6 +566,14 @@ class _DashboardState extends State<Dashboard> {
                 cardName: 'Total Expenses',
                 totalPrice:  _storeChartsInfo!.week!.weekExpenses!.isNotEmpty ? _storeChartsInfo!.week!.weekExpenses![0]['total'] : 0
             ),
+            TotalSalesCard(
+                cardName: 'Total Transfer ',
+                totalPrice:  _storeChartsInfo!.week!.weekTransferredSales!.isNotEmpty ? _storeChartsInfo!.week!.weekTransferredSales![0]['total'] : 0
+            ),
+            TotalSalesCard(
+                cardName: 'Available Cash',
+                totalPrice: availableCash
+            ),
             _isAdmin
                 ? TotalSalesCard(
               cardName: 'Total Profit',
@@ -543,6 +584,9 @@ class _DashboardState extends State<Dashboard> {
         );
       }
       else if(_selectedView == 'This Month'){
+        dynamic availableCash = (_storeChartsInfo!.thisMonth!.monthSales!.isNotEmpty ? _storeChartsInfo!.thisMonth!.monthSales![0]['total'] : 0)
+          - (_storeChartsInfo!.thisMonth!.monthExpenses!.isNotEmpty ? _storeChartsInfo!.thisMonth!.monthExpenses![0]['total'] : 0)
+          - (_storeChartsInfo!.thisMonth!.monthTransferredSales!.isNotEmpty ? _storeChartsInfo!.thisMonth!.monthTransferredSales![0]['total'] : 0);
         return Wrap(
           children: [
             TotalSalesCard(
@@ -557,6 +601,14 @@ class _DashboardState extends State<Dashboard> {
                 cardName: 'Total Expenses',
                 totalPrice:  _storeChartsInfo!.thisMonth!.monthExpenses!.isNotEmpty ? _storeChartsInfo!.thisMonth!.monthExpenses![0]['total'] : 0
             ),
+            TotalSalesCard(
+                cardName: 'Total Transfer ',
+                totalPrice:  _storeChartsInfo!.thisMonth!.monthTransferredSales!.isNotEmpty ? _storeChartsInfo!.thisMonth!.monthTransferredSales![0]['total'] : 0
+            ),
+            TotalSalesCard(
+                cardName: 'Available Cash',
+                totalPrice: availableCash
+            ),
             _isAdmin
                 ? TotalSalesCard(
               cardName: 'Total Profit',
@@ -567,6 +619,9 @@ class _DashboardState extends State<Dashboard> {
         );
       }
       else if(_selectedView == '6 Months'){
+        dynamic availableCash = (_storeChartsInfo!.sixMonth!.sixMonthSales!.isNotEmpty ? _storeChartsInfo!.sixMonth!.sixMonthSales![0]['total'] : 0)
+          - (_storeChartsInfo!.sixMonth!.sixMonthExpenses!.isNotEmpty ? _storeChartsInfo!.sixMonth!.sixMonthExpenses![0]['total'] : 0)
+          - (_storeChartsInfo!.sixMonth!.sixMonthTransferredSales!.isNotEmpty ? _storeChartsInfo!.sixMonth!.sixMonthTransferredSales![0]['total'] : 0);
         return Wrap(
           children: [
             TotalSalesCard(
@@ -581,6 +636,14 @@ class _DashboardState extends State<Dashboard> {
                 cardName: 'Total Expenses',
                 totalPrice:  _storeChartsInfo!.sixMonth!.sixMonthExpenses!.isNotEmpty ? _storeChartsInfo!.sixMonth!.sixMonthExpenses![0]['total'] : 0
             ),
+            TotalSalesCard(
+                cardName: 'Total Transfer ',
+                totalPrice:  _storeChartsInfo!.sixMonth!.sixMonthTransferredSales!.isNotEmpty ? _storeChartsInfo!.sixMonth!.sixMonthTransferredSales![0]['total'] : 0
+            ),
+            TotalSalesCard(
+                cardName: 'Available Cash',
+                totalPrice: availableCash
+            ),
             _isAdmin
                 ? TotalSalesCard(
               cardName: 'Total Profit',
@@ -591,6 +654,9 @@ class _DashboardState extends State<Dashboard> {
         );
       }
       else {
+        dynamic availableCash = (_storeChartsInfo!.allTime!.allSales!.isNotEmpty ? _storeChartsInfo!.allTime!.allSales![0]['total'] : 0)
+          - (_storeChartsInfo!.allTime!.allExpenses!.isNotEmpty ? _storeChartsInfo!.allTime!.allExpenses![0]['total'] : 0)
+          - (_storeChartsInfo!.allTime!.allTransferredSales!.isNotEmpty ? _storeChartsInfo!.allTime!.allTransferredSales![0]['total'] : 0);
         return Wrap(
           children: [
             TotalSalesCard(
@@ -604,6 +670,14 @@ class _DashboardState extends State<Dashboard> {
             TotalSalesCard(
                 cardName: 'Total Expenses',
                 totalPrice:  _storeChartsInfo!.allTime!.allExpenses!.isNotEmpty ? _storeChartsInfo!.allTime!.allExpenses![0]['total'] : 0
+            ),
+            TotalSalesCard(
+                cardName: 'Total Transfer ',
+                totalPrice:  _storeChartsInfo!.allTime!.allTransferredSales!.isNotEmpty ? _storeChartsInfo!.allTime!.allTransferredSales![0]['total'] : 0
+            ),
+            TotalSalesCard(
+                cardName: 'Available Cash',
+                totalPrice: availableCash
             ),
             _isAdmin
                 ? TotalSalesCard(
@@ -1007,57 +1081,53 @@ class _DashboardState extends State<Dashboard> {
                                 child: _buildPurchaseList(),
                               ),
                             ),
+                            const SizedBox(height: 40),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'Recent Sales',
+                                  style: TextStyle(
+                                    color: Color(0xFF171725),
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                const SizedBox(width: 350),
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.pushReplacementNamed(context, Transactions.id);
+                                  },
+                                  child: const Text(
+                                    'See All',
+                                    style: TextStyle(
+                                      color: Color(0xFF00509A),
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 15),
+                            Container(
+                              height: 340,
+                              //width: constraints.maxWidth,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(17),
+                                border: Border.all(
+                                  width: 1,
+                                  color: Color(0xFFE2E2EA),
+                                ),
+                              ),
+                              child: _buildSaleList(),
+                            ),
                           ],
                         ),
                       ],
                     ),
-                  ),
-                  Column(
-                    children: [
-                      Container(
-                        margin: EdgeInsets.only(top: 40, bottom: 15),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Recent Sales',
-                              style: TextStyle(
-                                color: Color(0xFF171725),
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                              ),
-                            ),
-                            InkWell(
-                              onTap: () {
-                                Navigator.pushReplacementNamed(context, Transactions.id);
-                              },
-                              child: const Text(
-                                'See All',
-                                style: TextStyle(
-                                  color: Color(0xFF00509A),
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 14,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        height: 340,
-                        //width: constraints.maxWidth,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(17),
-                          border: Border.all(
-                            width: 1,
-                            color: Color(0xFFE2E2EA),
-                          ),
-                        ),
-                        child: _buildSaleList(),
-                      ),
-                    ],
                   ),
                 ],
               ),

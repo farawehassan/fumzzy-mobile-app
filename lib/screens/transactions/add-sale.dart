@@ -36,7 +36,9 @@ class _AddSaleState extends State<AddSale> {
 
   final _formKey = GlobalKey<FormState>();
 
-  bool _showSpinner = false;
+  bool _showSaveSpinner = false;
+
+  bool _showSavePrintSpinner = false;
 
   /// All sales container added
   int _sales = 0;
@@ -141,7 +143,7 @@ class _AddSaleState extends State<AddSale> {
                             ),
                           ),
                           SizedBox(height: 60),
-                          _salesContainers.length > 0
+                          _salesContainers.isNotEmpty
                               ? Button(
                             onTap: (){
                               if(_formKey.currentState!.validate()){
@@ -262,7 +264,7 @@ class _AddSaleState extends State<AddSale> {
               ReusableCustomerInfoFields(
                 tableTitle: 'Selling Price',
                 widget: Container(
-                  width: 77,
+                  width: 97,
                   child: TextFormField(
                     style: TextStyle(
                       color: Colors.black,
@@ -294,6 +296,7 @@ class _AddSaleState extends State<AddSale> {
                     validator: (value) {
                       if (value!.isEmpty) return 'Enter price';
                       if (value == '0') return 'Enter price';
+                      if (selectedProduct != null && double.parse(value) < selectedProduct!.costPrice!) return 'Invalid';
                       return null;
                     },
                     decoration: kTextFieldBorderDecoration.copyWith(
@@ -311,7 +314,7 @@ class _AddSaleState extends State<AddSale> {
               ReusableCustomerInfoFields(
                 tableTitle: 'Quantity',
                 widget: Container(
-                  width: 67,
+                  width: 77,
                   child: TextFormField(
                     style: TextStyle(
                       color: Colors.black,
@@ -372,7 +375,7 @@ class _AddSaleState extends State<AddSale> {
               ReusableCustomerInfoFields(
                 tableTitle: 'Amount',
                 widget: Container(
-                  width: 110,
+                  width: 120,
                   child: TextFormField(
                     style: TextStyle(
                       color: Colors.black,
@@ -443,7 +446,10 @@ class _AddSaleState extends State<AddSale> {
 
     double balance = 0;
 
-    setState(() => _showSpinner = false);
+    setState(() {
+      _showSaveSpinner = false;
+      _showSavePrintSpinner = false;
+    });
 
     return showDialog(
       context: context,
@@ -881,7 +887,7 @@ class _AddSaleState extends State<AddSale> {
                                 Expanded(
                                   child: Button(
                                     onTap: (){
-                                      if(!_showSpinner){
+                                      if(!_showSaveSpinner && !_showSavePrintSpinner){
                                         if(formKey.currentState!.validate()){
                                           Map<String, dynamic> body = {};
                                           if(selectedCustomer == null){
@@ -918,7 +924,7 @@ class _AddSaleState extends State<AddSale> {
                                           String mode = _paymentMode == PaymentMode.cash
                                               ? 'Cash' : 'Transfer' ;
                                           if(!mounted)return;
-                                          setDialogState(() => _showSpinner = true);
+                                          setDialogState(() => _showSaveSpinner = true);
                                           if(selectedCustomer == null){
                                             _addSales(mode, customer.text, ()=> _addNewCustomer(body, setDialogState, false));
                                           }
@@ -928,9 +934,11 @@ class _AddSaleState extends State<AddSale> {
                                         }
                                       }
                                     },
-                                    buttonColor: Color(0xFF00509A),
+                                    buttonColor: _showSavePrintSpinner
+                                        ? Color(0xFF00509A).withOpacity(0.2)
+                                        : Color(0xFF00509A),
                                     child: Center(
-                                      child: _showSpinner
+                                      child: _showSaveSpinner
                                           ? CircleProgressIndicator()
                                           : Text(
                                         'Save',
@@ -948,7 +956,7 @@ class _AddSaleState extends State<AddSale> {
                                 Expanded(
                                   child: Button(
                                     onTap: (){
-                                      if(!_showSpinner){
+                                      if(!_showSavePrintSpinner && !_showSaveSpinner){
                                         if(formKey.currentState!.validate()){
                                           Map<String, dynamic> body = {};
                                           if(selectedCustomer == null){
@@ -985,7 +993,7 @@ class _AddSaleState extends State<AddSale> {
                                           String mode = _paymentMode == PaymentMode.cash
                                               ? 'Cash' : 'Transfer' ;
                                           if(!mounted)return;
-                                          setDialogState(() => _showSpinner = true);
+                                          setDialogState(() => _showSavePrintSpinner = true);
                                           if(selectedCustomer == null){
                                             _addSales(mode, customer.text, ()=> _addNewCustomer(body, setDialogState, true));
                                           }
@@ -995,9 +1003,11 @@ class _AddSaleState extends State<AddSale> {
                                         }
                                       }
                                     },
-                                    buttonColor: Color(0xFF00509A),
+                                    buttonColor: _showSaveSpinner
+                                        ? Color(0xFF00509A).withOpacity(0.2)
+                                        : Color(0xFF00509A),
                                     child: Center(
-                                      child: _showSpinner
+                                      child: _showSavePrintSpinner
                                           ? CircleProgressIndicator()
                                           : Text(
                                         'Print & Save',
@@ -1075,19 +1085,20 @@ class _AddSaleState extends State<AddSale> {
 
   Future<void> _addNewCustomer(Map<String, dynamic> body, StateSetter setDialogState, bool receipt) async{
     if(!mounted)return;
-    setDialogState(() => _showSpinner = true);
+    setDialogState(() => _showSaveSpinner = true);
     var api = CustomerDataSource();
     await api.addNewCustomer(body).then((message) async{
       if(!mounted)return;
       setDialogState((){
-        _showSpinner = false;
+        _showSaveSpinner = false;
         Navigator.pop(context);
       });
       Functions.showSuccessMessage('Successfully added sales');
+      _clear();
       if(receipt) _printReceipt(body);
     }).catchError((e){
       if(!mounted)return;
-      setDialogState(()=> _showSpinner = false);
+      setDialogState(()=> _showSaveSpinner = false);
       print(e);
       Functions.showErrorMessage(e);
     });
@@ -1095,19 +1106,20 @@ class _AddSaleState extends State<AddSale> {
 
   Future<void> _addNewReportsCustomer(Map<String, dynamic> body, StateSetter setDialogState, bool receipt) async{
     if(!mounted)return;
-    setDialogState(() => _showSpinner = true);
+    setDialogState(() => _showSaveSpinner = true);
     var api = CustomerDataSource();
     await api.addNewReportsCustomer(body).then((message) async{
       if(!mounted)return;
       setDialogState((){
-        _showSpinner = false;
+        _showSaveSpinner = false;
         Navigator.pop(context);
       });
       Functions.showSuccessMessage('Successfully added sales');
+      _clear();
       if(receipt) _printReceipt(body);
     }).catchError((e){
       if(!mounted)return;
-      setDialogState(()=> _showSpinner = false);
+      setDialogState(()=> _showSaveSpinner = false);
       print(e);
       Functions.showErrorMessage(e);
     });
@@ -1124,6 +1136,21 @@ class _AddSaleState extends State<AddSale> {
         ),
       ),
     );
+  }
+
+  void _clear(){
+    if(!mounted)return;
+    setState(() {
+      if(_salesContainers.isNotEmpty) _salesContainers.clear();
+      if(_salesData.isNotEmpty) _salesData.clear();
+      if(_realSalesData.isNotEmpty) _realSalesData.clear();
+      _totalPrice = 0;
+      _sales = 0;
+
+      _sales += 1;
+      _salesData.add({});
+      _buildExtraProduct(_sales);
+    });
   }
 
 }

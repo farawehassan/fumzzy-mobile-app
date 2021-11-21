@@ -12,7 +12,6 @@ import 'package:fumzy/screens/dashboard/drawer.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:fumzy/utils/constant-styles.dart';
 import 'package:fumzy/utils/functions.dart';
-
 import 'creditors-detail/creditor-detail.dart';
 
 class Creditors extends StatefulWidget {
@@ -91,7 +90,7 @@ class _CreditorsState extends State<Creditors> {
   /// A function to build the list of all the creditors
   Widget _buildCreditorList() {
     List<DataRow> itemRow = [];
-    if(_filteredCreditors.length > 0 && _filteredCreditors.isNotEmpty){
+    if(_filteredCreditors.isNotEmpty){
       for (int i = 0; i < _filteredCreditors.length; i++){
         Creditor creditor = _filteredCreditors[i];
         double totalSales = 0;
@@ -136,7 +135,7 @@ class _CreditorsState extends State<Creditors> {
             decoration: kTableContainer,
             child: SingleChildScrollView(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
@@ -150,7 +149,6 @@ class _CreditorsState extends State<Creditors> {
                         dataTextStyle: TextStyle(
                           color: Color(0xFF1F1F1F),
                           fontSize: 14,
-                          //fontWeight: FontWeight.w400,
                         ),
                         columnSpacing: 15.0,
                         dataRowHeight: 65.0,
@@ -166,17 +164,14 @@ class _CreditorsState extends State<Creditors> {
                       )
                   ),
                   const SizedBox(height: 80),
-                  _showCreditorSpinner
-                      ? Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(24.0),
+                  if(_showCreditorSpinner)
+                    Padding(
+                      padding: EdgeInsets.only(left: 200),
                       child: CircularProgressIndicator(
                         valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0A459F)),
                       ),
                     ),
-                  )
-                      : Container(),
-                  const SizedBox(height: 100),
+                  const SizedBox(height: 80),
                 ],
               ),
             ),

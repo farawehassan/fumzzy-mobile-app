@@ -11,6 +11,8 @@ import 'package:fumzy/utils/constant-styles.dart';
 import 'package:fumzy/utils/functions.dart';
 import 'package:fumzy/components/info-table.dart';
 
+import 'repayment-history.dart';
+
 class CreditorsDetail extends StatefulWidget {
 
   static const String id = 'creditorDetail';
@@ -55,6 +57,7 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
           DataCell(Text(Functions.money(report.amount!, 'N'))),
           DataCell(Text(report.description!)),
           DataCell(Text(Functions.money(report.paymentMade!, 'N'))),
+          DataCell(Text(Functions.money(report.amount! - report.paymentMade!, 'N'))),
           DataCell(PopupMenuButton(
             offset: Offset(110, 40),
             icon: Icon(
@@ -98,45 +101,49 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
               ),
             ],
           )),
-        ]),
+        ],
+        onSelectChanged: (value){
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CreditorRepaymentHistory(
+                creditor: widget.creditor,
+                report: report,
+              ),
+            ),
+          );
+        }),
       );
     }
     return SingleChildScrollView(
-      child: Container(
-        decoration: kTableContainer,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                physics: BouncingScrollPhysics(),
-                child: DataTable(
-                  headingTextStyle: TextStyle(
-                    color: Color(0xFF75759E),
-                    fontSize: 14,
-                    fontWeight: FontWeight.normal,
-                  ),
-                  dataTextStyle: TextStyle(
-                    color: Color(0xFF1F1F1F),
-                    fontSize: 14,
-                    //fontWeight: FontWeight.w400,
-                  ),
-                  columnSpacing: 15.0,
-                  dataRowHeight: 65.0,
-                  showCheckboxColumn: false,
-                  columns: [
-                    DataColumn(label: Text('Amount')),
-                    DataColumn(label: Text('Description')),
-                    DataColumn(label: Text('Payment Made')),
-                    DataColumn(label: Text('')),
-                  ],
-                  rows: itemRow,
-                )
+        scrollDirection: Axis.horizontal,
+        physics: BouncingScrollPhysics(),
+        child: Container(
+          decoration: kTableContainer,
+          child: DataTable(
+            headingTextStyle: TextStyle(
+              color: Color(0xFF75759E),
+              fontSize: 14,
+              fontWeight: FontWeight.normal,
             ),
-            const SizedBox(height: 80),
-          ],
-        ),
-      ),
+            dataTextStyle: TextStyle(
+              color: Color(0xFF1F1F1F),
+              fontSize: 14,
+              //fontWeight: FontWeight.w400,
+            ),
+            columnSpacing: 15.0,
+            dataRowHeight: 65.0,
+            showCheckboxColumn: false,
+            columns: [
+              DataColumn(label: Text('Amount')),
+              DataColumn(label: Text('Description')),
+              DataColumn(label: Text('Payment Made')),
+              DataColumn(label: Text('Balance')),
+              DataColumn(label: Text('')),
+            ],
+            rows: itemRow,
+          ),
+        )
     );
   }
 
@@ -259,7 +266,8 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
-                      width: constraints.maxWidth / 2.2,
+                      width: 200,
+                      alignment: Alignment.centerLeft,
                       child: TabBar(
                         labelStyle: kTabBarTextStyle,
                         labelColor: Color(0xFF004E92),
@@ -802,6 +810,7 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
                                         'creditorId': widget.creditor!.id,
                                         'reportId': reports.id,
                                         'amount': reports.amount,
+                                        'payment': double.parse(amountController.text),
                                         'paymentMade': reports.paymentMade!
                                             + double.parse(amountController.text),
                                         'description': referenceController.text
@@ -1058,6 +1067,7 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
                                       'creditorId': widget.creditor!.id,
                                       'reportId': reports.id,
                                       'amount': reports.amount,
+                                      'payment': reports.amount! - reports.paymentMade!,
                                       'paymentMade': reports.amount,
                                       'description': referenceController.text
                                     };

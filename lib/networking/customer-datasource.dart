@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:fumzy/bloc/future-values.dart';
 import 'package:fumzy/model/all-customers.dart';
 import 'package:fumzy/model/customer-names.dart';
+import 'package:fumzy/model/repayment-history.dart';
 import 'package:fumzy/model/user.dart';
 import 'package:path_provider/path_provider.dart';
 import 'endpoints.dart';
@@ -308,6 +309,28 @@ class CustomerDataSource{
     return _netUtil.put(REMOVE_CUSTOMER_REPORT, headers: header, body: body).then((dynamic res) {
       if (res['error']) throw res['message'];
       return res['message'];
+    }).catchError((e) {
+      errorHandler.handleError(e);
+    });
+  }
+
+  /// A function that fetches all the repayment history of a customer's report
+  /// in the database GET
+  /// It returns a list of [RepaymentHistory]
+  Future<List<RepaymentHistory>> getRepaymentHistory(String customer, String reportId) async {
+    List<RepaymentHistory> history = [];
+    Map<String, String> header = {};
+    Future<User> user = _futureValue.getCurrentUser();
+    await user.then((value) {
+      if(value.token == null) throw('You\'re not authorized, log out and log in back and try again!');
+      header = {'Authorization': 'Bearer ${value.token}'};
+    });
+    String GET_REPAYMENT_HISTORY_URL = GET_REPAYMENT_HISTORY + customer + '/' + reportId;
+    return _netUtil.get(GET_REPAYMENT_HISTORY_URL  , headers: header).then((dynamic res) {
+      if (res['error']) throw res['message'];
+      var rest = res['data'] as List;
+      history = rest.map<RepaymentHistory>((json) => RepaymentHistory.fromJson(json)).toList();
+      return history;
     }).catchError((e) {
       errorHandler.handleError(e);
     });

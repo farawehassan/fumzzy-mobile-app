@@ -56,6 +56,7 @@ const UPDATE_PAYMENT_MADE_REPORT = BASE_URL + 'customer/updatePaymentMadeReport'
 const SETTLE_PAYMENT = BASE_URL + 'customer/settlePaymentReport';
 const REMOVE_CUSTOMER_REPORT = BASE_URL + 'customer/removeCustomerReport';
 const DELETE_CUSTOMER = BASE_URL + 'customer/delete';
+const GET_REPAYMENT_HISTORY = BASE_URL + 'repaymentHistory/fetch/';
 
 /// Endpoints regarding creditors
 const ADD_CREDITOR = BASE_URL + 'creditor/create';

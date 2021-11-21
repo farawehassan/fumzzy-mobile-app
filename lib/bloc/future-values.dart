@@ -5,6 +5,7 @@ import 'package:fumzy/model/creditor.dart';
 import 'package:fumzy/model/customer-names.dart';
 import 'package:fumzy/model/expense.dart';
 import 'package:fumzy/model/product.dart';
+import 'package:fumzy/model/repayment-history.dart';
 import 'package:fumzy/model/store-charts.dart';
 import 'package:fumzy/model/store.dart';
 import 'package:fumzy/model/user.dart';
@@ -140,12 +141,21 @@ class FutureValues{
   }
 
   /// A function that fetches all customers name in the database with the help of
-  /// [CustomerDataSource]
+  /// [CreditorDataSource]
   /// It returns list of model [Creditor]
   Future<List<Creditor>> getAllCreditors() async{
     var data = CreditorDataSource();
     Future<List<Creditor>> creditors = data.getAllCreditors();
     return creditors;
+  }
+
+  /// A function that fetches customer repayment history in the database with
+  /// the help of [CustomerDataSource]
+  /// It returns list of model [RepaymentHistory]
+  Future<List<RepaymentHistory>> getRepaymentHistory(String customer, String reportId) async{
+    var data = CustomerDataSource();
+    Future<List<RepaymentHistory>> history = data.getRepaymentHistory(customer, reportId);
+    return history;
   }
 
   /// A function that fetches all customers name in the database with the help of

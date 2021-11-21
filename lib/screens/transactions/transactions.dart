@@ -124,7 +124,7 @@ class _TransactionsState extends State<Transactions> {
   ///A function to build expense list
   Widget _buildExpenseList(){
     List<DataRow> itemRow = [];
-    if(_filteredExpenses.length > 0 && _filteredExpenses.isNotEmpty){
+    if(_filteredExpenses.isNotEmpty){
       for (int i = 0; i < _filteredExpenses.length; i++){
         Expense expense = _filteredExpenses[i];
         itemRow.add(
@@ -165,7 +165,7 @@ class _TransactionsState extends State<Transactions> {
             decoration: kTableContainer,
             child: SingleChildScrollView(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SingleChildScrollView(
                     physics: BouncingScrollPhysics(),
@@ -195,16 +195,13 @@ class _TransactionsState extends State<Transactions> {
                     ),
                   ),
                   const SizedBox(height: 80),
-                  _showExpenseSpinner
-                      ? Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(24.0),
+                  if(_showExpenseSpinner)
+                    Padding(
+                      padding: EdgeInsets.only(left: 150),
                       child: CircularProgressIndicator(
                         valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0A459F)),
                       ),
                     ),
-                  )
-                      : Container(),
                   const SizedBox(height: 100),
                 ],
               ),
@@ -297,7 +294,7 @@ class _TransactionsState extends State<Transactions> {
   /// A function to build the list of all the purchases
   Widget _buildPurchaseList() {
     List<DataRow> itemRow = [];
-    if(_filteredPurchases.length > 0 && _filteredPurchases.isNotEmpty){
+    if(_filteredPurchases.isNotEmpty){
       for (int i = 0; i < _filteredPurchases.length; i++){
         Purchase purchase = _filteredPurchases[i];
         itemRow.add(
@@ -361,17 +358,14 @@ class _TransactionsState extends State<Transactions> {
                       )
                   ),
                   const SizedBox(height: 80),
-                  _showPurchaseSpinner
-                      ? Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(24.0),
+                  if(_showPurchaseSpinner)
+                    Padding(
+                      padding: EdgeInsets.only(left: 200),
                       child: CircularProgressIndicator(
                         valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0A459F)),
                       ),
                     ),
-                  )
-                      : Container(),
-                  const SizedBox(height: 100),
+                  const SizedBox(height: 80),
                 ],
               ),
             ),
@@ -463,7 +457,7 @@ class _TransactionsState extends State<Transactions> {
   /// A function to build the list of all the sales
   Widget _buildSaleList() {
     List<DataRow> itemRow = [];
-    if(_filteredSales.length > 0 && _filteredSales.isNotEmpty){
+    if(_filteredSales.isNotEmpty){
       for (int i = 0; i < _filteredSales.length; i++){
         Sale sale = _filteredSales[i];
         itemRow.add(
@@ -505,34 +499,51 @@ class _TransactionsState extends State<Transactions> {
           key: _refreshSalesKey,
           color: Color(0xFF004E92),
           child: Container(
-              decoration: kTableContainer,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: DataTable(
-                  headingTextStyle: TextStyle(
-                    color: Color(0xFF75759E),
-                    fontSize: 14,
-                    fontWeight: FontWeight.normal,
+            decoration: kTableContainer,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SingleChildScrollView(
+                    physics: BouncingScrollPhysics(),
+                    scrollDirection: Axis.horizontal,
+                    child: DataTable(
+                      headingTextStyle: TextStyle(
+                        color: Color(0xFF75759E),
+                        fontSize: 14,
+                        fontWeight: FontWeight.normal,
+                      ),
+                      dataTextStyle: TextStyle(
+                        color: Color(0xFF1F1F1F),
+                        fontSize: 14,
+                        //fontWeight: FontWeight.w400,
+                      ),
+                      columnSpacing: 15.0,
+                      dataRowHeight: 65.0,
+                      showCheckboxColumn: false,
+                      columns: [
+                        DataColumn(label: Text('Date')),
+                        DataColumn(label: Text('Product Name')),
+                        DataColumn(label: Text('Quantity')),
+                        DataColumn(label: Text('Payment Mode')),
+                        DataColumn(label: Text('Amount')),
+                        DataColumn(label: Text('')),
+                      ],
+                      rows: itemRow,
+                    ),
                   ),
-                  dataTextStyle: TextStyle(
-                    color: Color(0xFF1F1F1F),
-                    fontSize: 14,
-                    //fontWeight: FontWeight.w400,
-                  ),
-                  columnSpacing: 15.0,
-                  dataRowHeight: 65.0,
-                  showCheckboxColumn: false,
-                  columns: [
-                    DataColumn(label: Text('Date')),
-                    DataColumn(label: Text('Product Name')),
-                    DataColumn(label: Text('Quantity')),
-                    DataColumn(label: Text('Payment Mode')),
-                    DataColumn(label: Text('Amount')),
-                    DataColumn(label: Text('')),
-                  ],
-                  rows: itemRow,
-                ),
-              )),
+                  const SizedBox(height: 80),
+                  if(_showSaleSpinner)
+                    Padding(
+                      padding: EdgeInsets.only(left: 200),
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0A459F)),
+                      ),
+                    ),
+                  const SizedBox(height: 100),
+                ],
+              ),
+            )),
         ),
       );
     }

@@ -93,7 +93,7 @@ class _CustomersState extends State<Customers> {
   /// A function to build the list of all the customers
   Widget _buildCustomerList() {
     List<DataRow> itemRow = [];
-    if(_filteredCustomers.length > 0 && _filteredCustomers.isNotEmpty){
+    if(_filteredCustomers.isNotEmpty){
       for (int i = 0; i < _filteredCustomers.length; i++){
         AllCustomers customer = _filteredCustomers[i];
         double totalSales = 0;
@@ -126,7 +126,7 @@ class _CustomersState extends State<Customers> {
                   customer: customer,
                 ),
               ),
-            ).then((value) => _refreshDebtors());
+            ).then((value) => _refreshCustomers());
           }),
         );
       }
@@ -178,17 +178,14 @@ class _CustomersState extends State<Customers> {
                       )
                   ),
                   const SizedBox(height: 80),
-                  _showCustomerSpinner
-                      ? Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(24.0),
+                  if(_showCustomerSpinner)
+                    Padding(
+                      padding: EdgeInsets.only(left: 200),
                       child: CircularProgressIndicator(
                         valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0A459F)),
                       ),
                     ),
-                  )
-                      : Container(),
-                  const SizedBox(height: 100),
+                  const SizedBox(height: 80),
                 ],
               ),
             ),
@@ -279,7 +276,7 @@ class _CustomersState extends State<Customers> {
   /// A function to build the list of all the debtors
   Widget _buildDebtorList() {
     List<DataRow> itemRow = [];
-    if(_filteredDebtors.length > 0 && _filteredDebtors.isNotEmpty){
+    if(_filteredDebtors.isNotEmpty){
       for (int i = 0; i < _filteredDebtors.length; i++){
         AllCustomers customer = _filteredDebtors[i];
         int references = 0;
@@ -287,7 +284,7 @@ class _CustomersState extends State<Customers> {
         double totalDebts = 0;
         customer.reports!.forEach((element) {
           totalDebts += (element.totalAmount! - element.paymentMade!);
-          if(element.paid!){
+          if(!element.paid!){
             if(element.description == null) invoices += 1;
             else references += 1;
           }
@@ -372,17 +369,14 @@ class _CustomersState extends State<Customers> {
                       )
                   ),
                   const SizedBox(height: 80),
-                  _showDebtorSpinner
-                      ? Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(24.0),
+                  if(_showDebtorSpinner)
+                    Padding(
+                      padding: EdgeInsets.only(left: 200),
                       child: CircularProgressIndicator(
                         valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0A459F)),
                       ),
                     ),
-                  )
-                      : Container(),
-                  const SizedBox(height: 100),
+                  const SizedBox(height: 80),
                 ],
               ),
             ),

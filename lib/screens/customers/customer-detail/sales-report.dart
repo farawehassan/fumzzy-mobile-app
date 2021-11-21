@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:fumzy/bloc/future-values.dart';
 import 'package:fumzy/components/app-bar.dart';
 import 'package:fumzy/components/button.dart';
 import 'package:fumzy/components/circle-indicator.dart';
 import 'package:fumzy/components/info-table.dart';
+import 'package:fumzy/components/shimmer-loader.dart';
 import 'package:fumzy/model/all-customers.dart';
 import 'package:fumzy/model/customer-reports.dart';
+import 'package:fumzy/model/repayment-history.dart';
 import 'package:fumzy/networking/customer-datasource.dart';
 import 'package:fumzy/utils/constant-styles.dart';
 import 'package:fumzy/utils/functions.dart';
-import 'package:pin_code_fields/pin_code_fields.dart';
 
 class SalesReport extends StatefulWidget {
 
@@ -32,10 +34,13 @@ class SalesReport extends StatefulWidget {
 
 class _SalesReportState extends State<SalesReport> {
 
+  /// Instantiating a class of the [FutureValues]
+  var futureValue = FutureValues();
+
   bool _showSpinner = false;
 
   Widget _buildTotalReports(){
-    if(widget.reports!.report!.length > 0){
+    if(widget.reports!.report!.isNotEmpty){
       List<DataRow> itemRow = [];
       for (int i = 0; i < widget.reports!.report!.length; i++){
         Report report = widget.reports!.report![i];
@@ -89,6 +94,99 @@ class _SalesReportState extends State<SalesReport> {
       );
     }
     else return Container();
+  }
+
+  /// A List to hold the all the repayment history
+  List<RepaymentHistory> _repaymentHistory = [];
+
+  /// An Integer variable to hold the length of [_repaymentHistory]
+  int? _repaymentHistoryLength;
+
+  ///A function to get the report repayment history and store them in list[_repaymentHistory]
+  void _getRepaymentHistory() async {
+    Future<List<RepaymentHistory>> history = futureValue.getRepaymentHistory(widget.customer!.id!, widget.reports!.id!);
+    await history.then((value) {
+      if(!mounted)return;
+      setState(() {
+        _repaymentHistory.addAll(value);
+        _repaymentHistoryLength = _repaymentHistory.length;
+      });
+    }).catchError((e){
+      print(e);
+      Functions.showErrorMessage(e);
+    });
+  }
+
+  /// A function to build the repayment history
+  Widget _buildRepaymentHistory() {
+    List<DataRow> itemRow = [];
+    if(_repaymentHistory.isNotEmpty){
+      for (int i = 0; i < _repaymentHistory.length; i++){
+        RepaymentHistory history = _repaymentHistory[i];
+        itemRow.add(
+          DataRow(cells: [
+            DataCell(Text(Functions.getFormattedDateTime(history.createdAt!))),
+            DataCell(Text(Functions.money(history.amount!, 'N'))),
+          ]),
+        );
+      }
+      return SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Repayment History',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.normal,
+                color: Color(0xFF004E92),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              decoration: kTableContainer,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      physics: BouncingScrollPhysics(),
+                      child: DataTable(
+                        headingTextStyle: TextStyle(
+                          color: Color(0xFF75759E),
+                          fontSize: 14,
+                          fontWeight: FontWeight.normal,
+                        ),
+                        dataTextStyle: TextStyle(
+                          color: Color(0xFF1F1F1F),
+                          fontSize: 14,
+                        ),
+                        columnSpacing: 15.0,
+                        dataRowHeight: 65.0,
+                        showCheckboxColumn: false,
+                        columns: [
+                          DataColumn(label: Text('Date')),
+                          DataColumn(label: Text('Amount')),
+                        ],
+                        rows: itemRow,
+                      )
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+    else if(_repaymentHistoryLength == 0) return Container();
+    return ShimmerLoader();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getRepaymentHistory();
   }
 
   @override
@@ -303,8 +401,18 @@ class _SalesReportState extends State<SalesReport> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 35),
-                  _buildTotalReports(),
+                  SizedBox(height: 25),
+                  Wrap(
+                    runSpacing: 24,
+                    spacing: 60,
+                    children: [
+                      Container(
+                        margin: EdgeInsets.only(top: 28),
+                        child: _buildTotalReports()
+                      ),
+                      _buildRepaymentHistory(),
+                    ],
+                  ),
                 ],
               ),
             )
@@ -512,7 +620,8 @@ class _SalesReportState extends State<SalesReport> {
                                       Map<String, dynamic> body = {
                                         'id': widget.customer!.id,
                                         'reportId': widget.reports!.id,
-                                        'payment': amountController.text
+                                        'payment': double.parse(amountController.text),
+                                        'totalPaid': widget.reports!.paymentMade! + double.parse(amountController.text)
                                       };
                                       _updatePayment(body, setDialogState);
                                     }
@@ -767,7 +876,8 @@ class _SalesReportState extends State<SalesReport> {
                                     Map<String, dynamic> body = {
                                       'id': widget.customer!.id,
                                       'reportId': widget.reports!.id,
-                                      'payment': widget.reports!.totalAmount,
+                                      'payment': widget.reports!.totalAmount! - widget.reports!.paymentMade!,
+                                      'totalPayment': widget.reports!.totalAmount,
                                       'paymentReceivedAt': DateTime.now().toIso8601String()
                                     };
                                     _settlePayment(body, setDialogState);
