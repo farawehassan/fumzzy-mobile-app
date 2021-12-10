@@ -28,6 +28,17 @@ class Inventory extends StatefulWidget {
 
 class _InventoryState extends State<Inventory> {
 
+  /// Checking if the _search controller is empty to reset the
+  /// filteredProducts to Products
+  _InventoryState(){
+    _search.addListener(() {
+      if (_search.text.isEmpty) {
+        if (!mounted) return;
+        setState(() => _filteredProducts = _products);
+      }
+    });
+  }
+
   /// Instantiating a class of the [FutureValues]
   var futureValue = FutureValues();
 
@@ -48,10 +59,20 @@ class _InventoryState extends State<Inventory> {
     '': Colors.transparent
   };
 
+  List<String> _allFilter = [
+    'Product Name',
+    'Category',
+  ];
+
+  String _selectedFilter = 'Product Name';
+
   /** Product aspect ***/
   
   /// A List to hold the all the products
   List<Product> _products = [];
+
+  /// A List to hold the all the filtered products
+  List<Product> _filteredProducts = [];
 
   /// A List to hold the all the product categories and product count
   Map<String, double> _productCategories = {};
@@ -62,6 +83,9 @@ class _InventoryState extends State<Inventory> {
   void _getAllProducts({bool? refresh}) async {
     Future<List<Product>> products = futureValue.getAllProducts(refresh: refresh);
     await products.then((value) {
+      _products.clear();
+      _filteredProducts.clear();
+      _productsLength = null;
       if(!mounted)return;
       setState(() {
         for(int i = 0; i < value.length; i++){
@@ -74,6 +98,7 @@ class _InventoryState extends State<Inventory> {
             _productCategories[value[i].category!.name!] = value[i].currentQty!;
           }
         }
+        _filteredProducts = _products;
         _productsLength = _products.length;
       });
     }).catchError((e){
@@ -85,9 +110,9 @@ class _InventoryState extends State<Inventory> {
   /// A function to build the list of all the products
   Widget _buildProductList() {
     List<DataRow> itemRow = [];
-    if(_products.isNotEmpty){
-      for (int i = 0; i < _products.length; i++){
-        Product product = _products[i];
+    if(_filteredProducts.isNotEmpty){
+      for (int i = 0; i < _filteredProducts.length; i++){
+        Product product = _filteredProducts[i];
         String stock = '';
         if(product.currentQty! > 10) stock = 'In Stock';
         else if(product.currentQty! > 0) stock = 'Short Stock';
@@ -167,9 +192,11 @@ class _InventoryState extends State<Inventory> {
     return products.then((value) {
       _productsLength = null;
       _products.clear();
+      _filteredProducts.clear();
       if(!mounted)return;
       setState(() {
         _products.addAll(value);
+        _filteredProducts = _products;
         _productsLength = _products.length;
       });
     }).catchError((e){
@@ -404,79 +431,146 @@ class _InventoryState extends State<Inventory> {
                     ],
                   ),
                   const SizedBox(height: 35),
-                  Container(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 180,
-                          height: 50,
-                          padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 15.0),
-                          margin: EdgeInsets.only(right: 50),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(27.5),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 180,
+                        height: 50,
+                        padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 15.0),
+                        margin: EdgeInsets.only(right: 50),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(27.5),
+                        ),
+                        child: TextField(
+                          textAlign: TextAlign.start,
+                          textInputAction: TextInputAction.search,
+                          controller: _search,
+                          style: TextStyle(
+                              fontWeight: FontWeight.w400,
+                              fontSize: 15.0,
+                              color: Colors.black
                           ),
-                          child: TextField(
-                            textAlign: TextAlign.start,
-                            textInputAction: TextInputAction.search,
-                            controller: _search,
-                            decoration: InputDecoration(
-                              suffixIcon: Icon(
-                                IconlyLight.search,
-                                color: Colors.black,
-                                size: 17,
-                              ),
-                              hintText: 'Search',
-                              enabledBorder: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                            ),
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontSize: 15.0,
-                                color: Colors.black
-                            ),
-                          ),
-                        ), //search
-                        InkWell(
-                          onTap: () {
-                            print('filter');
+                          onChanged: (value){
+                            if(_search.text.isNotEmpty){
+                              List<Product> tempList = [];
+                              if(_selectedFilter == _allFilter[0]){
+                                for (int i = 0; i < _filteredProducts.length; i++) {
+                                  if (_filteredProducts[i].productName!.toLowerCase()
+                                      .contains(_search.text.toLowerCase())) {
+                                    tempList.add(_filteredProducts[i]);
+                                  }
+                                }
+                              }
+                              else {
+                                for (int i = 0; i < _filteredProducts.length; i++) {
+                                  if (_filteredProducts[i].category!.name!.toLowerCase()
+                                      .contains(_search.text.toLowerCase())) {
+                                    tempList.add(_filteredProducts[i]);
+                                  }
+                                }
+                              }
+
+                              if(!mounted)return;
+                              setState(() => _filteredProducts = tempList);
+                            }
                           },
-                          child: Container(
-                            width: 110,
-                            height: 50,
-                            padding: EdgeInsets.all(15),
-                            decoration: BoxDecoration(
+                          onSubmitted: (value){
+                            if(_search.text.isNotEmpty){
+                              List<Product> tempList = [];
+                              if(_selectedFilter == _allFilter[0]){
+                                for (int i = 0; i < _filteredProducts.length; i++) {
+                                  if (_filteredProducts[i].productName!.toLowerCase()
+                                      .contains(_search.text.toLowerCase())) {
+                                    tempList.add(_filteredProducts[i]);
+                                  }
+                                }
+                              }
+                              else {
+                                for (int i = 0; i < _filteredProducts.length; i++) {
+                                  if (_filteredProducts[i].category!.name!.toLowerCase()
+                                      .contains(_search.text.toLowerCase())) {
+                                    tempList.add(_filteredProducts[i]);
+                                  }
+                                }
+                              }
+
+                              if(!mounted)return;
+                              setState(() => _filteredProducts = tempList);
+                            }
+                          },
+                          decoration: InputDecoration(
+                            suffixIcon: Icon(
+                              IconlyLight.search,
+                              color: Colors.black,
+                              size: 17,
+                            ),
+                            hintText: 'Search',
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 144,
+                        child: DropdownButtonFormField<String>(
+                          value: _selectedFilter,
+                          onChanged: (value) {
+                            setState(() => _selectedFilter = value!);
+                          },
+                          style: TextStyle(
+                            color: Color(0xFF171725),
+                            fontWeight: FontWeight.normal,
+                            fontSize: 14,
+                          ),
+                          icon: Icon(
+                            Icons.tune,
+                            color: Colors.black,
+                            size: 18,
+                          ),
+                          isExpanded: false,
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.fromLTRB(10, 5, 5, 5),
+                            border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(3.0),
-                              color: Colors.white,
-                              border: Border.all(
+                              borderSide: BorderSide(
                                 width: 1,
                                 color: Color(0xFFE2E2EA),
                               ),
                             ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Filter',
-                                  style: TextStyle(
-                                    color: Color(0xFF171725),
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                                Icon(
-                                  Icons.tune,
-                                  color: Colors.black,
-                                  size: 18,
-                                ),
-                              ],
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(3.0),
+                              borderSide: BorderSide(
+                                width: 1,
+                                color: Color(0xFFE2E2EA),
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(3.0),
+                              borderSide: BorderSide(
+                                width: 1,
+                                color: Color(0xFFE2E2EA),
+                              ),
                             ),
                           ),
+                          items: _allFilter.map((value) {
+                            return DropdownMenuItem(
+                              child: Text(
+                                value,
+                                style: TextStyle(
+                                  color: Color(0xFF171725),
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              value: value,
+                            );
+                          }).toList(),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                   SizedBox(height: 37),
                   SingleChildScrollView(

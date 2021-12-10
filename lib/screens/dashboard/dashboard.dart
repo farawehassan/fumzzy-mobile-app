@@ -405,6 +405,7 @@ class _DashboardState extends State<Dashboard> {
       if(e.toString() == 'No internet connection'){
         _getStoreChartsInformation(refresh: false);
       }
+      if(!mounted)return;
       Functions.showErrorMessage(e);
     });
   }
@@ -1075,11 +1076,9 @@ class _DashboardState extends State<Dashboard> {
                               ],
                             ),
                             const SizedBox(height: 15),
-                            ReusableCard(
-                              child: Container(
-                                height: 340,
-                                child: _buildPurchaseList(),
-                              ),
+                            Container(
+                              height: 340,
+                              child: _buildPurchaseList(),
                             ),
                             const SizedBox(height: 40),
                             Row(
@@ -1113,15 +1112,6 @@ class _DashboardState extends State<Dashboard> {
                             const SizedBox(height: 15),
                             Container(
                               height: 340,
-                              //width: constraints.maxWidth,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(17),
-                                border: Border.all(
-                                  width: 1,
-                                  color: Color(0xFFE2E2EA),
-                                ),
-                              ),
                               child: _buildSaleList(),
                             ),
                           ],
