@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fumzy/utils/size-config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,7 +19,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   late AnimationController _controller;
 
   void _navigate(){
-    Timer(Duration(seconds: 3), ()=> _getBoolValuesFromSp());
+    Timer(Duration(seconds: 2), ()=> _getBoolValuesFromSp());
   }
 
   @override
@@ -34,7 +35,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
       setState(() {});
     });
     _controller.repeat(reverse: true);
-    _navigate();
+    Platform.isIOS ? _getBoolValuesFromSp() : _navigate();
   }
 
   @override

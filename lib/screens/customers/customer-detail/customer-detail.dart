@@ -16,6 +16,10 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 import 'sales-report.dart';
 import 'package:fumzy/components/info-table.dart';
 
+enum PaymentMode { cash, transfer }
+
+PaymentMode? _paymentMode = PaymentMode.cash;
+
 class CustomersDetail extends StatefulWidget {
 
   static const String id = 'customerDetail';
@@ -1000,6 +1004,62 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                             ),
                                           ],
                                         ),
+                                        Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            // Cash
+                                            Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              children: [
+                                                Radio<PaymentMode>(
+                                                  value: PaymentMode.cash,
+                                                  activeColor: Color(0xFF00509A),
+                                                  groupValue: _paymentMode,
+                                                  visualDensity: VisualDensity(
+                                                    horizontal: -4,
+                                                  ),
+                                                  onChanged: (PaymentMode? value) {
+                                                    setDialogState(() { _paymentMode = value; });
+                                                  },
+                                                ),
+                                                Padding(
+                                                  padding: const EdgeInsets.only(top: 2.0),
+                                                  child: Text(
+                                                    'Cash',
+                                                    style: TextStyle(fontSize: 16),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(width: 15),
+                                            // Transfer
+                                            Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              children: [
+                                                Radio<PaymentMode>(
+                                                  value: PaymentMode.transfer,
+                                                  activeColor: Color(0xFF00509A),
+                                                  groupValue: _paymentMode,
+                                                  visualDensity: VisualDensity(
+                                                    horizontal: -4,
+                                                  ),
+                                                  onChanged: (PaymentMode? value) {
+                                                    setDialogState(() { _paymentMode = value; });
+                                                  },
+                                                ),
+                                                Padding(
+                                                  padding: const EdgeInsets.only(top: 2.0),
+                                                  child: Text(
+                                                    'Transfer',
+                                                    style: TextStyle(fontSize: 16),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                         SizedBox(height: 30),
                                         /// Description
                                         Column(
@@ -1045,6 +1105,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                         'id': widget.customer!.id,
                                         'reportId': reports.id,
                                         'payment': double.parse(amountController.text),
+                                        'paymentMode': _paymentMode == PaymentMode.cash ? 'Cash' : 'Transfer',
                                         'totalPaid': reports.paymentMade! + double.parse(amountController.text)
                                       };
                                       _updatePayment(body, setDialogState);
@@ -1256,6 +1317,62 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                             ),
                                           ],
                                         ),
+                                        Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            // Cash
+                                            Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              children: [
+                                                Radio<PaymentMode>(
+                                                  value: PaymentMode.cash,
+                                                  activeColor: Color(0xFF00509A),
+                                                  groupValue: _paymentMode,
+                                                  visualDensity: VisualDensity(
+                                                    horizontal: -4,
+                                                  ),
+                                                  onChanged: (PaymentMode? value) {
+                                                    setDialogState(() { _paymentMode = value; });
+                                                  },
+                                                ),
+                                                Padding(
+                                                  padding: const EdgeInsets.only(top: 2.0),
+                                                  child: Text(
+                                                    'Cash',
+                                                    style: TextStyle(fontSize: 16),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(width: 15),
+                                            // Transfer
+                                            Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              children: [
+                                                Radio<PaymentMode>(
+                                                  value: PaymentMode.transfer,
+                                                  activeColor: Color(0xFF00509A),
+                                                  groupValue: _paymentMode,
+                                                  visualDensity: VisualDensity(
+                                                    horizontal: -4,
+                                                  ),
+                                                  onChanged: (PaymentMode? value) {
+                                                    setDialogState(() { _paymentMode = value; });
+                                                  },
+                                                ),
+                                                Padding(
+                                                  padding: const EdgeInsets.only(top: 2.0),
+                                                  child: Text(
+                                                    'Transfer',
+                                                    style: TextStyle(fontSize: 16),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                         SizedBox(height: 30),
                                         /// Description
                                         Column(
@@ -1302,6 +1419,7 @@ class _CustomersDetailState extends State<CustomersDetail> {
                                       'reportId': reports.id,
                                       'payment': reports.totalAmount! - reports.paymentMade!,
                                       'totalPayment': reports.totalAmount,
+                                      'paymentMode': _paymentMode == PaymentMode.cash ? 'Cash' : 'Transfer',
                                       'paymentReceivedAt': DateTime.now().toIso8601String()
                                     };
                                     _settlePayment(body, setDialogState);

@@ -10,8 +10,11 @@ import 'package:fumzy/networking/creditor-datasource.dart';
 import 'package:fumzy/utils/constant-styles.dart';
 import 'package:fumzy/utils/functions.dart';
 import 'package:fumzy/components/info-table.dart';
-
 import 'repayment-history.dart';
+
+enum PaymentMode { cash, transfer }
+
+PaymentMode? _paymentMode = PaymentMode.cash;
 
 class CreditorsDetail extends StatefulWidget {
 
@@ -765,6 +768,62 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
                                             ),
                                           ],
                                         ),
+                                        Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            // Cash
+                                            Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              children: [
+                                                Radio<PaymentMode>(
+                                                  value: PaymentMode.cash,
+                                                  activeColor: Color(0xFF00509A),
+                                                  groupValue: _paymentMode,
+                                                  visualDensity: VisualDensity(
+                                                    horizontal: -4,
+                                                  ),
+                                                  onChanged: (PaymentMode? value) {
+                                                    setDialogState(() { _paymentMode = value; });
+                                                  },
+                                                ),
+                                                Padding(
+                                                  padding: const EdgeInsets.only(top: 2.0),
+                                                  child: Text(
+                                                    'Cash',
+                                                    style: TextStyle(fontSize: 16),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(width: 15),
+                                            // Transfer
+                                            Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              children: [
+                                                Radio<PaymentMode>(
+                                                  value: PaymentMode.transfer,
+                                                  activeColor: Color(0xFF00509A),
+                                                  groupValue: _paymentMode,
+                                                  visualDensity: VisualDensity(
+                                                    horizontal: -4,
+                                                  ),
+                                                  onChanged: (PaymentMode? value) {
+                                                    setDialogState(() { _paymentMode = value; });
+                                                  },
+                                                ),
+                                                Padding(
+                                                  padding: const EdgeInsets.only(top: 2.0),
+                                                  child: Text(
+                                                    'Transfer',
+                                                    style: TextStyle(fontSize: 16),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                         SizedBox(height: 30),
                                         /// Description
                                         Column(
@@ -813,6 +872,7 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
                                         'payment': double.parse(amountController.text),
                                         'paymentMade': reports.paymentMade!
                                             + double.parse(amountController.text),
+                                        'paymentMode': _paymentMode == PaymentMode.cash ? 'Cash' : 'Transfer',
                                         'description': referenceController.text
                                       };
                                       _updateCredit(body, setDialogState);
@@ -1022,6 +1082,62 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
                                             ),
                                           ],
                                         ),
+                                        Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            // Cash
+                                            Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              children: [
+                                                Radio<PaymentMode>(
+                                                  value: PaymentMode.cash,
+                                                  activeColor: Color(0xFF00509A),
+                                                  groupValue: _paymentMode,
+                                                  visualDensity: VisualDensity(
+                                                    horizontal: -4,
+                                                  ),
+                                                  onChanged: (PaymentMode? value) {
+                                                    setDialogState(() { _paymentMode = value; });
+                                                  },
+                                                ),
+                                                Padding(
+                                                  padding: const EdgeInsets.only(top: 2.0),
+                                                  child: Text(
+                                                    'Cash',
+                                                    style: TextStyle(fontSize: 16),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(width: 15),
+                                            // Transfer
+                                            Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              children: [
+                                                Radio<PaymentMode>(
+                                                  value: PaymentMode.transfer,
+                                                  activeColor: Color(0xFF00509A),
+                                                  groupValue: _paymentMode,
+                                                  visualDensity: VisualDensity(
+                                                    horizontal: -4,
+                                                  ),
+                                                  onChanged: (PaymentMode? value) {
+                                                    setDialogState(() { _paymentMode = value; });
+                                                  },
+                                                ),
+                                                Padding(
+                                                  padding: const EdgeInsets.only(top: 2.0),
+                                                  child: Text(
+                                                    'Transfer',
+                                                    style: TextStyle(fontSize: 16),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                         SizedBox(height: 30),
                                         /// Description
                                         Column(
@@ -1069,6 +1185,7 @@ class _CreditorsDetailState extends State<CreditorsDetail> {
                                       'amount': reports.amount,
                                       'payment': reports.amount! - reports.paymentMade!,
                                       'paymentMade': reports.amount,
+                                      'paymentMode': _paymentMode == PaymentMode.cash ? 'Cash' : 'Transfer',
                                       'description': referenceController.text
                                     };
                                     _updateCredit(body, setDialogState);

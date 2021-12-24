@@ -77,7 +77,6 @@ class ProductDataSource{
     });
     String GET_PRODUCT_PURCHASES = GET_PURCHASES_BY_PRODUCT + '/$productId?page=$page&limit=$limit';
     return _netUtil.get(GET_PRODUCT_PURCHASES, headers: header).then((dynamic res) {
-      print(res);
       if (res['error']) throw res['message'];
       List<Purchase> allPurchases = [];
       var rest = res['data']['items'] as List;

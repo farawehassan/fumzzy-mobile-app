@@ -132,7 +132,7 @@ class _InventoryState extends State<Inventory> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => InventoryDetail(
-                      product: _products[i],
+                      product: _filteredProducts[i],
                       allCategories: _categories
                   ),
                 ),

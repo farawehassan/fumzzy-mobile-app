@@ -448,7 +448,7 @@ class _DashboardState extends State<Dashboard> {
   String? _selectedView = 'Today';
 
   Widget _getCharts(){
-    if(_storeChartsInfo == null){
+    if(_storeChartsInfo == null || _storeInfo == null){
       return Wrap(
         children: [
           TotalSalesCard(
@@ -480,212 +480,221 @@ class _DashboardState extends State<Dashboard> {
     }
     else {
       if(_selectedView == 'Today'){
-        dynamic availableCash = (_storeChartsInfo!.today!.todaySales!.isNotEmpty ? _storeChartsInfo!.today!.todaySales![0]['total'] : 0)
-          - (_storeChartsInfo!.today!.todayExpenses!.isNotEmpty ? _storeChartsInfo!.today!.todayExpenses![0]['total'] : 0)
-          - (_storeChartsInfo!.today!.todayTransferredSales!.isNotEmpty ? _storeChartsInfo!.today!.todayTransferredSales![0]['total'] : 0);
+        dynamic availableCash = _storeChartsInfo!.today!['todaySales'] - (
+            _storeChartsInfo!.today!['todayExpenses']
+                + _storeChartsInfo!.today!['todayTransferredSales']
+                + _storeInfo!.todayOutstandingBalance
+        ) + _storeInfo!.outstandingPaymentMadeToday;
         return Wrap(
           children: [
             TotalSalesCard(
               cardName: 'Total Sales',
-              totalPrice: _storeChartsInfo!.today!.todaySales!.isNotEmpty ? _storeChartsInfo!.today!.todaySales![0]['total'] : 0,
+              totalPrice: _storeChartsInfo!.today!['todaySales']
             ),
             TotalSalesCard(
               cardName: 'Total Purchases',
-              totalPrice: _storeChartsInfo!.today!.todayPurchases!.isNotEmpty ? _storeChartsInfo!.today!.todayPurchases![0]['total'] : 0
+              totalPrice: _storeChartsInfo!.today!['todayPurchases']
             ),
             TotalSalesCard(
               cardName: 'Total Expenses',
-              totalPrice:  _storeChartsInfo!.today!.todayExpenses!.isNotEmpty ? _storeChartsInfo!.today!.todayExpenses![0]['total'] : 0
+              totalPrice:  _storeChartsInfo!.today!['todayExpenses']
             ),
             TotalSalesCard(
-              cardName: 'Total Transfer ',
-              totalPrice:  _storeChartsInfo!.today!.todayTransferredSales!.isNotEmpty ? _storeChartsInfo!.today!.todayTransferredSales![0]['total'] : 0
+              cardName: 'Total Transfer',
+              totalPrice:  _storeChartsInfo!.today!['todayTransferredSales']
+            ),
+            TotalSalesCard(
+              cardName: 'Repayment Made',
+              totalPrice: _storeInfo!.outstandingPaymentMadeToday
+            ),
+            TotalSalesCard(
+                cardName: 'Outstanding Payment',
+                totalPrice: _storeInfo!.todayOutstandingBalance
             ),
             TotalSalesCard(
               cardName: 'Available Cash',
               totalPrice: availableCash
             ),
-            _isAdmin
-                ? TotalSalesCard(
-              cardName: 'Total Profit',
-              totalPrice: _storeChartsInfo!.today!.todayProfit!.isNotEmpty ? _storeChartsInfo!.today!.todayProfit![0]['total'] : 0,
-            )
-                : Container(),
+            if (_isAdmin)
+              TotalSalesCard(
+                cardName: 'Total Profit',
+                totalPrice: _storeChartsInfo!.today!['todayProfit']
+              )
           ],
         );
       }
       else if(_selectedView == 'Yesterday'){
-        dynamic availableCash = (_storeChartsInfo!.yesterday!.yesterdaySales!.isNotEmpty ? _storeChartsInfo!.yesterday!.yesterdaySales![0]['total'] : 0)
-          - (_storeChartsInfo!.yesterday!.yesterdayExpenses!.isNotEmpty ? _storeChartsInfo!.yesterday!.yesterdayExpenses![0]['total'] : 0)
-          - (_storeChartsInfo!.yesterday!.yesterdayTransferredSales!.isNotEmpty ? _storeChartsInfo!.yesterday!.yesterdayTransferredSales![0]['total'] : 0);
+        dynamic availableCash = _storeChartsInfo!.yesterday!['yesterdaySales'] - (
+            _storeChartsInfo!.yesterday!['yesterdayExpenses']
+                +  _storeChartsInfo!.yesterday!['yesterdayTransferredSales']
+        );
         return Wrap(
           children: [
             TotalSalesCard(
               cardName: 'Total Sales',
-              totalPrice: _storeChartsInfo!.yesterday!.yesterdaySales!.isNotEmpty ? _storeChartsInfo!.yesterday!.yesterdaySales![0]['total'] : 0,
+              totalPrice: _storeChartsInfo!.yesterday!['yesterdaySales']
             ),
             TotalSalesCard(
                 cardName: 'Total Purchases',
-                totalPrice: _storeChartsInfo!.yesterday!.yesterdayPurchases!.isNotEmpty ? _storeChartsInfo!.yesterday!.yesterdayPurchases![0]['total'] : 0
+                totalPrice: _storeChartsInfo!.yesterday!['yesterdayPurchases']
             ),
             TotalSalesCard(
                 cardName: 'Total Expenses',
-                totalPrice:  _storeChartsInfo!.yesterday!.yesterdayExpenses!.isNotEmpty ? _storeChartsInfo!.yesterday!.yesterdayExpenses![0]['total'] : 0
+                totalPrice:  _storeChartsInfo!.yesterday!['yesterdayExpenses']
             ),
             TotalSalesCard(
                 cardName: 'Total Transfer ',
-                totalPrice:  _storeChartsInfo!.yesterday!.yesterdayTransferredSales!.isNotEmpty ? _storeChartsInfo!.yesterday!.yesterdayTransferredSales![0]['total'] : 0
+                totalPrice:  _storeChartsInfo!.yesterday!['yesterdayTransferredSales']
             ),
             TotalSalesCard(
                 cardName: 'Available Cash',
                 totalPrice: availableCash
             ),
-            _isAdmin
-                ? TotalSalesCard(
-              cardName: 'Total Profit',
-              totalPrice: _storeChartsInfo!.yesterday!.yesterdayProfit!.isNotEmpty ? _storeChartsInfo!.yesterday!.yesterdayProfit![0]['total'] : 0,
-            )
-                : Container(),
+            if(_isAdmin)
+              TotalSalesCard(
+                  cardName: 'Total Profit',
+                  totalPrice: _storeChartsInfo!.yesterday!['yesterdayProfit']
+              )
           ],
         );
       }
       else if(_selectedView == 'This Week'){
-        dynamic availableCash = (_storeChartsInfo!.week!.weekSales!.isNotEmpty ? _storeChartsInfo!.week!.weekSales![0]['total'] : 0)
-          - (_storeChartsInfo!.week!.weekExpenses!.isNotEmpty ? _storeChartsInfo!.week!.weekExpenses![0]['total'] : 0)
-          - (_storeChartsInfo!.week!.weekTransferredSales!.isNotEmpty ? _storeChartsInfo!.week!.weekTransferredSales![0]['total'] : 0);
+        dynamic availableCash = _storeChartsInfo!.week!['weekSales'] - (
+            _storeChartsInfo!.week!['weekExpenses']
+                + _storeChartsInfo!.week!['weekTransferredSales']
+        );
         return Wrap(
           children: [
             TotalSalesCard(
               cardName: 'Total Sales',
-              totalPrice: _storeChartsInfo!.week!.weekSales!.isNotEmpty ? _storeChartsInfo!.week!.weekSales![0]['total'] : 0,
+              totalPrice: _storeChartsInfo!.week!['weekSales']
             ),
             TotalSalesCard(
                 cardName: 'Total Purchases',
-                totalPrice: _storeChartsInfo!.week!.weekPurchases!.isNotEmpty ? _storeChartsInfo!.week!.weekPurchases![0]['total'] : 0
+                totalPrice: _storeChartsInfo!.week!['weekPurchases']
             ),
             TotalSalesCard(
                 cardName: 'Total Expenses',
-                totalPrice:  _storeChartsInfo!.week!.weekExpenses!.isNotEmpty ? _storeChartsInfo!.week!.weekExpenses![0]['total'] : 0
+                totalPrice:  _storeChartsInfo!.week!['weekExpenses']
             ),
             TotalSalesCard(
                 cardName: 'Total Transfer ',
-                totalPrice:  _storeChartsInfo!.week!.weekTransferredSales!.isNotEmpty ? _storeChartsInfo!.week!.weekTransferredSales![0]['total'] : 0
+                totalPrice:  _storeChartsInfo!.week!['weekTransferredSales']
             ),
             TotalSalesCard(
                 cardName: 'Available Cash',
                 totalPrice: availableCash
             ),
-            _isAdmin
-                ? TotalSalesCard(
-              cardName: 'Total Profit',
-              totalPrice: _storeChartsInfo!.week!.weekProfit!.isNotEmpty ? _storeChartsInfo!.week!.weekProfit![0]['total'] : 0,
-            )
-                : Container(),
+            if(_isAdmin)
+              TotalSalesCard(
+                  cardName: 'Total Profit',
+                  totalPrice: _storeChartsInfo!.week!['weekProfit']
+              )
           ],
         );
       }
       else if(_selectedView == 'This Month'){
-        dynamic availableCash = (_storeChartsInfo!.thisMonth!.monthSales!.isNotEmpty ? _storeChartsInfo!.thisMonth!.monthSales![0]['total'] : 0)
-          - (_storeChartsInfo!.thisMonth!.monthExpenses!.isNotEmpty ? _storeChartsInfo!.thisMonth!.monthExpenses![0]['total'] : 0)
-          - (_storeChartsInfo!.thisMonth!.monthTransferredSales!.isNotEmpty ? _storeChartsInfo!.thisMonth!.monthTransferredSales![0]['total'] : 0);
+        dynamic availableCash = _storeChartsInfo!.thisMonth!['monthSales'] - (
+            _storeChartsInfo!.thisMonth!['monthExpenses']
+                + _storeChartsInfo!.thisMonth!['monthTransferredSales']
+        );
         return Wrap(
           children: [
             TotalSalesCard(
               cardName: 'Total Sales',
-              totalPrice: _storeChartsInfo!.thisMonth!.monthSales!.isNotEmpty ? _storeChartsInfo!.thisMonth!.monthSales![0]['total'] : 0,
+              totalPrice: _storeChartsInfo!.thisMonth!['monthSales']
             ),
             TotalSalesCard(
                 cardName: 'Total Purchases',
-                totalPrice: _storeChartsInfo!.thisMonth!.monthPurchases!.isNotEmpty ? _storeChartsInfo!.thisMonth!.monthPurchases![0]['total'] : 0
+                totalPrice: _storeChartsInfo!.thisMonth!['monthPurchases']
             ),
             TotalSalesCard(
                 cardName: 'Total Expenses',
-                totalPrice:  _storeChartsInfo!.thisMonth!.monthExpenses!.isNotEmpty ? _storeChartsInfo!.thisMonth!.monthExpenses![0]['total'] : 0
+                totalPrice:  _storeChartsInfo!.thisMonth!['monthExpenses']
             ),
             TotalSalesCard(
                 cardName: 'Total Transfer ',
-                totalPrice:  _storeChartsInfo!.thisMonth!.monthTransferredSales!.isNotEmpty ? _storeChartsInfo!.thisMonth!.monthTransferredSales![0]['total'] : 0
+                totalPrice:  _storeChartsInfo!.thisMonth!['monthTransferredSales']
             ),
             TotalSalesCard(
                 cardName: 'Available Cash',
                 totalPrice: availableCash
             ),
-            _isAdmin
-                ? TotalSalesCard(
-              cardName: 'Total Profit',
-              totalPrice: _storeChartsInfo!.thisMonth!.monthProfit!.isNotEmpty ? _storeChartsInfo!.thisMonth!.monthProfit![0]['total'] : 0,
-            )
-                : Container(),
+            if(_isAdmin)
+              TotalSalesCard(
+                  cardName: 'Total Profit',
+                  totalPrice: _storeChartsInfo!.thisMonth!['monthProfit']
+              )
           ],
         );
       }
       else if(_selectedView == '6 Months'){
-        dynamic availableCash = (_storeChartsInfo!.sixMonth!.sixMonthSales!.isNotEmpty ? _storeChartsInfo!.sixMonth!.sixMonthSales![0]['total'] : 0)
-          - (_storeChartsInfo!.sixMonth!.sixMonthExpenses!.isNotEmpty ? _storeChartsInfo!.sixMonth!.sixMonthExpenses![0]['total'] : 0)
-          - (_storeChartsInfo!.sixMonth!.sixMonthTransferredSales!.isNotEmpty ? _storeChartsInfo!.sixMonth!.sixMonthTransferredSales![0]['total'] : 0);
+        dynamic availableCash = _storeChartsInfo!.sixMonth!['sixMonthSales'] - (
+            _storeChartsInfo!.sixMonth!['sixMonthExpenses']
+                + _storeChartsInfo!.sixMonth!['sixMonthTransferredSales']
+        );
         return Wrap(
           children: [
             TotalSalesCard(
               cardName: 'Total Sales',
-              totalPrice: _storeChartsInfo!.sixMonth!.sixMonthSales!.isNotEmpty ? _storeChartsInfo!.sixMonth!.sixMonthSales![0]['total'] : 0,
+              totalPrice: _storeChartsInfo!.sixMonth!['sixMonthSales']
             ),
             TotalSalesCard(
                 cardName: 'Total Purchases',
-                totalPrice: _storeChartsInfo!.sixMonth!.sixMonthPurchases!.isNotEmpty ? _storeChartsInfo!.sixMonth!.sixMonthPurchases![0]['total'] : 0
+                totalPrice: _storeChartsInfo!.sixMonth!['sixMonthPurchases']
             ),
             TotalSalesCard(
                 cardName: 'Total Expenses',
-                totalPrice:  _storeChartsInfo!.sixMonth!.sixMonthExpenses!.isNotEmpty ? _storeChartsInfo!.sixMonth!.sixMonthExpenses![0]['total'] : 0
+                totalPrice:  _storeChartsInfo!.sixMonth!['sixMonthExpenses']
             ),
             TotalSalesCard(
                 cardName: 'Total Transfer ',
-                totalPrice:  _storeChartsInfo!.sixMonth!.sixMonthTransferredSales!.isNotEmpty ? _storeChartsInfo!.sixMonth!.sixMonthTransferredSales![0]['total'] : 0
+                totalPrice:  _storeChartsInfo!.sixMonth!['sixMonthTransferredSales']
             ),
             TotalSalesCard(
                 cardName: 'Available Cash',
                 totalPrice: availableCash
             ),
-            _isAdmin
-                ? TotalSalesCard(
-              cardName: 'Total Profit',
-              totalPrice: _storeChartsInfo!.sixMonth!.sixMonthProfit!.isNotEmpty ? _storeChartsInfo!.sixMonth!.sixMonthProfit![0]['total'] : 0,
-            )
-                : Container(),
+            if(_isAdmin)
+              TotalSalesCard(
+                  cardName: 'Total Profit',
+                  totalPrice: _storeChartsInfo!.sixMonth!['sixMonthProfit']
+              )
           ],
         );
       }
       else {
-        dynamic availableCash = (_storeChartsInfo!.allTime!.allSales!.isNotEmpty ? _storeChartsInfo!.allTime!.allSales![0]['total'] : 0)
-          - (_storeChartsInfo!.allTime!.allExpenses!.isNotEmpty ? _storeChartsInfo!.allTime!.allExpenses![0]['total'] : 0)
-          - (_storeChartsInfo!.allTime!.allTransferredSales!.isNotEmpty ? _storeChartsInfo!.allTime!.allTransferredSales![0]['total'] : 0);
+        dynamic availableCash = _storeChartsInfo!.allTime!['allSales'] - (
+            _storeChartsInfo!.allTime!['allExpenses']
+                + _storeChartsInfo!.allTime!['allTransferredSales']
+        );
         return Wrap(
           children: [
             TotalSalesCard(
               cardName: 'Total Sales',
-              totalPrice: _storeChartsInfo!.allTime!.allSales!.isNotEmpty ? _storeChartsInfo!.allTime!.allSales![0]['total'] : 0,
+              totalPrice: _storeChartsInfo!.allTime!['allSales']
             ),
             TotalSalesCard(
                 cardName: 'Total Purchases',
-                totalPrice: _storeChartsInfo!.allTime!.allPurchases!.isNotEmpty ? _storeChartsInfo!.allTime!.allPurchases![0]['total'] : 0
+                totalPrice: _storeChartsInfo!.allTime!['allPurchases']
             ),
             TotalSalesCard(
                 cardName: 'Total Expenses',
-                totalPrice:  _storeChartsInfo!.allTime!.allExpenses!.isNotEmpty ? _storeChartsInfo!.allTime!.allExpenses![0]['total'] : 0
+                totalPrice:  _storeChartsInfo!.allTime!['allExpenses']
             ),
             TotalSalesCard(
                 cardName: 'Total Transfer ',
-                totalPrice:  _storeChartsInfo!.allTime!.allTransferredSales!.isNotEmpty ? _storeChartsInfo!.allTime!.allTransferredSales![0]['total'] : 0
+                totalPrice:  _storeChartsInfo!.allTime!['allTransferredSales']
             ),
             TotalSalesCard(
                 cardName: 'Available Cash',
                 totalPrice: availableCash
             ),
-            _isAdmin
-                ? TotalSalesCard(
-              cardName: 'Total Profit',
-              totalPrice: _storeChartsInfo!.allTime!.allProfit!.isNotEmpty ? _storeChartsInfo!.allTime!.allProfit![0]['total'] : 0,
-            )
-                : Container(),
+            if(_isAdmin)
+              TotalSalesCard(
+                  cardName: 'Total Profit',
+                  totalPrice: _storeChartsInfo!.allTime!['allProfit']
+              )
           ],
         );
       }

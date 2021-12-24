@@ -11,6 +11,8 @@ class Store {
     this.outstandingSalesVolume,
     this.outstandingPurchase,
     this.outstandingPurchaseVolume,
+    this.outstandingPaymentMadeToday,
+    this.todayOutstandingBalance,
   });
 
   /// This variable holds the store inventory cost price
@@ -37,6 +39,12 @@ class Store {
   /// This variable holds the store total outstanding purchase volume
   int? outstandingPurchaseVolume;
 
+  /// This variable holds the store total outstanding purchase
+  double? outstandingPaymentMadeToday;
+
+  /// This variable holds the store total outstanding purchase
+  double? todayOutstandingBalance;
+
   factory Store.fromJson(Map<String, dynamic> json) => Store(
     inventoryCostPrice: double.parse(json['inventoryCostPrice'].toString()),
     inventorySellingPrice: double.parse(json['inventorySellingPrice'].toString()),
@@ -46,6 +54,8 @@ class Store {
     outstandingSalesVolume: int.parse(json['outstandingSalesVolume'].toString()),
     outstandingPurchase: double.parse(json['outstandingPurchase'].toString()),
     outstandingPurchaseVolume: int.parse(json['outstandingPurchaseVolume'].toString()),
+    outstandingPaymentMadeToday: double.parse(json['outstandingPaymentMadeToday'].toString()),
+    todayOutstandingBalance: double.parse(json['todayOutstandingBalance'].toString()),
   );
 
   Map<String, dynamic> toJson() => {
@@ -57,6 +67,8 @@ class Store {
     'outstandingSalesVolume': outstandingSalesVolume,
     'outstandingPurchase': outstandingPurchase,
     'outstandingPurchaseVolume': outstandingPurchaseVolume,
+    'outstandingPaymentMadeToday': outstandingPaymentMadeToday,
+    'todayOutstandingBalance': todayOutstandingBalance,
   };
   
 }
