@@ -740,7 +740,7 @@ class _InventoryState extends State<Inventory> {
                                 onTap: (){
                                   if(!_showSpinner){
                                     if(formKey.currentState!.validate()){
-                                      Map<String, String> body = { 'name': categoryController.text };
+                                      Map<String, String> body = { 'name': categoryController.text.trim().toUpperCase() };
                                       _createCategory(body, setDialogState);
                                     }
                                   }
@@ -1014,7 +1014,7 @@ class _InventoryState extends State<Inventory> {
     if(!mounted)return;
     setDialogState(() => _showSpinner = true);
     var api = ProductDataSource();
-    Map<String, String> body = {'id': id, 'name': name };
+    Map<String, String> body = {'id': id, 'name': name.trim().toUpperCase() };
     await api.updateCategory(body).then((message) async{
       if(!mounted)return;
       setDialogState((){

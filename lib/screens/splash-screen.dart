@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'dashboard/dashboard.dart';
 import 'login.dart';
+import 'package:new_version/new_version.dart';
 
 class SplashScreen extends StatefulWidget {
 
@@ -21,6 +22,28 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   void _navigate(){
     Timer(Duration(seconds: 2), ()=> _getBoolValuesFromSp());
   }
+
+  /*void _checkVersion() async {
+    final newVersion = NewVersion(
+      androidId: 'com.fumzy.mobile',
+    );
+    await newVersion.getVersionStatus().then((status) {
+      if(status!.canUpdate){
+        newVersion.showUpdateDialog(
+            context: context,
+            versionStatus: status,
+            dialogTitle: 'App Update',
+            dialogText: 'A new version of Fummzzy Global Ventures is now available. Download to to enjoy our latest features',
+            dismissAction: (){
+              Navigator.pop(context);
+              _navigate();
+            },
+            updateButtonText: 'Open ${Platform.isIOS ? 'App Store' : 'Play Store'}'
+        );
+      }
+      else _navigate();
+    });
+  }*/
 
   @override
   void initState() {

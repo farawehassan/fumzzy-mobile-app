@@ -7,6 +7,7 @@ import 'package:fumzy/bloc/suggestions.dart';
 import 'package:fumzy/components/app-bar.dart';
 import 'package:fumzy/components/button.dart';
 import 'package:fumzy/components/circle-indicator.dart';
+import 'package:fumzy/components/custom-dialog.dart';
 import 'package:fumzy/components/info-table.dart';
 import 'package:fumzy/components/reusable-card.dart';
 import 'package:fumzy/model/customer-names.dart';
@@ -1062,6 +1063,7 @@ class _AddSaleState extends State<AddSale> {
 
   void _addSales(String paymentMode, String customer, Function next) async{
     var api = SalesDataSource();
+    bool allSaved = true;
     for(int i = 0; i < _realSalesData.length; i++){
       Map<String, dynamic> body = {
         'customerName': customer,
@@ -1077,10 +1079,15 @@ class _AddSaleState extends State<AddSale> {
       }).catchError((e){
         if(!mounted)return;
         print(e);
+        allSaved = false;
         Functions.showErrorMessage(e);
       });
     }
-    await next();
+    if(allSaved) await next();
+    else {
+      Navigator.pop(context);
+      CustomDialog.buildDialog(context, 'Error in adding all sales. Please confirm if any sales was added in transactions first, if any was added, kindly delete them to keep your records clean then add all your sales again');
+    }
   }
 
   Future<void> _addNewCustomer(Map<String, dynamic> body, StateSetter setDialogState, bool receipt) async{

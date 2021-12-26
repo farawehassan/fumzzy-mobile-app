@@ -28,6 +28,7 @@ dependencies:
   esc_pos_bluetooth: ^0.4.1
   flutter_bluetooth_basic: ^0.1.7
   permission_handler: ^8.2.6
+  new_version: ^0.2.0
 
 dev_dependencies:
   flutter_test:
