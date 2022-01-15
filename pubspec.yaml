@@ -29,6 +29,7 @@ dependencies:
   flutter_bluetooth_basic: ^0.1.7
   permission_handler: ^8.2.6
   new_version: ^0.2.0
+  flutter_datetime_picker: any
 
 dev_dependencies:
   flutter_test:

@@ -23,7 +23,7 @@ class CustomerDataSource{
 
   /// A function that fetches all customers in the database GET
   /// It returns a Map of [<String, dynamic>]
-  Future<Map<String, dynamic>> getAllCustomersPaginated({bool? refresh, int? page, int? limit}) async {
+  Future<Map<String, dynamic>> getAllCustomersPaginated({bool? refresh, String? searchWord, int? page, int? limit}) async {
     Map<String, dynamic> result = {};
     String fileName = 'customers-p.json';
     var dir = await getTemporaryDirectory();
@@ -47,6 +47,7 @@ class CustomerDataSource{
         header = {'Authorization': 'Bearer ${value.token}'};
       });
       String GET_ALL_CUSTOMERS_URL = GET_ALL_CUSTOMERS + '?page=$page&limit=$limit';
+      if(searchWord != null) GET_ALL_CUSTOMERS_URL = GET_ALL_CUSTOMERS_URL + '&searchWord=$searchWord';
       return _netUtil.get(GET_ALL_CUSTOMERS_URL, headers: header).then((dynamic res) {
         if (res['error']) throw res['message'];
         file.writeAsStringSync(jsonEncode(res), flush: true, mode: FileMode.write);
@@ -65,7 +66,7 @@ class CustomerDataSource{
 
   /// A function that fetches all debtors in the database GET
   /// It returns a Map of [<String, dynamic>]
-  Future<Map<String, dynamic>> getAllDebtorsPaginated({bool? refresh, int? page, int? limit}) async {
+  Future<Map<String, dynamic>> getAllDebtorsPaginated({bool? refresh, String? searchWord, int? page, int? limit}) async {
     Map<String, dynamic> result = {};
     String fileName = 'debtors-p.json';
     var dir = await getTemporaryDirectory();
@@ -89,6 +90,7 @@ class CustomerDataSource{
         header = {'Authorization': 'Bearer ${value.token}'};
       });
       String GET_ALL_DEBTORS_URL = GET_ALL_DEBTORS + '?page=$page&limit=$limit';
+      if(searchWord != null) GET_ALL_DEBTORS_URL = GET_ALL_DEBTORS_URL + '&searchWord=$searchWord';
       return _netUtil.get(GET_ALL_DEBTORS_URL, headers: header).then((dynamic res) {
         if (res['error']) throw res['message'];
         file.writeAsStringSync(jsonEncode(res), flush: true, mode: FileMode.write);

@@ -16,6 +16,7 @@ import 'package:fumzy/screens/dashboard/drawer.dart';
 import 'package:fumzy/utils/constant-styles.dart';
 import 'package:fumzy/utils/functions.dart';
 import 'customer-detail/customer-detail.dart';
+import 'package:fumzy/components/keyboard-controlled.dart';
 
 class Customers extends StatefulWidget {
 
@@ -27,6 +28,22 @@ class Customers extends StatefulWidget {
 
 class _CustomersState extends State<Customers> {
 
+  /// Checking if the _searchController controller is empty to reset
+  _CustomersState(){
+    _search.addListener(() {
+      if (_search.text.isEmpty) {
+        _refreshCustomers();
+        _refreshDebtors();
+      }
+      else {
+        if(_search.text != '' || _search.text.isNotEmpty){
+          _searchCustomer();
+          _searchDebtors();
+        }
+      }
+    });
+  }
+
   /// Instantiating a class of the [FutureValues]
   var futureValue = FutureValues();
 
@@ -36,7 +53,7 @@ class _CustomersState extends State<Customers> {
 
   bool _showSpinner = false;
 
-  TextEditingController search = TextEditingController();
+  TextEditingController _search = TextEditingController();
 
   /// A List to hold the all the customers
   List<AllCustomers> _customers = [];
@@ -64,6 +81,30 @@ class _CustomersState extends State<Customers> {
         _filteredCustomers = _customers;
         _customersLength = _filteredCustomers.length;
         _totalCustomerCount = value['totalCount'];
+      });
+    }).catchError((e){
+      print(e);
+      Functions.showErrorMessage(e);
+    });
+  }
+
+  void _searchCustomer() async {
+    if(!mounted)return;
+    setState(() {
+      _showSpinner = true;
+      _customerPageSize = 1;
+    });
+    Future<Map<String, dynamic>> customers = futureValue.getAllCustomersPaginated(
+        refresh: true, page: _customerPageSize, limit: 50, searchWord: _search.text
+    );
+    await customers.then((value) {
+      _customers.clear();
+      if (!mounted) return;
+      setState(() {
+        _totalCustomerCount = value['totalCount'];
+        _customers.addAll(value['items']);
+        _filteredCustomers = _customers;
+        _showSpinner = false;
       });
     }).catchError((e){
       print(e);
@@ -219,7 +260,6 @@ class _CustomersState extends State<Customers> {
     });
   }
 
-
   /// A List to hold the all the debtors
   List<AllCustomers> _debtors = [];
 
@@ -246,6 +286,30 @@ class _CustomersState extends State<Customers> {
         _filteredDebtors = _debtors;
         _debtorsLength = _filteredDebtors.length;
         _totalDebtorCount = value['totalCount'];
+      });
+    }).catchError((e){
+      print(e);
+      Functions.showErrorMessage(e);
+    });
+  }
+
+  void _searchDebtors() async {
+    if(!mounted)return;
+    setState(() {
+      _showDebtorSpinner = true;
+      _debtorPageSize = 1;
+    });
+    Future<Map<String, dynamic>> customers = futureValue.getAllDebtorsPaginated(
+        refresh: true, page: _debtorPageSize, limit: 50, searchWord: _search.text
+    );
+    await customers.then((value) {
+      _debtors.clear();
+      if (!mounted) return;
+      setState(() {
+        _totalDebtorCount = value['totalCount'];
+        _debtors.addAll(value['items']);
+        _filteredDebtors = _debtors;
+        _showDebtorSpinner = false;
       });
     }).catchError((e){
       print(e);
@@ -449,156 +513,158 @@ class _CustomersState extends State<Customers> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) => (Scaffold(
-        appBar: buildAppBar(constraints, 'CUSTOMERS'),
-        drawer: RefactoredDrawer(title: 'CUSTOMERS'),
-        body: Padding(
-          padding: EdgeInsets.fromLTRB(20, 30, 20, 0),
-          child: DefaultTabController(
-            length: 2,
-            initialIndex: 0,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      'All Customers',
-                      style: TextStyle(
-                        color: Color(0xFF171725),
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14.0,
-                      ),
-                    ),
-                    if(_isAdmin) Button(
-                      onTap: () {
-                        _addNewDebtor(constraints);
-                      },
-                      buttonColor: Color(0xFF00509A),
-                      width: 160,
-                      child: Center(
-                        child: Text(
-                          'Add Debtor',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Color(0xFFFFFFFF),
-                            fontSize: 14,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 35),
-                Container(
-                  child: Row(
+    return KeyboardControlled(
+      child: LayoutBuilder(
+        builder: (context, constraints) => (Scaffold(
+          appBar: buildAppBar(constraints, 'CUSTOMERS'),
+          drawer: RefactoredDrawer(title: 'CUSTOMERS'),
+          body: Padding(
+            padding: EdgeInsets.fromLTRB(20, 30, 20, 0),
+            child: DefaultTabController(
+              length: 2,
+              initialIndex: 0,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Container(
-                        width: 180,
-                        height: 50,
-                        padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 15.0),
-                        margin: EdgeInsets.only(right: 50),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(27.5),
+                      Text(
+                        'All Customers',
+                        style: TextStyle(
+                          color: Color(0xFF171725),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14.0,
                         ),
-                        child: TextField(
-                          textAlign: TextAlign.start,
-                          textInputAction: TextInputAction.search,
-                          controller: search,
-                          decoration: InputDecoration(
-                            suffixIcon: Icon(
-                              IconlyLight.search,
-                              color: Colors.black,
-                              size: 17,
-                            ),
-                            hintText: 'Search',
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                          ),
-                          style: TextStyle(
-                              fontWeight: FontWeight.w400,
-                              fontSize: 15.0,
-                              color: Colors.black
-                          ),
-                        ),
-                      ), //search
-                      InkWell(
+                      ),
+                      if(_isAdmin) Button(
                         onTap: () {
-                          print('filter');
+                          _addNewDebtor(constraints);
                         },
-                        child: Container(
-                          width: 110,
-                          height: 50,
-                          padding: EdgeInsets.all(15),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(3.0),
-                            color: Colors.white,
-                            border: Border.all(
-                              width: 1,
-                              color: Color(0xFFE2E2EA),
+                        buttonColor: Color(0xFF00509A),
+                        width: 160,
+                        child: Center(
+                          child: Text(
+                            'Add Debtor',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Color(0xFFFFFFFF),
+                              fontSize: 14,
+                              fontWeight: FontWeight.normal,
                             ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Filter',
-                                style: TextStyle(
-                                  color: Color(0xFF171725),
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              Icon(
-                                Icons.tune,
-                                color: Colors.black,
-                                size: 18,
-                              ),
-                            ],
                           ),
                         ),
                       ),
                     ],
                   ),
-                ),
-                SizedBox(height: 17),
-                Container(
-                  width: 163,
-                  child: TabBar(
-                    labelStyle: kTabBarTextStyle,
-                    labelColor: Color(0xFF004E92),
-                    unselectedLabelColor: Color(0xFF004E92).withOpacity(0.6),
-                    indicatorColor: Color(0xFF004E92),
-                    indicatorWeight: 3,
-                    tabs: [
-                      Tab(child: Text('All', style: kTabBarTextStyle)),
-                      Tab(child: Text('Debtors', style: kTabBarTextStyle)),
-                    ],
+                  SizedBox(height: 35),
+                  Container(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 180,
+                          height: 50,
+                          padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 15.0),
+                          margin: EdgeInsets.only(right: 50),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(27.5),
+                          ),
+                          child: TextField(
+                            textAlign: TextAlign.start,
+                            textInputAction: TextInputAction.search,
+                            controller: _search,
+                            decoration: InputDecoration(
+                              suffixIcon: Icon(
+                                IconlyLight.search,
+                                color: Colors.black,
+                                size: 17,
+                              ),
+                              hintText: 'Search',
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                            ),
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 15.0,
+                                color: Colors.black
+                            ),
+                          ),
+                        ), //search
+                        InkWell(
+                          onTap: () {
+                            print('filter');
+                          },
+                          child: Container(
+                            width: 110,
+                            height: 50,
+                            padding: EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(3.0),
+                              color: Colors.white,
+                              border: Border.all(
+                                width: 1,
+                                color: Color(0xFFE2E2EA),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Filter',
+                                  style: TextStyle(
+                                    color: Color(0xFF171725),
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.tune,
+                                  color: Colors.black,
+                                  size: 18,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                SizedBox(height: 25),
-                Expanded(
-                  child: TabBarView(
-                    children: [
-                      _buildCustomerList(),
-                      _buildDebtorList(),
-                    ],
+                  SizedBox(height: 17),
+                  Container(
+                    width: 163,
+                    child: TabBar(
+                      labelStyle: kTabBarTextStyle,
+                      labelColor: Color(0xFF004E92),
+                      unselectedLabelColor: Color(0xFF004E92).withOpacity(0.6),
+                      indicatorColor: Color(0xFF004E92),
+                      indicatorWeight: 3,
+                      tabs: [
+                        Tab(child: Text('All', style: kTabBarTextStyle)),
+                        Tab(child: Text('Debtors', style: kTabBarTextStyle)),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                  SizedBox(height: 25),
+                  Expanded(
+                    child: TabBarView(
+                      children: [
+                        _buildCustomerList(),
+                        _buildDebtorList(),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      )),
+        )),
+      ),
     );
   }
 

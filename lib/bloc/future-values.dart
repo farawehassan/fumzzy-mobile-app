@@ -53,27 +53,36 @@ class FutureValues{
   /// A function that fetches all sales in the database with the help of
   /// [SalesDataSource] - paginated
   /// It returns a Map of [<String, dynamic>]
-  Future<Map<String, dynamic>> getAllSalesPaginated({bool? refresh, int? page, limit}) async{
+  Future<Map<String, dynamic>> getAllSalesPaginated({bool? refresh, String? searchWord, int? page, limit}) async{
     var data = SalesDataSource();
-    Future<Map<String, dynamic>> sales = data.getAllSales(refresh: refresh, page: page, limit: limit);
+    Future<Map<String, dynamic>> sales = data.getAllSales(refresh: refresh, searchWord: searchWord, page: page, limit: limit);
     return sales;
   }
+
+  /// A function that fetches all sales in the database with the help of
+  /// [SalesDataSource] - paginated
+  /// It returns a Map of [<String, dynamic>]
+  /*Future<Map<String, dynamic>> getAllSalesDate({String? startDate, String? endDate}) async{
+    var data = SalesDataSource();
+    Future<Map<String, dynamic>> sales = data.getAllSalesDate(startDate: startDate, endDate: endDate);
+    return sales;
+  }*/
 
   /// A function that fetches all purchases in the database with the help of
   /// [ProductDataSource] - paginated
   /// It returns a Map of [<String, dynamic>]
-  Future<Map<String, dynamic>> getAllPurchasesPaginated({bool? refresh, int? page, limit}) async{
+  Future<Map<String, dynamic>> getAllPurchasesPaginated({bool? refresh, String? searchWord, int? page, limit}) async{
     var data = ProductDataSource();
-    Future<Map<String, dynamic>> purchases = data.getAllPurchasesPaginated(refresh: refresh, page: page, limit: limit);
+    Future<Map<String, dynamic>> purchases = data.getAllPurchasesPaginated(refresh: refresh, searchWord: searchWord, page: page, limit: limit);
     return purchases;
   }
 
   /// A function that fetches all product purchases in the database with the help of
   /// [ProductDataSource] - paginated
   /// It returns a [Map]
-  Future<Map<String, dynamic>> getProductPurchases(String productId, {int? page, limit}) async{
+  Future<Map<String, dynamic>> getProductPurchases(String productId, {String? searchWord, int? page, limit}) async{
     var data = ProductDataSource();
-    Future<Map<String, dynamic>> purchases = data.getProductPurchases(productId, page: page, limit: limit);
+    Future<Map<String, dynamic>> purchases = data.getProductPurchases(productId, searchWord: searchWord, page: page, limit: limit);
     return purchases;
   }
 
@@ -107,36 +116,36 @@ class FutureValues{
   ///A function that fetches all expenses in the database with the help of
   ///[ExpenseDataSource]
   ///It returns a list of model[Expense]
-  Future<Map<String, dynamic>> getAllExpense({bool? refresh, int? page, limit}) async{
+  Future<Map<String, dynamic>> getAllExpense({bool? refresh, String? searchWord, int? page, limit}) async{
     var data = ExpenseDataSource();
-    Future<Map<String, dynamic>> expenses = data.getAllExpenses(refresh: refresh, page: page, limit: limit);
+    Future<Map<String, dynamic>> expenses = data.getAllExpenses(refresh: refresh, searchWord: searchWord, page: page, limit: limit);
     return expenses;
   }
 
   /// A function that fetches all customers in the database with the help of
   /// [ProductDataSource] - paginated
   /// It returns a [Map]
-  Future<Map<String, dynamic>> getAllCustomersPaginated({bool? refresh, int? page, limit}) async{
+  Future<Map<String, dynamic>> getAllCustomersPaginated({bool? refresh, String? searchWord, int? page, limit}) async{
     var data = CustomerDataSource();
-    Future<Map<String, dynamic>> customers = data.getAllCustomersPaginated(refresh: refresh, page: page, limit: limit);
+    Future<Map<String, dynamic>> customers = data.getAllCustomersPaginated(refresh: refresh, searchWord: searchWord, page: page, limit: limit);
     return customers;
   }
 
   /// A function that fetches all debtors in the database with the help of
   /// [ProductDataSource] - paginated
   /// It returns a [Map]
-  Future<Map<String, dynamic>> getAllDebtorsPaginated({bool? refresh, int? page, limit}) async{
+  Future<Map<String, dynamic>> getAllDebtorsPaginated({bool? refresh, String? searchWord, int? page, limit}) async{
     var data = CustomerDataSource();
-    Future<Map<String, dynamic>> customers = data.getAllDebtorsPaginated(refresh: refresh, page: page, limit: limit);
+    Future<Map<String, dynamic>> customers = data.getAllDebtorsPaginated(refresh: refresh, searchWord: searchWord, page: page, limit: limit);
     return customers;
   }
 
   /// A function that fetches all creditors in the database with the help of
   /// [CreditorDataSource] - paginated
   /// It returns a [Map]
-  Future<Map<String, dynamic>> getAllCreditorsPaginated({bool? refresh, int? page, limit}) async{
+  Future<Map<String, dynamic>> getAllCreditorsPaginated({bool? refresh, String? searchWord, int? page, limit}) async{
     var data = CreditorDataSource();
-    Future<Map<String, dynamic>> creditors = data.getAllCreditorsPaginated(refresh: refresh, page: page, limit: limit);
+    Future<Map<String, dynamic>> creditors = data.getAllCreditorsPaginated(refresh: refresh, searchWord: searchWord, page: page, limit: limit);
     return creditors;
   }
 

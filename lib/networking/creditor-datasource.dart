@@ -21,7 +21,7 @@ class CreditorDataSource{
 
   /// A function that fetches all creditors in the database GET
   /// It returns a Map of [<String, dynamic>]
-  Future<Map<String, dynamic>> getAllCreditorsPaginated({bool? refresh, int? page, int? limit}) async {
+  Future<Map<String, dynamic>> getAllCreditorsPaginated({bool? refresh, String? searchWord, int? page, int? limit}) async {
     Map<String, dynamic> result = {};
     String fileName = 'creditors-p.json';
     var dir = await getTemporaryDirectory();
@@ -45,6 +45,7 @@ class CreditorDataSource{
         header = {'Authorization': 'Bearer ${value.token}'};
       });
       String GET_ALL_CREDITORS_URL = GET_ALL_CREDITORS_PAGINATED + '?page=$page&limit=$limit';
+      if(searchWord != null) GET_ALL_CREDITORS_URL = GET_ALL_CREDITORS_URL + '&searchWord=$searchWord';
       return _netUtil.get(GET_ALL_CREDITORS_URL, headers: header).then((dynamic res) {
         if (res['error']) throw res['message'];
         file.writeAsStringSync(jsonEncode(res), flush: true, mode: FileMode.write);

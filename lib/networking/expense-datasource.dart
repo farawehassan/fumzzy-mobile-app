@@ -21,7 +21,7 @@ class ExpenseDataSource{
 
   ///A function that fetches all expenses in the database GET
   ///It returns a list of [Expense]
-  Future<Map<String, dynamic>> getAllExpenses({bool? refresh, int? page, int? limit}) async {
+  Future<Map<String, dynamic>> getAllExpenses({bool? refresh, String? searchWord, int? page, int? limit}) async {
     Map<String, dynamic> result = {};
     String fileName = 'expenses.json';
     var dir = await getTemporaryDirectory();
@@ -45,6 +45,7 @@ class ExpenseDataSource{
         header = {'Authorization': 'Bearer ${value.token}'};
       });
       String GET_ALL_EXPENSES_URL = GET_ALL_EXPENSES + '?page=$page&limit=$limit';
+      if(searchWord != null) GET_ALL_EXPENSES_URL = GET_ALL_EXPENSES_URL + '&searchWord=$searchWord';
       return _netUtil.get(GET_ALL_EXPENSES_URL, headers: header).then((dynamic res) {
         if (res['error']) throw res['message'];
         file.writeAsStringSync(jsonEncode(res), flush: true, mode: FileMode.write);

@@ -567,6 +567,12 @@ class _AddSaleState extends State<AddSale> {
                                           child: TypeAheadFormField(
                                             textFieldConfiguration: TextFieldConfiguration(
                                               controller: customer,
+                                              onChanged: (value){
+                                                if(value.isEmpty){
+                                                  if (!mounted) return;
+                                                  setState(() => selectedCustomer = null);
+                                                }
+                                              },
                                               decoration: kTextFieldBorderDecoration.copyWith(
                                                 hintText: 'Customer name',
                                                 contentPadding: EdgeInsets.all(10),
@@ -1063,7 +1069,6 @@ class _AddSaleState extends State<AddSale> {
 
   void _addSales(String paymentMode, String customer, Function next) async{
     var api = SalesDataSource();
-    bool allSaved = true;
     for(int i = 0; i < _realSalesData.length; i++){
       Map<String, dynamic> body = {
         'customerName': customer,
@@ -1079,15 +1084,10 @@ class _AddSaleState extends State<AddSale> {
       }).catchError((e){
         if(!mounted)return;
         print(e);
-        allSaved = false;
         Functions.showErrorMessage(e);
       });
     }
-    if(allSaved) await next();
-    else {
-      Navigator.pop(context);
-      CustomDialog.buildDialog(context, 'Error in adding all sales. Please confirm if any sales was added in transactions first, if any was added, kindly delete them to keep your records clean then add all your sales again');
-    }
+    await next();
   }
 
   Future<void> _addNewCustomer(Map<String, dynamic> body, StateSetter setDialogState, bool receipt) async{

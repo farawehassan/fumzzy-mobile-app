@@ -392,6 +392,7 @@ class _DashboardState extends State<Dashboard> {
       if(e.toString() == 'No internet connection'){
         _getStoreInformation(refresh: false);
       }
+      if(!mounted)return;
       Functions.showErrorMessage(e);
     });
   }
@@ -509,7 +510,7 @@ class _DashboardState extends State<Dashboard> {
             ),
             TotalSalesCard(
                 cardName: 'Outstanding Payment',
-                totalPrice: _storeInfo!.todayOutstandingBalance
+                totalPrice: _storeInfo!.todayOutstandingSalesBalance
             ),
             TotalSalesCard(
               cardName: 'Available Cash',

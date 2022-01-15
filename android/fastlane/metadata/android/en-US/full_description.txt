@@ -1,0 +1,1 @@
+A sales application that manages the products and sales in the store.

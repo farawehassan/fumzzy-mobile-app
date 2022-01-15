@@ -13,6 +13,7 @@ import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:fumzy/utils/constant-styles.dart';
 import 'package:fumzy/utils/functions.dart';
 import 'creditors-detail/creditor-detail.dart';
+import 'package:fumzy/components/keyboard-controlled.dart';
 
 class Creditors extends StatefulWidget {
 
@@ -24,6 +25,20 @@ class Creditors extends StatefulWidget {
 
 class _CreditorsState extends State<Creditors> {
 
+  /// Checking if the _searchController controller is empty to reset
+  _CreditorsState(){
+    _search.addListener(() {
+      if (_search.text.isEmpty) {
+        _refreshCreditors();
+      }
+      else {
+        if(_search.text != '' || _search.text.isNotEmpty){
+          _searchCreditors();
+        }
+      }
+    });
+  }
+
   /// Instantiating a class of the [FutureValues]
   var futureValue = FutureValues();
 
@@ -33,7 +48,7 @@ class _CreditorsState extends State<Creditors> {
 
   bool _showSpinner = false;
 
-  TextEditingController search = TextEditingController();
+  TextEditingController _search = TextEditingController();
 
   /// A List to hold the all the creditors
   List<Creditor> _creditors = [];
@@ -61,6 +76,30 @@ class _CreditorsState extends State<Creditors> {
         _filteredCreditors = _creditors;
         _creditorsLength = _filteredCreditors.length;
         _totalCreditorCount = value['totalCount'];
+      });
+    }).catchError((e){
+      print(e);
+      Functions.showErrorMessage(e);
+    });
+  }
+
+  void _searchCreditors() async {
+    if(!mounted)return;
+    setState(() {
+      _showSpinner = true;
+      _creditorPageSize = 1;
+    });
+    Future<Map<String, dynamic>> customers = futureValue.getAllCreditorsPaginated(
+        refresh: true, page: _creditorPageSize, limit: 50, searchWord: _search.text
+    );
+    await customers.then((value) {
+      _creditors.clear();
+      if (!mounted) return;
+      setState(() {
+        _totalCreditorCount = value['totalCount'];
+        _creditors.addAll(value['items']);
+        _filteredCreditors = _creditors;
+        _showSpinner = false;
       });
     }).catchError((e){
       print(e);
@@ -213,137 +252,140 @@ class _CreditorsState extends State<Creditors> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) => (Scaffold(
-        appBar: buildAppBar(constraints, 'CREDITORS'),
-        drawer: RefactoredDrawer(title: 'CREDITORS'),
-        body: Padding(
-          padding: EdgeInsets.fromLTRB(20, 30, 20, 0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'All Creditors',
-                    style: TextStyle(
-                      color: Color(0xFF171725),
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14.0,
+    return KeyboardControlled(
+      child: LayoutBuilder(
+        builder: (context, constraints) => (Scaffold(
+          appBar: buildAppBar(constraints, 'CREDITORS'),
+          drawer: RefactoredDrawer(title: 'CREDITORS'),
+          body: Padding(
+            padding: EdgeInsets.fromLTRB(20, 30, 20, 0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'All Creditors',
+                      style: TextStyle(
+                        color: Color(0xFF171725),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14.0,
+                      ),
                     ),
-                  ),
-                  Button(
-                    onTap: (){
-                      _addNewCreditor(constraints);
-                    },
-                    buttonColor: Color(0xFF00509A),
-                    width: 160,
-                    child: Center(
-                      child: Text(
-                        'Add New Creditor',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Color(0xFFFFFFFF),
-                          fontSize: 14,
-                          fontWeight: FontWeight.normal,
+                    Button(
+                      onTap: (){
+                        _addNewCreditor(constraints);
+                      },
+                      buttonColor: Color(0xFF00509A),
+                      width: 160,
+                      child: Center(
+                        child: Text(
+                          'Add New Creditor',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Color(0xFFFFFFFF),
+                            fontSize: 14,
+                            fontWeight: FontWeight.normal,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 15),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 20),
-                      Container(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: 180,
-                              height: 50,
-                              padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 15.0),
-                              margin: EdgeInsets.only(right: 50),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(27.5),
-                              ),
-                              child: TextField(
-                                textAlign: TextAlign.start,
-                                textInputAction: TextInputAction.search,
-                                decoration: InputDecoration(
-                                  suffixIcon: Icon(
-                                    IconlyLight.search,
-                                    color: Colors.black,
-                                    size: 17,
-                                  ),
-                                  hintText: 'Search',
-                                  enabledBorder: InputBorder.none,
-                                  focusedBorder: InputBorder.none,
-                                ),
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 15.0,
-                                    color: Colors.black
-                                ),
-                              ),
-                            ), //search
-                            InkWell(
-                              onTap: () {
-                                print('filter');
-                              },
-                              child: Container(
-                                width: 110,
+                  ],
+                ),
+                SizedBox(height: 15),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 20),
+                        Container(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 180,
                                 height: 50,
-                                padding: EdgeInsets.all(15),
+                                padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 15.0),
+                                margin: EdgeInsets.only(right: 50),
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(3.0),
                                   color: Colors.white,
-                                  border: Border.all(
-                                    width: 1,
-                                    color: Color(0xFFE2E2EA),
+                                  borderRadius: BorderRadius.circular(27.5),
+                                ),
+                                child: TextField(
+                                  textAlign: TextAlign.start,
+                                  textInputAction: TextInputAction.search,
+                                  controller: _search,
+                                  decoration: InputDecoration(
+                                    suffixIcon: Icon(
+                                      IconlyLight.search,
+                                      color: Colors.black,
+                                      size: 17,
+                                    ),
+                                    hintText: 'Search',
+                                    enabledBorder: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                  ),
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 15.0,
+                                      color: Colors.black
                                   ),
                                 ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      'Filter',
-                                      style: TextStyle(
-                                        color: Color(0xFF171725),
-                                        fontWeight: FontWeight.normal,
-                                        fontSize: 14,
+                              ), //search
+                              InkWell(
+                                onTap: () {
+                                  print('filter');
+                                },
+                                child: Container(
+                                  width: 110,
+                                  height: 50,
+                                  padding: EdgeInsets.all(15),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(3.0),
+                                    color: Colors.white,
+                                    border: Border.all(
+                                      width: 1,
+                                      color: Color(0xFFE2E2EA),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Filter',
+                                        style: TextStyle(
+                                          color: Color(0xFF171725),
+                                          fontWeight: FontWeight.normal,
+                                          fontSize: 14,
+                                        ),
                                       ),
-                                    ),
-                                    Icon(
-                                      Icons.tune,
-                                      color: Colors.black,
-                                      size: 18,
-                                    ),
-                                  ],
+                                      Icon(
+                                        Icons.tune,
+                                        color: Colors.black,
+                                        size: 18,
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 37),
-                      _buildCreditorList()
-                    ],
+                        SizedBox(height: 37),
+                        _buildCreditorList()
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      )),
+        )),
+      ),
     );
   }
 

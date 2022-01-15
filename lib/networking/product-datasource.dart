@@ -23,7 +23,7 @@ class ProductDataSource{
 
   /// A function that fetches all purchases in the database GET
   /// It returns a Map of [<String, dynamic>]
-  Future<Map<String, dynamic>> getAllPurchasesPaginated({bool? refresh, int? page, int? limit}) async {
+  Future<Map<String, dynamic>> getAllPurchasesPaginated({bool? refresh, String? searchWord, int? page, int? limit}) async {
     Map<String, dynamic> result = {};
     String fileName = 'purchases.json';
     var dir = await getTemporaryDirectory();
@@ -47,6 +47,7 @@ class ProductDataSource{
         header = {'Authorization': 'Bearer ${value.token}'};
       });
       String GET_ALL_PURCHASES_URL = GET_ALL_PURCHASES_PAGINATED + '?page=$page&limit=$limit';
+      if(searchWord != null) GET_ALL_PURCHASES_URL = GET_ALL_PURCHASES_URL + '&searchWord=$searchWord';
       return _netUtil.get(GET_ALL_PURCHASES_URL, headers: header).then((dynamic res) {
         if (res['error']) throw res['message'];
         file.writeAsStringSync(jsonEncode(res), flush: true, mode: FileMode.write);
@@ -67,7 +68,7 @@ class ProductDataSource{
 
   /// A function that fetches all products purchases in the database -paginated GET
   /// It returns a [Map]
-  Future<Map<String, dynamic>> getProductPurchases(String productId, {int? page, int? limit}) async {
+  Future<Map<String, dynamic>> getProductPurchases(String productId, {String? searchWord, int? page, int? limit}) async {
     Map<String, dynamic> result = {};
     late Map<String, String> header;
     Future<User> user = _futureValue.getCurrentUser();
@@ -76,6 +77,7 @@ class ProductDataSource{
       header = {'Authorization': 'Bearer ${value.token}'};
     });
     String GET_PRODUCT_PURCHASES = GET_PURCHASES_BY_PRODUCT + '/$productId?page=$page&limit=$limit';
+    if(searchWord != null) GET_PRODUCT_PURCHASES = GET_PRODUCT_PURCHASES + '&searchWord=$searchWord';
     return _netUtil.get(GET_PRODUCT_PURCHASES, headers: header).then((dynamic res) {
       if (res['error']) throw res['message'];
       List<Purchase> allPurchases = [];

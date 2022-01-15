@@ -17,10 +17,14 @@ import 'package:fumzy/model/sales.dart';
 import 'package:fumzy/networking/product-datasource.dart';
 import 'package:fumzy/screens/dashboard/drawer.dart';
 import 'package:fumzy/utils/constant-styles.dart';
+import 'package:fumzy/utils/dob-utils.dart';
 import 'package:fumzy/utils/functions.dart';
+import 'package:fumzy/components/keyboard-controlled.dart';
+import 'package:fumzy/utils/size-config.dart';
 import 'expense-info.dart';
 import 'sales-info.dart';
 import 'add-sale.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 
 class Transactions extends StatefulWidget {
 
@@ -38,6 +42,24 @@ class Transactions extends StatefulWidget {
 
 class _TransactionsState extends State<Transactions> {
 
+  /// Checking if the _searchController controller is empty to reset
+  _TransactionsState(){
+    _search.addListener(() {
+      if (_search.text.isEmpty) {
+        _refreshSales();
+        //_refreshPurchases();
+        _refreshExpenses();
+      }
+      else {
+        if(_search.text != '' || _search.text.isNotEmpty){
+          _searchSales();
+          //_searchPurchases();
+          _searchExpenses();
+        }
+      }
+    });
+  }
+
   /// Instantiating a class of the [FutureValues]
   var futureValue = FutureValues();
 
@@ -46,7 +68,7 @@ class _TransactionsState extends State<Transactions> {
   final GlobalKey<RefreshIndicatorState> _refreshSalesKey = GlobalKey<RefreshIndicatorState>();
   final GlobalKey<RefreshIndicatorState> _refreshExpenseKey = GlobalKey<RefreshIndicatorState>();
 
-  TextEditingController search = TextEditingController();
+  TextEditingController _search = TextEditingController();
 
   ///[CONTROLLERS] and [KEY] for [EXPENSE DIALOG]
   final _expenseFormKey = GlobalKey<FormState>();
@@ -60,6 +82,13 @@ class _TransactionsState extends State<Transactions> {
   TextEditingController _sellingPrice = TextEditingController();
   TextEditingController _quantity = TextEditingController();
   TextEditingController _sellersName = TextEditingController();
+
+  List<String> _allFilter = [
+    'Names',
+    'Date and Time',
+  ];
+
+  String _selectedFilter = 'Names';
 
   bool _showSpinner = false;
 
@@ -95,6 +124,30 @@ class _TransactionsState extends State<Transactions> {
         _filteredExpenses = _expenses;
         _expensesLength = _filteredExpenses.length;
         _totalExpenseCount = value['totalCount'];
+      });
+    }).catchError((e){
+      print(e);
+      Functions.showErrorMessage(e);
+    });
+  }
+
+  void _searchExpenses() async {
+    if(!mounted)return;
+    setState(() {
+      _showExpenseSpinner = true;
+      _expensePageSize = 1;
+    });
+    Future<Map<String, dynamic>> expenses = futureValue.getAllExpense(
+        refresh: true, page: _expensePageSize, limit: 50, searchWord: _search.text
+    );
+    await expenses.then((value) {
+      _expenses.clear();
+      if (!mounted) return;
+      setState(() {
+        _totalExpenseCount = value['totalCount'];
+        _expenses.addAll(value['items']);
+        _filteredExpenses = _expenses;
+        _showExpenseSpinner = false;
       });
     }).catchError((e){
       print(e);
@@ -272,6 +325,30 @@ class _TransactionsState extends State<Transactions> {
     });
   }
 
+  void _searchPurchases() async {
+    if(!mounted)return;
+    setState(() {
+      _showPurchaseSpinner = true;
+      _purchasePageSize = 1;
+    });
+    Future<Map<String, dynamic>> products = futureValue.getAllPurchasesPaginated(
+        refresh: true, page: _purchasePageSize, limit: 50, searchWord: _search.text
+    );
+    await products.then((value) {
+      _purchases.clear();
+      if (!mounted) return;
+      setState(() {
+        _totalPurchaseCount = value['totalCount'];
+        _purchases.addAll(value['items']);
+        _filteredPurchases = _purchases;
+        _showPurchaseSpinner = false;
+      });
+    }).catchError((e){
+      print(e);
+      Functions.showErrorMessage(e);
+    });
+  }
+
   Future _loadMorePurchases() async {
     setState(() { _purchasePageSize += 1; });
     Future<Map<String, dynamic>> purchases = futureValue.getAllPurchasesPaginated(page: _purchasePageSize, limit: 50);
@@ -428,6 +505,30 @@ class _TransactionsState extends State<Transactions> {
         _filteredSales = _sales;
         _saleLength = _filteredSales.length;
         _totalSaleCount = value['totalCount'];
+      });
+    }).catchError((e){
+      print(e);
+      Functions.showErrorMessage(e);
+    });
+  }
+
+  void _searchSales() async {
+    if(!mounted)return;
+    setState(() {
+      _showSaleSpinner = true;
+      _salePageSize = 1;
+    });
+    Future<Map<String, dynamic>> sales = futureValue.getAllSalesPaginated(
+        refresh: true, page: _salePageSize, limit: 50, searchWord: _search.text
+    );
+    await sales.then((value) {
+      _sales.clear();
+      if (!mounted) return;
+      setState(() {
+        _totalSaleCount = value['totalCount'];
+        _sales.addAll(value['items']);
+        _filteredSales = _sales;
+        _showSaleSpinner = false;
       });
     }).catchError((e){
       print(e);
@@ -612,11 +713,7 @@ class _TransactionsState extends State<Transactions> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: (){
-        FocusScopeNode currentFocus = FocusScope.of(context);
-        if(!currentFocus.hasPrimaryFocus) currentFocus.unfocus();
-      },
+    return KeyboardControlled(
       child: LayoutBuilder(
         builder: (context, constraints) => (Scaffold(
           appBar: buildAppBar(constraints, 'TRANSACTIONS'),
@@ -729,7 +826,7 @@ class _TransactionsState extends State<Transactions> {
                           child: TextField(
                             textAlign: TextAlign.start,
                             textInputAction: TextInputAction.search,
-                            controller: search,
+                            controller: _search,
                             decoration: InputDecoration(
                               suffixIcon: Icon(
                                 IconlyLight.search,
@@ -747,40 +844,66 @@ class _TransactionsState extends State<Transactions> {
                             ),
                           ),
                         ), //search
-                        InkWell(
-                          onTap: () {
-                            print('filter');
-                          },
-                          child: Container(
-                            width: 110,
-                            height: 50,
-                            padding: EdgeInsets.all(15),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(3.0),
-                              color: Colors.white,
-                              border: Border.all(
-                                width: 1,
-                                color: Color(0xFFE2E2EA),
+                        SizedBox(
+                          width: 144,
+                          child: DropdownButtonFormField<String>(
+                            value: _selectedFilter,
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedFilter = value!;
+                              });
+                              if(_selectedFilter == _allFilter[1]){
+                                _showFilterModal(context);
+                              }
+                            },
+                            style: TextStyle(
+                              color: Color(0xFF171725),
+                              fontWeight: FontWeight.normal,
+                              fontSize: 14,
+                            ),
+                            icon: Icon(
+                              Icons.tune,
+                              color: Colors.black,
+                              size: 18,
+                            ),
+                            isExpanded: false,
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.fromLTRB(10, 5, 5, 5),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(3.0),
+                                borderSide: BorderSide(
+                                  width: 1,
+                                  color: Color(0xFFE2E2EA),
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(3.0),
+                                borderSide: BorderSide(
+                                  width: 1,
+                                  color: Color(0xFFE2E2EA),
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(3.0),
+                                borderSide: BorderSide(
+                                  width: 1,
+                                  color: Color(0xFFE2E2EA),
+                                ),
                               ),
                             ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Filter',
+                            items: _allFilter.map((value) {
+                              return DropdownMenuItem(
+                                child: Text(
+                                  value,
                                   style: TextStyle(
                                     color: Color(0xFF171725),
                                     fontWeight: FontWeight.normal,
                                     fontSize: 14,
                                   ),
                                 ),
-                                Icon(
-                                  Icons.tune,
-                                  color: Colors.black,
-                                  size: 18,
-                                ),
-                              ],
-                            ),
+                                value: value,
+                              );
+                            }).toList(),
                           ),
                         ),
                       ],
@@ -818,6 +941,285 @@ class _TransactionsState extends State<Transactions> {
           ),
         )),
       ),
+    );
+  }
+
+  /// A [TextEditingController] to control the input text for the start date
+  TextEditingController _startDateController = TextEditingController();
+
+  DateTime? _startDate;
+
+  /// A [TextEditingController] to control the input text for the end date
+  TextEditingController _endDateController = TextEditingController();
+
+  DateTime? _endDate;
+
+  bool _showRecordSpinner = false;
+
+  /// Function to show the modal sheet tom filter transactions
+  void _showFilterModal(BuildContext context) {
+    showModalBottomSheet(
+      backgroundColor: Colors.transparent,
+      context: context,
+      builder: (BuildContext bc) {
+        return StatefulBuilder(builder: (context, setModalState) {
+          return Material(
+            type: MaterialType.transparency,
+            child: Container(
+              padding: EdgeInsets.fromLTRB(0, 20, 0, 45),
+              width: SizeConfig.screenWidth,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+                color: Color(0xFFFFFFFF),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                    margin: EdgeInsets.only(left: 15, right: 15),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Filter Transactions',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontStyle: FontStyle.normal,
+                            fontSize: 15,
+                            fontFamily: 'Circular Std Book',
+                            color: Color(0xFF00509A),
+                          ),
+                        ),
+                        InkWell(
+                          onTap: (){
+                            Navigator.pop(context);
+                          },
+                          child: Icon(
+                            Icons.close_sharp,
+                            size: 24,
+                            color: Color(0xFFFF2A52),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Container(
+                    height: 1,
+                    width: SizeConfig.screenWidth,
+                    color: Color(0xFF000000).withOpacity(0.5),
+                  ),
+                  SizedBox(height: 10),
+                  Container(
+                    margin: EdgeInsets.only(left: 15, right: 15),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Date',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontStyle: FontStyle.normal,
+                            fontSize: 14,
+                            fontFamily: 'Circular Std Book',
+                            color: Color(0xFF00509A),
+                          ),
+                        ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: (SizeConfig.screenWidth! / 3) - 45,
+                              child: TextFormField(
+                                controller: _startDateController,
+                                readOnly: true,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.normal,
+                                  fontStyle: FontStyle.normal,
+                                  fontSize: 14,
+                                  color: Color(0xFF00509A),
+                                ),
+                                onTap: (){
+                                  _showStartDateTime(setModalState);
+                                },
+                                decoration: InputDecoration(
+                                  hintText: 'Start Date',
+                                  hintStyle: TextStyle(
+                                    fontWeight: FontWeight.normal,
+                                    fontStyle: FontStyle.normal,
+                                    fontSize: 14,
+                                    color: Color(0xFF00509A).withOpacity(0.5),
+                                  ),
+                                  enabledBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(width: 0.2, color: Color(0xFF979797)),
+                                  ),
+                                  focusedBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(width: 0.2, color: Color(0xFF000428)),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            Container(
+                              height: 1,
+                              width: 10,
+                              color: Color(0xFF000000).withOpacity(0.5),
+                            ),
+                            SizedBox(width: 10),
+                            Container(
+                              width: (SizeConfig.screenWidth! / 3) - 45,
+                              child: TextFormField(
+                                controller: _endDateController,
+                                readOnly: true,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.normal,
+                                  fontStyle: FontStyle.normal,
+                                  fontSize: 14,
+                                  color: Color(0xFF00509A),
+                                ),
+                                onTap: (){
+                                  _showEndDateTime(setModalState);
+                                },
+                                decoration: InputDecoration(
+                                  hintText: 'End Date',
+                                  hintStyle: TextStyle(
+                                    fontWeight: FontWeight.normal,
+                                    fontStyle: FontStyle.normal,
+                                    fontSize: 14,
+                                    color: Color(0xFF00509A).withOpacity(0.5),
+                                  ),
+                                  enabledBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(width: 0.2, color: Color(0xFF979797)),
+                                  ),
+                                  focusedBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(width: 0.2, color: Color(0xFF000428)),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 35),
+                  Button(
+                    onTap: (){
+                      setModalState(() {
+                        _showRecordSpinner = true;
+                      });
+                      //_loadTransactions(setModalState);
+                    },
+                    buttonColor: Color(0xFF00509A),
+                    child: Center(
+                      child: _showRecordSpinner
+                          ? CircleProgressIndicator()
+                          : Text(
+                        'Display Records',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Color(0xFFFFFFFF),
+                          fontSize: 14,
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+      },
+    );
+  }
+
+  void _loadTransactions(StateSetter setModalState) async {
+    if(!mounted)return;
+    setState(() {
+      _showSaleSpinner = true;
+      _salePageSize = 1;
+    });
+    Future<Map<String, dynamic>> sales = futureValue.getAllSalesPaginated(
+        refresh: true, page: _salePageSize, limit: 50,
+        //startDate: _startDate.toString(), endDate: _endDate.toString()
+    );
+    await sales.then((value) {
+      _sales.clear();
+      if (!mounted) return;
+      setState(() {
+        _totalSaleCount = value['totalCount'];
+        _sales.addAll(value['items']);
+        _filteredSales = _sales;
+        _showSaleSpinner = false;
+      });
+    }).catchError((e) {
+      print(e);
+      Functions.showErrorMessage(e);
+    });
+  }
+
+  /// Function to show the bottom date time picker for selecting start date
+  void _showStartDateTime(StateSetter setModalState){
+    DateTime start = DateTime(2020, 12, 1);
+    DateTime now = DateTime.now();
+    DatePicker.showDatePicker(
+        context,
+        showTitleActions: true,
+        minTime: start,
+        maxTime: now,
+        onChanged: (date) {
+          if(!mounted)return;
+          setModalState(() {
+            _startDateController.text = DOBUtils.combineDateOfBirth(date);
+            _startDate = date;
+          });
+        },
+        onConfirm: (date) {
+          if(!mounted)return;
+          setModalState(() {
+            _startDateController.text = DOBUtils.combineDateOfBirth(date);
+            _startDate = date;
+          });
+        },
+        currentTime: now,
+        locale: LocaleType.en
+    );
+  }
+
+  /// Function to show the bottom date time picker for selecting end date
+  void _showEndDateTime(StateSetter setModalState){
+    DateTime start = DateTime(2020, 12, 1);
+    DateTime now = DateTime.now();
+    DatePicker.showDatePicker(
+        context,
+        showTitleActions: true,
+        minTime: start,
+        maxTime: now,
+        onChanged: (date) {
+          if(!mounted)return;
+          setModalState(() {
+            _endDateController.text = DOBUtils.combineDateOfBirth(date);
+            _endDate = date;
+          });
+        },
+        onConfirm: (date) {
+          if(!mounted)return;
+          setModalState(() {
+            _endDateController.text = DOBUtils.combineDateOfBirth(date);
+            _endDate = date;
+          });
+        },
+        currentTime: now,
+        locale: LocaleType.en
     );
   }
 

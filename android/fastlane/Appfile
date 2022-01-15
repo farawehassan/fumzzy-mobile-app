@@ -1,0 +1,2 @@
+json_key_file("/Users/mrfarawe/Flutter\ Workspace/fumzzy-mobile-app/pc-api-6781754472483094219-375-bdc599bbe0e4.json") # Path to the json secret file - Follow https://docs.fastlane.tools/actions/supply/#setup to get one
+package_name("com.fumzy.mobile") # e.g. com.krausefx.app
